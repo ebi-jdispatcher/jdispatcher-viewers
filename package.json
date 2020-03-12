@@ -1,0 +1,21 @@
+{
+    "name": "jdispatcher-viewers",
+    "version": "0.0.1",
+    "description": "Viewers for Job Dispatcher tool outputs",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "lite-server"
+    },
+    "author": "Fábio Madeira",
+    "repository": "https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.22.0",
+        "@typescript-eslint/parser": "^2.22.0",
+        "eslint": "^6.8.0",
+        "lite-server": "^2.5.4",
+        "fabric": "4.0.0-beta.7",
+        "@types/node": "13.9.0"
+    }
+}
