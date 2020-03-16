@@ -5,18 +5,25 @@
     "main": "app.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "lite-server"
+        "start": "webpack-dev-server",
+        "build": "webpack --config webpack.config.prod.js"
     },
     "author": "Fábio Madeira",
     "repository": "https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers",
     "license": "Apache-2.0",
     "devDependencies": {
+        "@types/fabric": "3.6.2",
+        "@types/node": "13.9.0",
         "@typescript-eslint/eslint-plugin": "^2.22.0",
         "@typescript-eslint/parser": "^2.22.0",
+        "clean-webpack-plugin": "^3.0.0",
+        "commonjs": "0.0.1",
         "eslint": "^6.8.0",
-        "lite-server": "^2.5.4",
         "fabric": "3.6.2",
-        "@types/node": "13.9.0",
-        "@types/fabric": "3.6.2"
+        "ts-loader": "^6.2.1",
+        "typescript": "^3.8.3",
+        "webpack": "^4.42.0",
+        "webpack-cli": "^3.3.11",
+        "webpack-dev-server": "^3.10.3"
     }
 }
