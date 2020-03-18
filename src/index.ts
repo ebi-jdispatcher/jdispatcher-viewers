@@ -1,6 +1,19 @@
+import { FabricjsRenderer } from "./app";
+import { SSSResultModel } from "./data-model";
+import { default as mockDataObj } from "./testdata/ncbiblast.json";
+
+enum CanvasStatus {
+  New = "new",
+  Rendered = "rendered"
+}
+
 // Input Data Type
 class CanvasType {
-  constructor(public jobId: string, public dataObj: object) {}
+  constructor(
+    public jobId: string,
+    public dataObj: SSSResultModel,
+    public status: CanvasStatus
+  ) {}
 }
 
 type Listener = (items: CanvasType[]) => void;
@@ -27,11 +40,11 @@ class canvasState {
     this.listener = listenerFn;
   }
 
-  addCanvas(jobId: string, dataObj: object) {
+  addCanvas(jobId: string, dataObj: SSSResultModel, status: CanvasStatus) {
     if (this.jobIds.length === 0 || !this.jobIds.includes(jobId)) {
       this.canvasInstances = [];
       this.jobIds.push(jobId);
-      const newCanvasInstance = new CanvasType(jobId, dataObj);
+      const newCanvasInstance = new CanvasType(jobId, dataObj, status);
       this.canvasInstances.push(newCanvasInstance);
 
       this.listener(this.canvasInstances.slice());
@@ -134,7 +147,12 @@ class jobIdInputForm {
     };
 
     if (validate(formValidatable)) {
-      canvasInstance.addCanvas(jobId, {});
+      if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+        canvasInstance.addCanvas(jobId, mockDataObj, CanvasStatus.New);
+      } else {
+        alert("Fetching from live service not yet implemented!");
+        return;
+      }
     } else {
       alert("The jobId provided is not valid!");
       return;
@@ -175,7 +193,10 @@ class CanvasRenderer {
 
     this.canvasInstance = [];
     canvasInstance.addListener((canvasInstance: CanvasType[]) => {
-      this.canvasInstance = canvasInstance;
+      const filteredInstances = canvasInstance.filter(
+        inst => inst.status === CanvasStatus.New
+      );
+      this.canvasInstance = filteredInstances;
       this.renderCanvas();
     });
   }
@@ -187,8 +208,12 @@ class CanvasRenderer {
     )!.textContent = `Visual Output for ${this.canvasInstance[0].jobId}`;
     this.hostElement.insertAdjacentElement("beforeend", this.elementTitle);
     this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
+    new FabricjsRenderer({
+      jobId: this.canvasInstance[0].jobId,
+      dataObj: this.canvasInstance[0].dataObj
+    });
   }
 }
 
-const jobIdForm = new jobIdInputForm();
-const canvasRender = new CanvasRenderer();
+new jobIdInputForm();
+new CanvasRenderer();
