@@ -171,10 +171,10 @@ class CanvasRenderer {
 
   constructor() {
     this.templateElement = document.getElementById(
-      "output-vis"
+      "output-vis-canvas"
     )! as HTMLTemplateElement;
     this.templateElementTitle = document.getElementById(
-      "output-vis"
+      "output-vis-title"
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById(
       "visual-output-app"
@@ -189,7 +189,7 @@ class CanvasRenderer {
       this.templateElementTitle.content,
       true
     );
-    this.elementTitle = importedHTMLcontentTitle.firstElementChild as HTMLDivElement;
+    this.elementTitle = importedHTMLcontentTitle.firstElementChild as HTMLHeadingElement;
 
     this.canvasInstance = [];
     canvasInstance.addListener((canvasInstance: CanvasType[]) => {
