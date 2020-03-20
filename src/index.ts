@@ -202,16 +202,17 @@ class CanvasRenderer {
   }
 
   private renderCanvas() {
-    console.log(this.canvasInstance);
     this.elementTitle.querySelector(
       "h3"
     )!.textContent = `Visual Output for ${this.canvasInstance[0].jobId}`;
     this.hostElement.insertAdjacentElement("beforeend", this.elementTitle);
     this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
-    new FabricjsRenderer({
+    const fabricjs = new FabricjsRenderer({
       jobId: this.canvasInstance[0].jobId,
       dataObj: this.canvasInstance[0].dataObj
     });
+    // TODO add export as SVG and PNG - clickEvents
+    console.log(fabricjs.canvas.renderCanvas);
   }
 }
 
