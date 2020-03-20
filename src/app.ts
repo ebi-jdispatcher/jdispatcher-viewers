@@ -6,6 +6,7 @@ interface TextType {
     fontSize: number;
     selectable: boolean;
     evented: boolean;
+    objectCaching: false;
     top?: number;
     left?: number;
     right?: number;
@@ -19,6 +20,7 @@ interface TextType {
 interface LineType {
     selectable: boolean;
     evented: boolean;
+    objectCaching: false;
     top?: number;
     left?: number;
     right?: number;
@@ -30,16 +32,23 @@ interface LineType {
 interface GroupType {
     selectable: boolean;
     evented: boolean;
+    objectCaching: false;
     [key: string]: any;
 }
 
 class Defaults {
     public static canvasWidth: number = 1000;
     public static canvasHeight: number = 110;
+    public static maxPixels: number = (65.0 * Defaults.canvasWidth) / 100;
+    public static evaluePixels: number = (8.0 * Defaults.canvasWidth) / 100;
+    public static leftPaddingPixels: number =
+        (26.5 * Defaults.canvasWidth) / 100;
+    public static borderPixels: number = (0.15 * Defaults.canvasWidth) / 100;
     public static fontSize: number = 12;
     public static groupConfig: GroupType = {
         selectable: false,
-        evented: false
+        evented: false,
+        objectCaching: false
     };
     constructor() {}
 }
@@ -51,14 +60,16 @@ class CanvasType {
 
 // Object Renderers
 class HeaderRenderer {
-    constructor(private canvasObj: CanvasType, private topAdjust: number) {}
-    public drawHeaderTextGroup() {
+    constructor(private canvasObj: CanvasType, private topPadding: number) {}
+    public drawHeaderTextGroup(): [fabric.Group, number] {
+        const origTopPadding = this.topPadding;
         let textObj: TextType = {
             fontWeight: "bold",
             fontSize: Defaults.fontSize + 1,
             selectable: false,
             evented: false,
-            top: this.topAdjust + 0,
+            objectCaching: false,
+            top: this.topPadding,
             left: 5
         };
         // program & version
@@ -76,24 +87,27 @@ class HeaderRenderer {
         const dbs: string = db_names.join(", ");
         textObj.fontWeight = "normal";
         textObj.fontSize = Defaults.fontSize;
-        textObj.top = this.topAdjust + 12;
+        this.topPadding += 12;
+        textObj.top = this.topPadding;
         const databaseText = new fabric.Text(`Database(s): ${dbs}`, textObj);
         // Sequence
         const sequence = this.canvasObj.dataObj.query_def;
-        textObj.top = this.topAdjust + 24;
+        this.topPadding += 12;
+        textObj.top = this.topPadding;
         const sequenceText = new fabric.Text(`Sequence: ${sequence}`, textObj);
         // Length
         const length = this.canvasObj.dataObj.query_len;
-        textObj.top = this.topAdjust + 36;
+        this.topPadding += 12;
+        textObj.top = this.topPadding;
         const lengthText = new fabric.Text(`Length: ${length}`, textObj);
         // Start
         const start = this.canvasObj.dataObj.start;
-        textObj.top = this.topAdjust + 0;
+        textObj.top = origTopPadding;
         textObj.left = Defaults.canvasWidth - 133;
         const startText = new fabric.Text(`${start}`, textObj);
         // End
         const end = this.canvasObj.dataObj.end;
-        textObj.top = this.topAdjust + 12;
+        textObj.top = origTopPadding + 12;
         const endText = new fabric.Text(`${end}`, textObj);
         const textGroup = new fabric.Group(
             [
@@ -106,31 +120,33 @@ class HeaderRenderer {
             ],
             Defaults.groupConfig
         );
-        return textGroup;
+        return [textGroup, this.topPadding];
     }
 }
 
 class FooterRenderer {
-    constructor(private topAdjust: number) {}
-    public drawFooterTextGroup() {
+    constructor(private topPadding: number) {}
+    public drawFooterTextGroup(): [fabric.Text, number] {
         let textObj: TextType = {
             fontWeight: "normal",
             fontSize: Defaults.fontSize,
             selectable: false,
             evented: false,
-            top: this.topAdjust + 0,
+            objectCaching: false,
+            top: this.topPadding + 0,
             left: 0,
             textAlign: "center"
         };
         const copyright =
-            "European Bioinformatics Institute 2006-2020. EBI is an Outstation of the European Molecular Biology Laboratory.";
+            `European Bioinformatics Institute 2006-2020. ` +
+            `EBI is an Outstation of the European Molecular Biology Laboratory.`;
         const copyrightText = new fabric.Text(`${copyright}`, textObj);
         copyrightText.width = Defaults.canvasWidth;
-        return copyrightText;
+        return [copyrightText, this.topPadding];
     }
 }
 
-function findPositionFactor(inputString: string) {
+function getHorizontalPaddingFactor(inputString: string): number {
     let positionFactor = 0;
     if (inputString.length === 1) {
         positionFactor = 2.5;
@@ -144,13 +160,146 @@ function findPositionFactor(inputString: string) {
     return positionFactor;
 }
 
+function getPixelCoordinates(
+    queryLen: number,
+    subjLen: number,
+    subjHspLen: number,
+    evalPixels: boolean = false
+) {
+    const totalLen: number = queryLen + subjLen;
+    const totalQueryPixels: number =
+        (queryLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
+    // const totalSubjPixels: number =
+    //     (subjLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
+    const subjDiffPixels: number =
+        (subjHspLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
+    const startQueryPixels = Defaults.leftPaddingPixels + Defaults.borderPixels;
+    const endQueryPixels =
+        Defaults.leftPaddingPixels + totalQueryPixels - Defaults.borderPixels;
+    const startSubjPixels =
+        Defaults.leftPaddingPixels +
+        totalQueryPixels +
+        Defaults.evaluePixels +
+        Defaults.borderPixels;
+    const endSubjPixels =
+        Defaults.leftPaddingPixels +
+        totalQueryPixels +
+        Defaults.evaluePixels +
+        subjDiffPixels -
+        Defaults.borderPixels;
+    if (evalPixels) {
+        const startEvalPixels =
+            Defaults.leftPaddingPixels +
+            totalQueryPixels +
+            Defaults.borderPixels;
+        const endEvalPixels =
+            Defaults.leftPaddingPixels +
+            totalQueryPixels +
+            Defaults.evaluePixels -
+            Defaults.borderPixels;
+        return [
+            startQueryPixels,
+            endQueryPixels,
+            startEvalPixels,
+            endEvalPixels,
+            startSubjPixels,
+            endSubjPixels
+        ];
+    }
+    return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
+}
+
+function drawLineTracks(
+    startQueryPixels: number,
+    endQueryPixels: number,
+    startSubjPixels: number,
+    endSubjPixels: number,
+    topPadding: number,
+    strokeWidth: number
+): [fabric.Group, number] {
+    const top: number = 15;
+    let lineObj: LineType = {
+        selectable: false,
+        evented: false,
+        objectCaching: false,
+        top: topPadding + top,
+        stroke: "black",
+        strokeWidth: strokeWidth
+    };
+    //  Query
+    const coordsQuery: [number, number, number, number] = [
+        startQueryPixels,
+        topPadding + top,
+        endQueryPixels,
+        topPadding + top
+    ];
+    lineObj.left = startQueryPixels;
+    const queryLine = new fabric.Line(coordsQuery, lineObj);
+
+    const coordsQueryStartCap: [number, number, number, number] = [
+        startQueryPixels,
+        topPadding + top - 3,
+        startQueryPixels,
+        topPadding + top + 3
+    ];
+    lineObj.top = topPadding + top - 2;
+    const queryStartCap = new fabric.Line(coordsQueryStartCap, lineObj);
+
+    const coordsQueryEndCap: [number, number, number, number] = [
+        endQueryPixels,
+        topPadding + top - 3,
+        endQueryPixels,
+        topPadding + top + 3
+    ];
+    lineObj.left = endQueryPixels;
+    const queryEndCap = new fabric.Line(coordsQueryEndCap, lineObj);
+
+    // Subject
+    const coordsSubj: [number, number, number, number] = [
+        startSubjPixels,
+        topPadding + top,
+        endSubjPixels,
+        topPadding + top
+    ];
+    lineObj.top = topPadding + top;
+    lineObj.left = startSubjPixels;
+    const subjLine = new fabric.Line(coordsSubj, lineObj);
+
+    const coordsSubjStartCap: [number, number, number, number] = [
+        startSubjPixels,
+        topPadding + top - 3,
+        startSubjPixels,
+        topPadding + top + 3
+    ];
+    lineObj.top = topPadding + top - 2;
+    const subjStartCap = new fabric.Line(coordsSubjStartCap, lineObj);
+
+    const coordsSubjEndCap: [number, number, number, number] = [
+        endSubjPixels,
+        topPadding + top - 3,
+        endSubjPixels,
+        topPadding + top + 3
+    ];
+    lineObj.left = endSubjPixels;
+    const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
+
+    const lineGroup = new fabric.Group(
+        [
+            queryLine,
+            subjLine,
+            queryStartCap,
+            queryEndCap,
+            subjStartCap,
+            subjEndCap
+        ],
+        Defaults.groupConfig
+    );
+    return [lineGroup, topPadding + top];
+}
+
 class ContentHeaderRenderer {
-    private maxPixels: number = (65.0 * Defaults.canvasWidth) / 100;
-    private evaluePixels: number = (7.0 * Defaults.canvasWidth) / 100;
-    private leftpadPixels: number = (27.5 * Defaults.canvasWidth) / 100;
-    private borderPixels: number = (0.15 * Defaults.canvasWidth) / 100;
-    private queryPixels: number;
-    private subjPixels: number;
+    private queryLen: number = 0;
+    private subjLen: number = 0;
     private startQueryPixels: number;
     private endQueryPixels: number;
     private startEvalPixels: number;
@@ -158,65 +307,51 @@ class ContentHeaderRenderer {
     private startSubjPixels: number;
     private endSubjPixels: number;
 
-    constructor(
-        public canvasObj: CanvasType,
-        private queryLen: number,
-        private subjLen: number,
-        private topAdjust: number
-    ) {
-        const totalLen: number = this.queryLen + this.subjLen;
-        this.queryPixels =
-            (this.queryLen * this.maxPixels - this.evaluePixels) / totalLen;
-        this.subjPixels =
-            (this.subjLen * this.maxPixels - this.evaluePixels) / totalLen;
-        this.startQueryPixels = this.leftpadPixels + this.borderPixels;
-        this.endQueryPixels =
-            this.leftpadPixels + this.queryPixels - this.borderPixels;
-        this.startEvalPixels =
-            this.leftpadPixels + this.queryPixels + this.borderPixels;
-        this.endEvalPixels =
-            this.leftpadPixels +
-            this.queryPixels +
-            this.evaluePixels -
-            this.borderPixels;
-        this.startSubjPixels =
-            this.leftpadPixels +
-            this.queryPixels +
-            this.evaluePixels +
-            this.borderPixels;
-        this.endSubjPixels =
-            this.leftpadPixels +
-            this.queryPixels +
-            this.evaluePixels +
-            this.subjPixels -
-            this.borderPixels;
+    constructor(public canvasObj: CanvasType, private topPadding: number) {
+        this.queryLen = this.canvasObj.dataObj.query_len;
+        for (const hit of this.canvasObj.dataObj.hits) {
+            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+        }
+        [
+            this.startQueryPixels,
+            this.endQueryPixels,
+            this.startEvalPixels,
+            this.endEvalPixels,
+            this.startSubjPixels,
+            this.endSubjPixels
+        ] = getPixelCoordinates(
+            this.queryLen,
+            this.subjLen,
+            this.subjLen,
+            true
+        );
     }
-    private drawHeaderTextGroup() {
-        this.drawMiddleLineGroup();
+    private drawHeaderTextGroup(): fabric.Group {
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: Defaults.fontSize,
+            fontSize: Defaults.fontSize + 1,
             selectable: false,
             evented: false,
-            top: this.topAdjust + 0
+            objectCaching: false,
+            top: this.topPadding + 2
         };
         // Query Match
         textObj.left =
             this.startQueryPixels +
             (this.endQueryPixels - this.startQueryPixels) / 2 -
-            41;
+            45;
         const queryText = new fabric.Text("Sequence Match", textObj);
         // E-value
         textObj.left =
             this.startEvalPixels +
             (this.endEvalPixels - this.startEvalPixels) / 2 -
-            17;
+            20;
         const evalueText = new fabric.Text("E-value", textObj);
         // Subject Match
         textObj.left =
             this.startSubjPixels +
             (this.endSubjPixels - this.startSubjPixels) / 2 -
-            35;
+            45;
         const subjText = new fabric.Text("Subject Match", textObj);
         const textGroup = new fabric.Group(
             [queryText, evalueText, subjText],
@@ -224,100 +359,41 @@ class ContentHeaderRenderer {
         );
         return textGroup;
     }
-    private drawMiddleLineGroup() {
-        const top: number = 15;
-        let lineObj: LineType = {
-            selectable: false,
-            evented: false,
-            top: this.topAdjust + top,
-            stroke: "black",
-            strokeWidth: 2
-        };
-        //  Query
-        const coordsQuery: [number, number, number, number] = [
+    private drawMiddleLineGroup(): fabric.Group {
+        let lineGroup: fabric.Group;
+        [lineGroup, this.topPadding] = drawLineTracks(
             this.startQueryPixels,
-            this.topAdjust + top,
             this.endQueryPixels,
-            this.topAdjust + top
-        ];
-        lineObj.left = this.startQueryPixels;
-        const queryLine = new fabric.Line(coordsQuery, lineObj);
-        lineObj.top = this.topAdjust + top - 2;
-        const coordsQueryStartCap: [number, number, number, number] = [
-            this.startQueryPixels,
-            this.topAdjust + top - 3,
-            this.startQueryPixels,
-            this.topAdjust + top + 3
-        ];
-        const queryStartCap = new fabric.Line(coordsQueryStartCap, lineObj);
-        lineObj.left = this.endQueryPixels;
-        const coordsQueryEndCap: [number, number, number, number] = [
-            this.endQueryPixels,
-            this.topAdjust + top - 3,
-            this.endQueryPixels,
-            this.topAdjust + top + 3
-        ];
-        const queryEndCap = new fabric.Line(coordsQueryEndCap, lineObj);
-        // Subject
-        lineObj.top = this.topAdjust + top;
-        const coordsSubj: [number, number, number, number] = [
             this.startSubjPixels,
-            this.topAdjust + top,
             this.endSubjPixels,
-            this.topAdjust + top
-        ];
-        lineObj.left = this.startSubjPixels;
-        lineObj.top = this.topAdjust + top;
-        const subjLine = new fabric.Line(coordsSubj, lineObj);
-        lineObj.top = this.topAdjust + top - 2;
-        const coordsSubjStartCap: [number, number, number, number] = [
-            this.startSubjPixels,
-            this.topAdjust + top - 3,
-            this.startSubjPixels,
-            this.topAdjust + top + 3
-        ];
-        const subjStartCap = new fabric.Line(coordsSubjStartCap, lineObj);
-        lineObj.left = this.endSubjPixels;
-        const coordsSubjEndCap: [number, number, number, number] = [
-            this.endSubjPixels,
-            this.topAdjust + top - 3,
-            this.endSubjPixels,
-            this.topAdjust + top + 3
-        ];
-        const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
-        const lineGroup = new fabric.Group(
-            [
-                queryLine,
-                subjLine,
-                queryStartCap,
-                queryEndCap,
-                subjStartCap,
-                subjEndCap
-            ],
-            Defaults.groupConfig
+            this.topPadding + 2,
+            2
         );
         return lineGroup;
     }
-    private drawFooterTextGroup() {
+    private drawFooterTextGroup(): fabric.Group {
         let textObj: TextType = {
             fontWeight: "normal",
             fontSize: Defaults.fontSize,
             selectable: false,
             evented: false,
-            top: this.topAdjust + 19
+            objectCaching: false,
+            top: this.topPadding + 7
         };
         // Start Query
         textObj.left = this.startQueryPixels - 2.5;
         const startQueryText = new fabric.Text("1", textObj);
         // End Query
-        let positionFactor: number = findPositionFactor(`${this.queryLen}`);
+        let positionFactor: number = getHorizontalPaddingFactor(
+            `${this.queryLen}`
+        );
         textObj.left = this.endQueryPixels - positionFactor;
         const endQueryText = new fabric.Text(`${this.queryLen}`, textObj);
         // Start Subject
         textObj.left = this.startSubjPixels - 2.5;
         const startSubjText = new fabric.Text("1", textObj);
         // End Subject
-        positionFactor = findPositionFactor(`${this.subjLen}`);
+        positionFactor = getHorizontalPaddingFactor(`${this.subjLen}`);
         textObj.left = this.endSubjPixels - positionFactor;
         const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
         const textGroup = new fabric.Group(
@@ -326,7 +402,7 @@ class ContentHeaderRenderer {
         );
         return textGroup;
     }
-    public drawContentHeader() {
+    public drawContentHeader(): [fabric.Group, number] {
         const headerText = this.drawHeaderTextGroup();
         const middleLine = this.drawMiddleLineGroup();
         const footerText = this.drawFooterTextGroup();
@@ -334,7 +410,92 @@ class ContentHeaderRenderer {
             [headerText, middleLine, footerText],
             Defaults.groupConfig
         );
-        return mixedGroup;
+        this.topPadding += 5;
+        return [mixedGroup, this.topPadding];
+    }
+}
+
+class ContentRenderer {
+    private trackObjects: fabric.Object[] = [];
+
+    constructor(
+        public canvasObj: CanvasType,
+        private topPadding: number,
+        private limitNumberHsps: boolean = true
+    ) {
+        // draw a new track per hsp for each hit
+        // only display 10 hsps per hit
+        const queryLen: number = this.canvasObj.dataObj.query_len;
+        let subjLen: number = 0;
+        for (const hit of this.canvasObj.dataObj.hits) {
+            if (hit.hit_len > subjLen) subjLen = hit.hit_len;
+        }
+        for (const hit of this.canvasObj.dataObj.hits) {
+            let numberHsps: number = 0;
+            const totalNumberHsps: number = hit.hit_hsps.length;
+            for (const _hsp of hit.hit_hsps) {
+                numberHsps++;
+                if (this.limitNumberHsps && numberHsps > 10) {
+                    // notice about not all HSPs being displayed
+                    this.topPadding += 5;
+                    let textObj: TextType = {
+                        fontWeight: "normal",
+                        fontSize: Defaults.fontSize,
+                        selectable: false,
+                        evented: false,
+                        objectCaching: false,
+                        top: this.topPadding,
+                        left: Defaults.maxPixels / 2,
+                        fill: "red"
+                    };
+                    this.trackObjects.push(
+                        new fabric.Text(
+                            `This hit contains ${totalNumberHsps} alignments, ` +
+                                `but only the first 10 are displayed`,
+                            textObj
+                        )
+                    );
+                    this.topPadding += 15;
+                    break;
+                } else {
+                    const subjHspLen: number = hit.hit_len;
+                    let startQueryPixels: number;
+                    let endQueryPixels: number;
+                    let startSubjPixels: number;
+                    let endSubjPixels: number;
+                    [
+                        startQueryPixels,
+                        endQueryPixels,
+                        startSubjPixels,
+                        endSubjPixels
+                    ] = getPixelCoordinates(
+                        queryLen,
+                        subjLen,
+                        subjHspLen,
+                        false
+                    );
+                    let lineGroup: fabric.Group;
+                    [lineGroup, this.topPadding] = drawLineTracks(
+                        startQueryPixels,
+                        endQueryPixels,
+                        startSubjPixels,
+                        endSubjPixels,
+                        this.topPadding,
+                        1
+                    );
+                    this.trackObjects.push(lineGroup);
+                }
+                //   this.topPadding += 5;
+            }
+        }
+    }
+    public drawContent(): [fabric.Group, number] {
+        const lineGroup = new fabric.Group(
+            [...this.trackObjects],
+            Defaults.groupConfig
+        );
+        console.log(lineGroup);
+        return [lineGroup, this.topPadding];
     }
 }
 
@@ -343,49 +504,68 @@ export class FabricjsRenderer {
     private canvasHeight: number = Defaults.canvasHeight;
     private canvasWidth: number = Defaults.canvasWidth;
     private canvasObjects: fabric.Object[] = [];
-    // private numberHits: number;
-    private queryLen: number = 0;
-    private subjLen: number = 0;
-    private topAdjust: number = 2;
 
     constructor(public canvasObj: CanvasType) {
         this.canvas = new fabric.Canvas("canvas", {
             selectionLineWidth: 2
         });
+        let topPadding: number = 2;
 
-        this.queryLen = this.canvasObj.dataObj.query_len;
-        for (const hit of this.canvasObj.dataObj.hits) {
-            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
-        }
         // canvas header
-        this.canvasObjects.push(
-            new HeaderRenderer(canvasObj, this.topAdjust).drawHeaderTextGroup()
-        );
+        let headerGroup: fabric.Group;
+        [headerGroup, topPadding] = new HeaderRenderer(
+            canvasObj,
+            topPadding
+        ).drawHeaderTextGroup();
+        this.canvasObjects.push(headerGroup);
+
         // content header
-        this.topAdjust = 50;
-        this.canvasObjects.push(
-            new ContentHeaderRenderer(
+        if (this.canvasObj.dataObj.hits.length > 0) {
+            topPadding += 15;
+            let contentHeaderGroup: fabric.Group;
+            [contentHeaderGroup, topPadding] = new ContentHeaderRenderer(
                 canvasObj,
-                this.queryLen,
-                this.subjLen,
-                this.topAdjust
-            ).drawContentHeader()
-        );
+                topPadding
+            ).drawContentHeader();
+            this.canvasObjects.push(contentHeaderGroup);
 
-        // TODO dynamic content
+            // dynamic content
+            topPadding += 15;
+            let contentGroup: fabric.Group;
+            [contentGroup, topPadding] = new ContentRenderer(
+                canvasObj,
+                topPadding
+            ).drawContent();
+            this.canvasObjects.push(contentGroup);
 
-        // TODO color scale
+            // TODO color scale
+        } else {
+            // text content: "No hits found!"
+            topPadding += 15;
+            let textObj: TextType = {
+                fontWeight: "bold",
+                fontSize: 13,
+                selectable: false,
+                evented: false,
+                objectCaching: false,
+                top: topPadding
+            };
+            this.canvasObjects.push(new fabric.Text("No hits found!", textObj));
+            topPadding += 10;
+        }
 
         // canvas footer
-        this.topAdjust = 100;
-        this.canvasObjects.push(
-            new FooterRenderer(this.topAdjust).drawFooterTextGroup()
-        );
+        topPadding += 20;
+        let footerGroup: fabric.Text;
+        [footerGroup, topPadding] = new FooterRenderer(
+            topPadding
+        ).drawFooterTextGroup();
+        this.canvasObjects.push(footerGroup);
 
         // finishing off
-        this.topAdjust = this.topAdjust + 20;
-        if (this.canvasHeight < this.topAdjust) {
-            this.canvasHeight = this.topAdjust;
+        topPadding += 20;
+        if (this.canvasHeight < topPadding) {
+            this.canvasHeight = topPadding;
         }
         this.setFrameSize();
         this.renderCanvas();
