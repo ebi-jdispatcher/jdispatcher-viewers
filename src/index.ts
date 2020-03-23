@@ -1,20 +1,7 @@
 import { FabricjsRenderer } from "./app";
 import { SSSResultModel } from "./data-model";
+import { CanvasType, CanvasStatus } from "./custom-types";
 import { default as mockDataObj } from "./testdata/ncbiblast.json";
-
-enum CanvasStatus {
-    New = "new",
-    Rendered = "rendered"
-}
-
-// Input Data Type
-class CanvasType {
-    constructor(
-        public jobId: string,
-        public dataObj: SSSResultModel,
-        public status: CanvasStatus
-    ) {}
-}
 
 type Listener = (items: CanvasType[]) => void;
 

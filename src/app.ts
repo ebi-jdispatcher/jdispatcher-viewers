@@ -1,40 +1,7 @@
 import { fabric } from "fabric";
 import { SSSResultModel } from "./data-model";
-
-interface TextType {
-    fontWeight: string;
-    fontSize: number;
-    selectable: boolean;
-    evented: boolean;
-    objectCaching: false;
-    top?: number;
-    left?: number;
-    right?: number;
-    center?: number;
-    angle?: number;
-    stroke?: string;
-    fill?: string;
-    [key: string]: any;
-}
-
-interface LineType {
-    selectable: boolean;
-    evented: boolean;
-    objectCaching: false;
-    top?: number;
-    left?: number;
-    right?: number;
-    center?: number;
-    angle?: number;
-    [key: string]: any;
-}
-
-interface GroupType {
-    selectable: boolean;
-    evented: boolean;
-    objectCaching: false;
-    [key: string]: any;
-}
+import { TextType, LineType, GroupType } from "./custom-types";
+import { MouseDown, MouseOver, MouseOut } from "./custom-events";
 
 class Defaults {
     public static canvasWidth: number = 1000;
