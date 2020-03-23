@@ -484,17 +484,19 @@ export class FabricjsRenderer {
             fontWeight: "normal",
             fontSize: Defaults.fontSize,
             selectable: false,
-            evented: false,
+            evented: true,
             objectCaching: false,
             top: this.topPadding + 0,
-            left: 0,
-            textAlign: "center"
+            left: 225,
+            underline: false
         };
         const copyright =
             `European Bioinformatics Institute 2006-2020. ` +
             `EBI is an Outstation of the European Molecular Biology Laboratory.`;
         const copyrightText = new fabric.Text(`${copyright}`, textObj);
-        copyrightText.width = Defaults.canvasWidth;
         this.canvas.add(copyrightText);
+        MouseOver(copyrightText, textObj, this.canvas);
+        MouseDown(copyrightText, "https://www.ebi.ac.uk", this.canvas);
+        MouseOut(copyrightText, textObj, this.canvas);
     }
 }
