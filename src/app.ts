@@ -1,6 +1,5 @@
 import { fabric } from "fabric";
-import { SSSResultModel } from "./data-model";
-import { TextType, LineType, GroupType } from "./custom-types";
+import { CanvasType, TextType, LineType, GroupType } from "./custom-types";
 import { MouseDown, MouseOver, MouseOut } from "./custom-events";
 
 class Defaults {
@@ -18,11 +17,6 @@ class Defaults {
         objectCaching: false
     };
     constructor() {}
-}
-
-// Input Data Type
-class CanvasType {
-    constructor(public jobId: string, public dataObj: SSSResultModel) {}
 }
 
 function getHorizontalPaddingFactor(inputString: string): number {
