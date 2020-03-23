@@ -1,174 +1,18 @@
 import { fabric } from "fabric";
-import { InputType, TextType, LineType, GroupType } from "./custom-types";
+import { CanvasDefaults } from "./config";
+import { InputType, TextType } from "./custom-types";
+import {
+    getTextLegendPaddingFactor,
+    getQuerySubjPixelCoords,
+    getEvalPixelCoords,
+    drawLineTracks
+} from "./utilities";
 import { mouseDown, mouseOver, mouseOut } from "./custom-events";
-
-class Defaults {
-    public static canvasWidth: number = 1000;
-    public static canvasHeight: number = 110;
-    public static maxPixels: number = (65.0 * Defaults.canvasWidth) / 100;
-    public static evaluePixels: number = (8.0 * Defaults.canvasWidth) / 100;
-    public static leftPaddingPixels: number =
-        (26.5 * Defaults.canvasWidth) / 100;
-    public static borderPixels: number = (0.15 * Defaults.canvasWidth) / 100;
-    public static fontSize: number = 12;
-    public static groupConfig: GroupType = {
-        selectable: false,
-        evented: false,
-        objectCaching: false
-    };
-    constructor() {}
-}
-
-function getTextLegendPaddingFactor(inputString: string): number {
-    let positionFactor = 0;
-    if (inputString.length === 1) {
-        positionFactor = 2.5;
-    } else if (inputString.length === 2) {
-        positionFactor = 10;
-    } else if (inputString.length === 3) {
-        positionFactor = 15.5;
-    } else if (inputString.length === 4) {
-        positionFactor = 21;
-    }
-    return positionFactor;
-}
-
-function getQuerySubjPixelCoords(
-    queryLen: number,
-    subjLen: number,
-    subjHspLen: number
-) {
-    const totalLen: number = queryLen + subjLen;
-    const totalQueryPixels: number =
-        (queryLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
-    // const totalSubjPixels: number =
-    //     (subjLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
-    const subjDiffPixels: number =
-        (subjHspLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
-    const startQueryPixels = Defaults.leftPaddingPixels + Defaults.borderPixels;
-    const endQueryPixels =
-        Defaults.leftPaddingPixels + totalQueryPixels - Defaults.borderPixels;
-    const startSubjPixels =
-        Defaults.leftPaddingPixels +
-        totalQueryPixels +
-        Defaults.evaluePixels +
-        Defaults.borderPixels;
-    const endSubjPixels =
-        Defaults.leftPaddingPixels +
-        totalQueryPixels +
-        Defaults.evaluePixels +
-        subjDiffPixels -
-        Defaults.borderPixels;
-
-    return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
-}
-
-function getEvalPixelCoords(queryLen: number, subjLen: number) {
-    const totalLen: number = queryLen + subjLen;
-    const totalQueryPixels: number =
-        (queryLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
-    const startEvalPixels =
-        Defaults.leftPaddingPixels + totalQueryPixels + Defaults.borderPixels;
-    const endEvalPixels =
-        Defaults.leftPaddingPixels +
-        totalQueryPixels +
-        Defaults.evaluePixels -
-        Defaults.borderPixels;
-    return [startEvalPixels, endEvalPixels];
-}
-
-function drawLineTracks(
-    startQueryPixels: number,
-    endQueryPixels: number,
-    startSubjPixels: number,
-    endSubjPixels: number,
-    topPadding: number,
-    strokeWidth: number
-): [fabric.Group, number] {
-    const top: number = 15;
-    let lineObj: LineType = {
-        selectable: false,
-        evented: false,
-        objectCaching: false,
-        top: topPadding + top,
-        stroke: "black",
-        strokeWidth: strokeWidth
-    };
-    //  Query
-    const coordsQuery: [number, number, number, number] = [
-        startQueryPixels,
-        topPadding + top,
-        endQueryPixels,
-        topPadding + top
-    ];
-    lineObj.left = startQueryPixels;
-    const queryLine = new fabric.Line(coordsQuery, lineObj);
-
-    const coordsQueryStartCap: [number, number, number, number] = [
-        startQueryPixels,
-        topPadding + top - 3,
-        startQueryPixels,
-        topPadding + top + 3
-    ];
-    lineObj.top = topPadding + top - 2;
-    const queryStartCap = new fabric.Line(coordsQueryStartCap, lineObj);
-
-    const coordsQueryEndCap: [number, number, number, number] = [
-        endQueryPixels,
-        topPadding + top - 3,
-        endQueryPixels,
-        topPadding + top + 3
-    ];
-    lineObj.left = endQueryPixels;
-    const queryEndCap = new fabric.Line(coordsQueryEndCap, lineObj);
-
-    // Subject
-    const coordsSubj: [number, number, number, number] = [
-        startSubjPixels,
-        topPadding + top,
-        endSubjPixels,
-        topPadding + top
-    ];
-    lineObj.top = topPadding + top;
-    lineObj.left = startSubjPixels;
-    const subjLine = new fabric.Line(coordsSubj, lineObj);
-
-    const coordsSubjStartCap: [number, number, number, number] = [
-        startSubjPixels,
-        topPadding + top - 3,
-        startSubjPixels,
-        topPadding + top + 3
-    ];
-    lineObj.top = topPadding + top - 2;
-    const subjStartCap = new fabric.Line(coordsSubjStartCap, lineObj);
-
-    const coordsSubjEndCap: [number, number, number, number] = [
-        endSubjPixels,
-        topPadding + top - 3,
-        endSubjPixels,
-        topPadding + top + 3
-    ];
-    lineObj.left = endSubjPixels;
-    const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
-
-    const lineGroup = new fabric.Group(
-        [
-            queryLine,
-            subjLine,
-            queryStartCap,
-            queryEndCap,
-            subjStartCap,
-            subjEndCap
-        ],
-        Defaults.groupConfig
-    );
-    return [lineGroup, topPadding + top];
-}
 
 export class FabricjsRenderer {
     public canvas: fabric.Canvas;
-    private canvasHeight: number = Defaults.canvasHeight;
-    private canvasWidth: number = Defaults.canvasWidth;
+    private canvasHeight: number = CanvasDefaults.canvasHeight;
+    private canvasWidth: number = CanvasDefaults.canvasWidth;
     private topPadding: number = 2;
     private queryLen: number = 0;
     private subjLen: number = 0;
@@ -238,7 +82,7 @@ export class FabricjsRenderer {
         const origTopPadding = this.topPadding;
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: Defaults.fontSize + 1,
+            fontSize: CanvasDefaults.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -259,7 +103,7 @@ export class FabricjsRenderer {
         }
         const dbs: string = db_names.join(", ");
         textObj.fontWeight = "normal";
-        textObj.fontSize = Defaults.fontSize;
+        textObj.fontSize = CanvasDefaults.fontSize;
         this.topPadding += 12;
         textObj.top = this.topPadding;
         const databaseText = new fabric.Text(`Database(s): ${dbs}`, textObj);
@@ -276,7 +120,7 @@ export class FabricjsRenderer {
         // Start
         const start = this.canvasObj.dataObj.start;
         textObj.top = origTopPadding;
-        textObj.left = Defaults.canvasWidth - 133;
+        textObj.left = CanvasDefaults.canvasWidth - 133;
         const startText = new fabric.Text(`${start}`, textObj);
         // End
         const end = this.canvasObj.dataObj.end;
@@ -291,7 +135,7 @@ export class FabricjsRenderer {
                 startText,
                 endText
             ],
-            Defaults.groupConfig
+            CanvasDefaults.groupConfig
         );
         this.canvas.add(textGroup);
     }
@@ -304,7 +148,7 @@ export class FabricjsRenderer {
             evented: false,
             objectCaching: false,
             top: this.topPadding,
-            left: Defaults.maxPixels / 2,
+            left: CanvasDefaults.maxPixels / 2,
             fill: "red"
         };
         this.canvas.add(
@@ -318,7 +162,7 @@ export class FabricjsRenderer {
     private drawContentHeaderTextGroup() {
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: Defaults.fontSize + 1,
+            fontSize: CanvasDefaults.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -344,7 +188,7 @@ export class FabricjsRenderer {
         const subjText = new fabric.Text("Subject Match", textObj);
         const textGroup = new fabric.Group(
             [queryText, evalueText, subjText],
-            Defaults.groupConfig
+            CanvasDefaults.groupConfig
         );
         this.canvas.add(textGroup);
     }
@@ -363,7 +207,7 @@ export class FabricjsRenderer {
     private drawContentFooterTextGroup() {
         let textObj: TextType = {
             fontWeight: "normal",
-            fontSize: Defaults.fontSize,
+            fontSize: CanvasDefaults.fontSize,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -387,7 +231,7 @@ export class FabricjsRenderer {
         const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
         const textGroup = new fabric.Group(
             [startQueryText, endQueryText, startSubjText, endSubjText],
-            Defaults.groupConfig
+            CanvasDefaults.groupConfig
         );
         this.canvas.add(textGroup);
     }
@@ -415,12 +259,12 @@ export class FabricjsRenderer {
                     this.topPadding += 5;
                     let textObj: TextType = {
                         fontWeight: "normal",
-                        fontSize: Defaults.fontSize,
+                        fontSize: CanvasDefaults.fontSize,
                         selectable: false,
                         evented: false,
                         objectCaching: false,
                         top: this.topPadding,
-                        left: Defaults.maxPixels / 2,
+                        left: CanvasDefaults.maxPixels / 2,
                         fill: "red"
                     };
                     this.canvas.add(
@@ -464,7 +308,7 @@ export class FabricjsRenderer {
     private drawFooterText() {
         let textObj: TextType = {
             fontWeight: "normal",
-            fontSize: Defaults.fontSize,
+            fontSize: CanvasDefaults.fontSize,
             selectable: false,
             evented: true,
             objectCaching: false,
