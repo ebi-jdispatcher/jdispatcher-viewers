@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { CanvasType, TextType, LineType, GroupType } from "./custom-types";
-import { MouseDown, MouseOver, MouseOut } from "./custom-events";
+import { InputType, TextType, LineType, GroupType } from "./custom-types";
+import { mouseDown, mouseOver, mouseOut } from "./custom-events";
 
 class Defaults {
     public static canvasWidth: number = 1000;
@@ -19,7 +19,7 @@ class Defaults {
     constructor() {}
 }
 
-function getHorizontalPaddingFactor(inputString: string): number {
+function getTextLegendPaddingFactor(inputString: string): number {
     let positionFactor = 0;
     if (inputString.length === 1) {
         positionFactor = 2.5;
@@ -33,11 +33,10 @@ function getHorizontalPaddingFactor(inputString: string): number {
     return positionFactor;
 }
 
-function getPixelCoordinates(
+function getQuerySubjPixelCoords(
     queryLen: number,
     subjLen: number,
-    subjHspLen: number,
-    evalPixels: boolean = false
+    subjHspLen: number
 ) {
     const totalLen: number = queryLen + subjLen;
     const totalQueryPixels: number =
@@ -60,26 +59,22 @@ function getPixelCoordinates(
         Defaults.evaluePixels +
         subjDiffPixels -
         Defaults.borderPixels;
-    if (evalPixels) {
-        const startEvalPixels =
-            Defaults.leftPaddingPixels +
-            totalQueryPixels +
-            Defaults.borderPixels;
-        const endEvalPixels =
-            Defaults.leftPaddingPixels +
-            totalQueryPixels +
-            Defaults.evaluePixels -
-            Defaults.borderPixels;
-        return [
-            startQueryPixels,
-            endQueryPixels,
-            startEvalPixels,
-            endEvalPixels,
-            startSubjPixels,
-            endSubjPixels
-        ];
-    }
+
     return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
+}
+
+function getEvalPixelCoords(queryLen: number, subjLen: number) {
+    const totalLen: number = queryLen + subjLen;
+    const totalQueryPixels: number =
+        (queryLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
+    const startEvalPixels =
+        Defaults.leftPaddingPixels + totalQueryPixels + Defaults.borderPixels;
+    const endEvalPixels =
+        Defaults.leftPaddingPixels +
+        totalQueryPixels +
+        Defaults.evaluePixels -
+        Defaults.borderPixels;
+    return [startEvalPixels, endEvalPixels];
 }
 
 function drawLineTracks(
@@ -183,9 +178,11 @@ export class FabricjsRenderer {
     private endEvalPixels: number;
     private startSubjPixels: number;
     private endSubjPixels: number;
-    private limitNumberHsps: boolean = true;
 
-    constructor(public canvasObj: CanvasType) {
+    constructor(
+        public canvasObj: InputType,
+        private limitNumberHsps: boolean = true
+    ) {
         this.canvas = new fabric.Canvas("canvas", {
             selectionLineWidth: 2
         });
@@ -199,17 +196,14 @@ export class FabricjsRenderer {
         [
             this.startQueryPixels,
             this.endQueryPixels,
-            this.startEvalPixels,
-            this.endEvalPixels,
             this.startSubjPixels,
             this.endSubjPixels
-        ] = getPixelCoordinates(
+        ] = getQuerySubjPixelCoords(this.queryLen, this.subjLen, this.subjLen);
+        [this.startEvalPixels, this.endEvalPixels] = getEvalPixelCoords(
             this.queryLen,
-            this.subjLen,
-            this.subjLen,
-            true
+            this.subjLen
         );
-        // this.canvasObj.dataObj.hits = [];
+
         if (this.canvasObj.dataObj.hits.length > 0) {
             this.topPadding += 20;
             this.drawContentHeaderGroup();
@@ -379,7 +373,7 @@ export class FabricjsRenderer {
         textObj.left = this.startQueryPixels - 2.5;
         const startQueryText = new fabric.Text("1", textObj);
         // End Query
-        let positionFactor: number = getHorizontalPaddingFactor(
+        let positionFactor: number = getTextLegendPaddingFactor(
             `${this.queryLen}`
         );
         textObj.left = this.endQueryPixels - positionFactor;
@@ -388,7 +382,7 @@ export class FabricjsRenderer {
         textObj.left = this.startSubjPixels - 2.5;
         const startSubjText = new fabric.Text("1", textObj);
         // End Subject
-        positionFactor = getHorizontalPaddingFactor(`${this.subjLen}`);
+        positionFactor = getTextLegendPaddingFactor(`${this.subjLen}`);
         textObj.left = this.endSubjPixels - positionFactor;
         const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
         const textGroup = new fabric.Group(
@@ -449,12 +443,7 @@ export class FabricjsRenderer {
                         endQueryPixels,
                         startSubjPixels,
                         endSubjPixels
-                    ] = getPixelCoordinates(
-                        queryLen,
-                        subjLen,
-                        subjHspLen,
-                        false
-                    );
+                    ] = getQuerySubjPixelCoords(queryLen, subjLen, subjHspLen);
                     let lineGroup: fabric.Group;
                     [lineGroup, this.topPadding] = drawLineTracks(
                         startQueryPixels,
@@ -466,7 +455,6 @@ export class FabricjsRenderer {
                     );
                     this.canvas.add(lineGroup);
                 }
-                //   this.topPadding += 5;
             }
         }
     }
@@ -489,8 +477,8 @@ export class FabricjsRenderer {
             `EBI is an Outstation of the European Molecular Biology Laboratory.`;
         const copyrightText = new fabric.Text(`${copyright}`, textObj);
         this.canvas.add(copyrightText);
-        MouseOver(copyrightText, textObj, this.canvas);
-        MouseDown(copyrightText, "https://www.ebi.ac.uk", this.canvas);
-        MouseOut(copyrightText, textObj, this.canvas);
+        mouseOver(copyrightText, textObj, this.canvas);
+        mouseDown(copyrightText, "https://www.ebi.ac.uk", this.canvas);
+        mouseOut(copyrightText, textObj, this.canvas);
     }
 }

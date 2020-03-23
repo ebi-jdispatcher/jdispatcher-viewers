@@ -1,14 +1,15 @@
 import { SSSResultModel } from "./data-model";
 
-export enum CanvasStatus {
+export enum RenderStatusEnum {
     New = "new",
     Rendered = "rendered"
 }
-export class CanvasType {
+
+export class InputType {
     constructor(
         public jobId: string,
         public dataObj: SSSResultModel,
-        public status: CanvasStatus
+        public status: RenderStatusEnum
     ) {}
 }
 

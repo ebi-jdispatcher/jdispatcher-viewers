@@ -1,14 +1,14 @@
 import { FabricjsRenderer } from "./app";
 import { SSSResultModel } from "./data-model";
-import { CanvasType, CanvasStatus } from "./custom-types";
+import { InputType, RenderStatusEnum } from "./custom-types";
 import { default as mockDataObj } from "./testdata/ncbiblast.json";
 
-type Listener = (items: CanvasType[]) => void;
+type Listener = (items: InputType[]) => void;
 
 // Canvas State Management
-class canvasState {
-    private canvasInstances: CanvasType[] = [];
-    private static instance: canvasState;
+class CanvasState {
+    private canvasInstances: InputType[] = [];
+    private static instance: CanvasState;
     private listener: Listener = () => {};
     private jobIds: string[] = [];
 
@@ -18,7 +18,7 @@ class canvasState {
         if (this.instance) {
             return this.instance;
         } else {
-            this.instance = new canvasState();
+            this.instance = new CanvasState();
             return this.instance;
         }
     }
@@ -27,19 +27,18 @@ class canvasState {
         this.listener = listenerFn;
     }
 
-    addCanvas(jobId: string, dataObj: SSSResultModel, status: CanvasStatus) {
+    addCanvas(jobId: string, dataObj: SSSResultModel, status: RenderStatusEnum) {
         if (this.jobIds.length === 0 || !this.jobIds.includes(jobId)) {
             this.canvasInstances = [];
             this.jobIds.push(jobId);
-            const newCanvasInstance = new CanvasType(jobId, dataObj, status);
+            const newCanvasInstance = new InputType(jobId, dataObj, status);
             this.canvasInstances.push(newCanvasInstance);
-
             this.listener(this.canvasInstances.slice());
         }
     }
 }
 
-const canvasInstance = canvasState.getInstance();
+const canvasInstance = CanvasState.getInstance();
 
 function autobind(
     _target: any,
@@ -66,7 +65,7 @@ interface Valitable {
     pattern?: RegExp;
 }
 
-function validate(validInput: Valitable) {
+function validateInput(validInput: Valitable) {
     let isValid = true;
     if (validInput.required) {
         isValid = isValid && validInput.value.trim().length !== 0;
@@ -86,7 +85,7 @@ function validate(validInput: Valitable) {
 }
 
 // jobId Input Form
-class jobIdInputForm {
+class JobIdInputForm {
     private templateElement: HTMLTemplateElement;
     private hostElement: HTMLDivElement;
     private element: HTMLFormElement;
@@ -111,11 +110,11 @@ class jobIdInputForm {
             "#jobid"
         )! as HTMLInputElement;
 
-        this.configure();
+        this.submitListener();
         this.renderForm();
     }
 
-    private configure() {
+    private submitListener() {
         this.element.addEventListener("submit", this.submitHandler);
     }
 
@@ -135,9 +134,9 @@ class jobIdInputForm {
             pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)/g
         };
 
-        if (validate(formValidatable)) {
+        if (validateInput(formValidatable)) {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
-                canvasInstance.addCanvas(jobId, mockDataObj, CanvasStatus.New);
+                canvasInstance.addCanvas(jobId, mockDataObj, RenderStatusEnum.New);
             } else {
                 alert("Fetching from live service not yet implemented!");
                 return;
@@ -156,7 +155,7 @@ class CanvasRenderer {
     private hostElement: HTMLDivElement;
     private elementTitle: HTMLDivElement;
     private elementCanvas: HTMLDivElement;
-    private canvasInstance: CanvasType[];
+    private canvasInstance: InputType[];
 
     constructor() {
         this.templateElement = document.getElementById(
@@ -181,9 +180,9 @@ class CanvasRenderer {
         this.elementTitle = importedHTMLcontentTitle.firstElementChild as HTMLHeadingElement;
 
         this.canvasInstance = [];
-        canvasInstance.addListener((canvasInstance: CanvasType[]) => {
+        canvasInstance.addListener((canvasInstance: InputType[]) => {
             const filteredInstances = canvasInstance.filter(
-                inst => inst.status === CanvasStatus.New
+                inst => inst.status === RenderStatusEnum.New
             );
             this.canvasInstance = filteredInstances;
             this.renderCanvas();
@@ -199,12 +198,12 @@ class CanvasRenderer {
         const fabricjs = new FabricjsRenderer({
             jobId: this.canvasInstance[0].jobId,
             dataObj: this.canvasInstance[0].dataObj,
-            status: CanvasStatus.New
-        });
+            status: RenderStatusEnum.New
+        }, true);
         // TODO add export as SVG and PNG - clickEvents
         console.log(fabricjs.canvas.renderCanvas);
     }
 }
 
-new jobIdInputForm();
+new JobIdInputForm();
 new CanvasRenderer();

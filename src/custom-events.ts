@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { TextType } from "./custom-types";
 
-export function MouseOver(
+export function mouseOver(
     fabricObj: fabric.Object,
     textObj: TextType,
     canvas: fabric.Canvas
@@ -16,7 +16,7 @@ export function MouseOver(
     });
 }
 
-export function MouseDown(
+export function mouseDown(
     fabricObj: fabric.Object,
     href: string,
     canvas: fabric.Canvas
@@ -29,7 +29,7 @@ export function MouseDown(
     });
 }
 
-export function MouseOut(
+export function mouseOut(
     fabricObj: fabric.Object,
     textObj: TextType,
     canvas: fabric.Canvas
