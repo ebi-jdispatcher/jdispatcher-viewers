@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CanvasDefaults } from "./config";
-import { LineType } from "./custom-types";
+import { LineType, RectangleType, ColorType } from "./custom-types";
 import { HSVtoRGB } from "./color-utilities";
 
 export function getTextLegendPaddingFactor(inputString: string): number {
@@ -165,6 +165,46 @@ export function drawLineTracks(
         CanvasDefaults.groupConfig
     );
     return [lineGroup, topPadding + top];
+}
+
+export function drawDomainTracks(
+    startQueryPixels: number,
+    endQueryPixels: number,
+    startSubjPixels: number,
+    endSubjPixels: number,
+    topPadding: number,
+    fill: string
+): [fabric.Group, number] {
+    const top: number = 10;
+    let rectObj: RectangleType = {
+        selectable: false,
+        evented: false,
+        objectCaching: false,
+        top: topPadding + top,
+        fill: fill,
+        rx: 5,
+        ry: 5
+    };
+    //  Query
+    rectObj.top = topPadding - 5;
+    rectObj.left = startQueryPixels;
+    rectObj.width = endQueryPixels;
+    rectObj.height = top;
+    const queryDomain = new fabric.Rect(rectObj);
+
+    // Subject
+    rectObj.top = topPadding - 5;
+    rectObj.left = startSubjPixels;
+    rectObj.width = endSubjPixels;
+    rectObj.height = top;
+    const subjDomain = new fabric.Rect(rectObj);
+
+    // Group
+    const domainGroup = new fabric.Group(
+        [queryDomain, subjDomain],
+        CanvasDefaults.groupConfig
+    );
+    return [domainGroup, topPadding + top];
 }
 
 export function getRgbColor(

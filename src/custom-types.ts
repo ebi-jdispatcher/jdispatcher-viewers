@@ -41,6 +41,18 @@ export interface LineType {
     [key: string]: any;
 }
 
+export interface RectangleType {
+    selectable: boolean;
+    evented: boolean;
+    objectCaching: false;
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+    fill?: string;
+    [key: string]: any;
+}
+
 export interface GroupType {
     selectable: boolean;
     evented: boolean;

@@ -5,9 +5,14 @@ import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
     getEvalPixelCoords,
-    drawLineTracks
+    getHspPixelCoords,
+    drawLineTracks,
+    drawDomainTracks,
+    getRgbColor,
+    getGradientSteps
 } from "./utilities";
 import { mouseDown, mouseOver, mouseOut } from "./custom-events";
+import { colorDefaultGradient, defaultGradient } from "./color-schemes";
 
 export class FabricjsRenderer {
     public canvas: fabric.Canvas;
@@ -25,7 +30,8 @@ export class FabricjsRenderer {
 
     constructor(
         public canvasObj: InputType,
-        private limitNumberHsps: boolean = true
+        private limitNumberHsps: boolean = true,
+        private scaleType: string = "dynamic"
     ) {
         this.canvas = new fabric.Canvas("canvas", {
             selectionLineWidth: 2
@@ -44,8 +50,7 @@ export class FabricjsRenderer {
             this.endSubjPixels
         ] = getQuerySubjPixelCoords(this.queryLen, this.subjLen, this.subjLen);
         [this.startEvalPixels, this.endEvalPixels] = getEvalPixelCoords(
-            this.queryLen,
-            this.subjLen
+            this.endQueryPixels
         );
 
         if (this.canvasObj.dataObj.hits.length > 0) {
@@ -56,6 +61,8 @@ export class FabricjsRenderer {
             this.drawDynamicContentGroup();
 
             // TODO color scale
+            this.topPadding += 15;
+            this.drawColorScaleGroup();
         } else {
             // text content: "No hits found!"
             this.drawNoHitsFoundText();
@@ -241,7 +248,7 @@ export class FabricjsRenderer {
         this.drawContentFooterTextGroup();
     }
 
-    private drawDynamicContentTracks() {
+    private drawDynamicContentGroup() {
         // draw a new track per hsp for each hit
         // only display 10 hsps per hit
         const queryLen: number = this.canvasObj.dataObj.query_len;
@@ -249,10 +256,21 @@ export class FabricjsRenderer {
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
         }
+        let minEval: number = 10e50;
+        let maxEval: number = 0;
+        let minNotZeroEval: number = 10e50;
+        for (const hit of this.canvasObj.dataObj.hits) {
+            for (const hsp of hit.hit_hsps) {
+                if (hsp.hsp_expect! < minEval) minEval = hsp.hsp_expect!;
+                if (hsp.hsp_expect! > maxEval) maxEval = hsp.hsp_expect!;
+                if (hsp.hsp_expect! < minNotZeroEval && hsp.hsp_expect! > 0.0)
+                    minNotZeroEval = hsp.hsp_expect!;
+            }
+        }
         for (const hit of this.canvasObj.dataObj.hits) {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
-            for (const _hsp of hit.hit_hsps) {
+            for (const hsp of hit.hit_hsps) {
                 numberHsps++;
                 if (this.limitNumberHsps && numberHsps > 10) {
                     // notice about not all HSPs being displayed
@@ -277,6 +295,7 @@ export class FabricjsRenderer {
                     this.topPadding += 15;
                     break;
                 } else {
+                    // line Tracks
                     const subjHspLen: number = hit.hit_len;
                     let startQueryPixels: number;
                     let endQueryPixels: number;
@@ -288,8 +307,9 @@ export class FabricjsRenderer {
                         startSubjPixels,
                         endSubjPixels
                     ] = getQuerySubjPixelCoords(queryLen, subjLen, subjHspLen);
-                    let lineGroup: fabric.Group;
-                    [lineGroup, this.topPadding] = drawLineTracks(
+
+                    let linesGroup: fabric.Group;
+                    [linesGroup, this.topPadding] = drawLineTracks(
                         startQueryPixels,
                         endQueryPixels,
                         startSubjPixels,
@@ -297,14 +317,73 @@ export class FabricjsRenderer {
                         this.topPadding,
                         1
                     );
-                    this.canvas.add(lineGroup);
+                    this.canvas.add(linesGroup);
+
+                    // domain tracks
+                    let startQueryHspPixels: number;
+                    let endQueryHspPixels: number;
+                    let startSubjHspPixels: number;
+                    let endSubjHspPixels: number;
+                    const hspQueryStart: number = hsp.hsp_query_from;
+                    const hspQueryEnd: number = hsp.hsp_query_to;
+                    const hspSubjStart: number = hsp.hsp_hit_from;
+                    const hspSubjEnd: number = hsp.hsp_hit_to;
+                    [
+                        startQueryHspPixels,
+                        endQueryHspPixels
+                    ] = getHspPixelCoords(
+                        queryLen,
+                        subjLen,
+                        queryLen,
+                        startQueryPixels,
+                        hspQueryStart,
+                        hspQueryEnd
+                    );
+                    [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
+                        queryLen,
+                        subjLen,
+                        subjHspLen,
+                        startSubjPixels,
+                        hspSubjStart,
+                        hspSubjEnd
+                    );
+                    const gradientSetps = getGradientSteps(
+                        minEval,
+                        maxEval,
+                        minNotZeroEval,
+                        this.scaleType
+                    );
+                    const color = getRgbColor(
+                        hsp.hsp_expect!,
+                        gradientSetps,
+                        defaultGradient
+                    );
+                    let domainsGroup: fabric.Group;
+                    [domainsGroup, this.topPadding] = drawDomainTracks(
+                        startQueryHspPixels,
+                        endQueryHspPixels,
+                        startSubjHspPixels,
+                        endSubjHspPixels,
+                        this.topPadding,
+                        color
+                    );
+                    this.canvas.add(domainsGroup);
                 }
             }
         }
     }
-    public drawDynamicContentGroup() {
-        this.drawDynamicContentTracks();
+
+    private drawColorScaleGroup() {
+        var colorScale = new fabric.Rect({
+            left: CanvasDefaults.leftScalePaddingPixels,
+            top: this.topPadding,
+            width: CanvasDefaults.scalePixels,
+            height: 15
+        });
+        colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
+        this.canvas.add(colorScale);
     }
+
     private drawFooterText() {
         let textObj: TextType = {
             fontWeight: "normal",

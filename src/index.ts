@@ -199,7 +199,7 @@ class CanvasRenderer {
             jobId: this.canvasInstance[0].jobId,
             dataObj: this.canvasInstance[0].dataObj,
             status: RenderStatusEnum.New
-        }, true);
+        }, true, "dynamic");
         // TODO add export as SVG and PNG - clickEvents
         console.log(fabricjs.canvas.renderCanvas);
     }
