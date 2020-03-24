@@ -5,12 +5,10 @@ import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
     getEvalPixelCoords,
-    getHspPixelCoords,
-    drawLineTracks,
-    drawDomainTracks,
-    getRgbColor,
-    getGradientSteps
-} from "./utilities";
+    getHspPixelCoords
+} from "./coords-utilities";
+import { drawLineTracks, drawDomainTracks } from "./drawing-utilities";
+import { getRgbColor, getGradientSteps } from "./color-utilities";
 import { mouseDown, mouseOver, mouseOut } from "./custom-events";
 import { colorDefaultGradient, defaultGradient } from "./color-schemes";
 
