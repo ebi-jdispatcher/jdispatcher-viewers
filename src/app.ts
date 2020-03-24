@@ -52,21 +52,22 @@ export class FabricjsRenderer {
         );
 
         if (this.canvasObj.dataObj.hits.length > 0) {
-            this.topPadding += 20;
+            // content header
+            this.topPadding += 25;
             this.drawContentHeaderGroup();
             // dynamic content
-            this.topPadding += 15;
+            this.topPadding += 25;
             this.drawDynamicContentGroup();
-
-            // TODO color scale
-            this.topPadding += 15;
+            // color scale
+            this.topPadding += 20;
             this.drawColorScaleGroup();
         } else {
             // text content: "No hits found!"
+            this.topPadding += 20;
             this.drawNoHitsFoundText();
         }
         // canvas footer
-        this.topPadding += 25;
+        this.topPadding += 30;
         this.drawFooterText();
         // finishing off
         this.topPadding += 20;
@@ -145,10 +146,9 @@ export class FabricjsRenderer {
         this.canvas.add(textGroup);
     }
     private drawNoHitsFoundText() {
-        this.topPadding += 20;
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: 13,
+            fontSize: CanvasDefaults.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -162,7 +162,6 @@ export class FabricjsRenderer {
                 textObj
             )
         );
-        this.topPadding += 5;
     }
     private drawContentHeaderTextGroup() {
         let textObj: TextType = {
@@ -204,7 +203,7 @@ export class FabricjsRenderer {
             this.endQueryPixels,
             this.startSubjPixels,
             this.endSubjPixels,
-            this.topPadding + 2,
+            this.topPadding,
             2
         );
         this.canvas.add(lineGroup);
@@ -216,7 +215,7 @@ export class FabricjsRenderer {
             selectable: false,
             evented: false,
             objectCaching: false,
-            top: this.topPadding + 7
+            top: this.topPadding
         };
         // Start Query
         textObj.left = this.startQueryPixels - 2.5;
@@ -242,7 +241,9 @@ export class FabricjsRenderer {
     }
     private drawContentHeaderGroup() {
         this.drawContentHeaderTextGroup();
+        this.topPadding += 10;
         this.drawContentMiddleLineGroup();
+        this.topPadding += 5;
         this.drawContentFooterTextGroup();
     }
 
@@ -254,9 +255,9 @@ export class FabricjsRenderer {
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
         }
-        let minEval: number = 10e50;
+        let minEval: number = Number.MAX_VALUE;
         let maxEval: number = 0;
-        let minNotZeroEval: number = 10e50;
+        let minNotZeroEval: number = Number.MAX_VALUE;
         for (const hit of this.canvasObj.dataObj.hits) {
             for (const hsp of hit.hit_hsps) {
                 if (hsp.hsp_expect! < minEval) minEval = hsp.hsp_expect!;
@@ -272,7 +273,6 @@ export class FabricjsRenderer {
                 numberHsps++;
                 if (this.limitNumberHsps && numberHsps > 10) {
                     // notice about not all HSPs being displayed
-                    this.topPadding += 5;
                     let textObj: TextType = {
                         fontWeight: "normal",
                         fontSize: CanvasDefaults.fontSize,
@@ -290,7 +290,7 @@ export class FabricjsRenderer {
                             textObj
                         )
                     );
-                    this.topPadding += 15;
+                    this.topPadding += 20;
                     break;
                 } else {
                     // line Tracks
@@ -389,7 +389,7 @@ export class FabricjsRenderer {
             selectable: false,
             evented: true,
             objectCaching: false,
-            top: this.topPadding + 0,
+            top: this.topPadding,
             left: 225,
             underline: false
         };

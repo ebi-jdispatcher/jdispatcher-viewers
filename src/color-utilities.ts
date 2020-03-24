@@ -47,9 +47,6 @@ export function getRgbColor(
             h = 4.0;
         }
         const rgb = HSVtoRGB(h / 6, 0.75, 1.0);
-        console.log(gradientSteps);
-        console.log(h);
-        console.log(rgb);
         return `rgb(${rgb.join(",")})`;
     }
 }
@@ -139,7 +136,7 @@ export function getGradientSteps(
             ];
         }
     } else {
-        console.log(`${scaleType} not yet implemented!`);
+        throw Error(`${scaleType} not yet implemented!`);
     }
     return gradientSteps;
 }
