@@ -16,21 +16,27 @@ export function getTextLegendPaddingFactor(inputString: string): number {
     return positionFactor;
 }
 
+function getTotalPixels(queryLen: number, subjLen: number, varLen: number) {
+    const totalLen = queryLen + subjLen;
+    const totalPixels =
+        (varLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) /
+        totalLen;
+    return totalPixels;
+}
+
 export function getQuerySubjPixelCoords(
     queryLen: number,
     subjLen: number,
     subjHspLen: number
 ) {
-    const totalLen: number = queryLen + subjLen;
-    const totalQueryPixels: number =
-        (queryLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) / totalLen;
-    // const totalSubjPixels: number =
-    //     (subjLen * Defaults.maxPixels - Defaults.evaluePixels) / totalLen;
-    const subjDiffPixels: number =
-        (subjHspLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) / totalLen;
-    const startQueryPixels = CanvasDefaults.leftPaddingPixels + CanvasDefaults.borderPixels;
+    const totalQueryPixels = getTotalPixels(queryLen, subjLen, queryLen);
+    const totalSubjPixels = getTotalPixels(queryLen, subjLen, subjHspLen);
+    const startQueryPixels =
+        CanvasDefaults.leftPaddingPixels + CanvasDefaults.borderPixels;
     const endQueryPixels =
-        CanvasDefaults.leftPaddingPixels + totalQueryPixels - CanvasDefaults.borderPixels;
+        CanvasDefaults.leftPaddingPixels +
+        totalQueryPixels -
+        CanvasDefaults.borderPixels;
     const startSubjPixels =
         CanvasDefaults.leftPaddingPixels +
         totalQueryPixels +
@@ -40,24 +46,35 @@ export function getQuerySubjPixelCoords(
         CanvasDefaults.leftPaddingPixels +
         totalQueryPixels +
         CanvasDefaults.evaluePixels +
-        subjDiffPixels -
+        totalSubjPixels -
         CanvasDefaults.borderPixels;
-
     return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
 }
 
-export function getEvalPixelCoords(queryLen: number, subjLen: number) {
-    const totalLen: number = queryLen + subjLen;
-    const totalQueryPixels: number =
-        (queryLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) / totalLen;
-    const startEvalPixels =
-        CanvasDefaults.leftPaddingPixels + totalQueryPixels + CanvasDefaults.borderPixels;
+export function getEvalPixelCoords(endQueryPixels: number) {
+    const startEvalPixels = endQueryPixels + 2 * CanvasDefaults.borderPixels;
     const endEvalPixels =
-        CanvasDefaults.leftPaddingPixels +
-        totalQueryPixels +
+        endQueryPixels +
+        CanvasDefaults.borderPixels +
         CanvasDefaults.evaluePixels -
         CanvasDefaults.borderPixels;
     return [startEvalPixels, endEvalPixels];
+}
+
+export function getHspPixelCoords(
+    queryLen: number,
+    subjLen: number,
+    varLen: number,
+    paddingPixels: number,
+    hspStart: number,
+    hspEnd: number
+) {
+    const totalPixels = getTotalPixels(queryLen, subjLen, varLen);
+    const startPixels = (hspStart * totalPixels) / varLen;
+    const endPixels = ((hspEnd - hspStart - 1) * totalPixels) / varLen;
+    const startHspPixels = paddingPixels + startPixels;
+    const endHspPixels = endPixels - 2 * CanvasDefaults.borderPixels;
+    return [startHspPixels, endHspPixels];
 }
 
 export function drawLineTracks(
@@ -134,6 +151,7 @@ export function drawLineTracks(
     lineObj.left = endSubjPixels;
     const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
 
+    // Group
     const lineGroup = new fabric.Group(
         [
             queryLine,
