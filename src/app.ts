@@ -366,6 +366,29 @@ export class FabricjsRenderer {
                         color
                     );
                     this.canvas.add(domainsGroup);
+
+                    // E-value text tracks
+                    let textObj: TextType = {
+                        fontWeight: "normal",
+                        fontSize: CanvasDefaults.fontSize + 1,
+                        selectable: false,
+                        evented: false,
+                        objectCaching: false,
+                        top: this.topPadding - 20,
+                        textAlign: "center"
+                    };
+
+                    textObj.left = this.startEvalPixels;
+                    const evalText: fabric.Text = new fabric.Text(
+                        `${
+                            Number.isInteger(hsp.hsp_expect!)
+                                ? hsp.hsp_expect! + ".0"
+                                : hsp.hsp_expect!.toString()
+                        }`,
+                        textObj
+                    );
+                    evalText.width = CanvasDefaults.evaluePixels;
+                    this.canvas.add(evalText);
                 }
             }
         }
