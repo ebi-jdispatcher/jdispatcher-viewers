@@ -47,3 +47,8 @@ export interface GroupType {
     objectCaching: false;
     [key: string]: any;
 }
+
+export interface ColorType {
+    keys: number[];
+    [key: number]: [number, number, number];
+}[]
