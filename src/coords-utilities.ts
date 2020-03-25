@@ -51,12 +51,12 @@ export function getQuerySubjPixelCoords(
 
 export function getEvalPixelCoords(endQueryPixels: number) {
     const startEvalPixels = endQueryPixels + 2 * CanvasDefaults.borderPixels;
-    const endEvalPixels =
-        endQueryPixels +
-        CanvasDefaults.borderPixels +
-        CanvasDefaults.evaluePixels -
-        CanvasDefaults.borderPixels;
-    return [startEvalPixels, endEvalPixels];
+    // const endEvalPixels =
+    //     endQueryPixels +
+    //     CanvasDefaults.borderPixels +
+    //     CanvasDefaults.evaluePixels -
+    //     CanvasDefaults.borderPixels;
+    return startEvalPixels;
 }
 
 export function getHspPixelCoords(

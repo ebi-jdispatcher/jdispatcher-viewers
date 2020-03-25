@@ -34,7 +34,6 @@ export class FabricjsRenderer {
     private startQueryPixels: number;
     private endQueryPixels: number;
     private startEvalPixels: number;
-    private endEvalPixels: number;
     private startSubjPixels: number;
     private endSubjPixels: number;
     private gradientSteps: number[] = [];
@@ -58,7 +57,7 @@ export class FabricjsRenderer {
             this.startSubjPixels,
             this.endSubjPixels
         ] = getQuerySubjPixelCoords(this.queryLen, this.subjLen, this.subjLen);
-        [this.startEvalPixels, this.endEvalPixels] = getEvalPixelCoords(
+        this.startEvalPixels = getEvalPixelCoords(
             this.endQueryPixels
         );
 
@@ -121,17 +120,38 @@ export class FabricjsRenderer {
         const dbs: string = db_names.join(", ");
         textObj.fontWeight = "normal";
         textObj.fontSize = CanvasDefaults.fontSize;
-        this.topPadding += 12;
+        this.topPadding += 15;
         textObj.top = this.topPadding;
         const databaseText = new fabric.Text(`Database(s): ${dbs}`, textObj);
         // Sequence
         const sequence = this.canvasObj.dataObj.query_def;
-        this.topPadding += 12;
+        this.topPadding += 15;
         textObj.top = this.topPadding;
-        const sequenceText = new fabric.Text(`Sequence: ${sequence}`, textObj);
+        const sequenceText = new fabric.Text("Sequence: ", textObj);
+        let textSeqObj: TextType = {
+            fontWeight: "normal",
+            fontFamily: "Menlo",
+            fontSize: CanvasDefaults.fontSize - 2,
+            selectable: false,
+            evented: true,
+            objectCaching: false,
+            top: this.topPadding,
+            left: 57.5
+        };
+        const sequenceDefText = new fabric.Text(`${sequence}`, textSeqObj);
+        this.canvas.add(sequenceDefText);
+        if (this.canvasObj.dataObj.query_url != null) {
+            mouseOverText(sequenceDefText, textSeqObj, this.canvas);
+            mouseDownText(
+                sequenceDefText,
+                this.canvasObj.dataObj.query_url,
+                this.canvas
+            );
+            mouseOutText(sequenceDefText, textSeqObj, this.canvas);
+        }
         // Length
         const length = this.canvasObj.dataObj.query_len;
-        this.topPadding += 12;
+        this.topPadding += 15;
         textObj.top = this.topPadding;
         const lengthText = new fabric.Text(`Length: ${length}`, textObj);
         // Start
@@ -141,7 +161,7 @@ export class FabricjsRenderer {
         const startText = new fabric.Text(`${start}`, textObj);
         // End
         const end = this.canvasObj.dataObj.end;
-        textObj.top = origTopPadding + 12;
+        textObj.top = origTopPadding + 15;
         const endText = new fabric.Text(`${end}`, textObj);
         const textGroup = new fabric.Group(
             [
@@ -227,7 +247,6 @@ export class FabricjsRenderer {
     private drawContentFooterTextGroup() {
         let textObj: TextType = {
             fontWeight: "normal",
-            fontType: "monospace",
             fontSize: CanvasDefaults.fontSize,
             selectable: false,
             evented: false,
@@ -269,11 +288,11 @@ export class FabricjsRenderer {
         // only display 10 hsps per hit
         const queryLen: number = this.canvasObj.dataObj.query_len;
         let subjLen: number = 0;
-        let maxHitIDLen: number = 0;
+        let maxIDLen: number = 0;
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
-            if (hit.hit_id.length > maxHitIDLen)
-                maxHitIDLen = hit.hit_id.length;
+            if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
+                maxIDLen = hit.hit_db.length + hit.hit_id.length;
         }
         let minEval: number = Number.MAX_VALUE;
         let maxEval: number = 0;
@@ -301,15 +320,17 @@ export class FabricjsRenderer {
             // Hit ID + Hit Description text tracks
             let textObj: TextType = {
                 fontWeight: "normal",
-                fontFamily: "monospace",
+                fontFamily: "Menlo",
                 fontSize: CanvasDefaults.fontSize - 2,
                 selectable: false,
                 evented: false,
                 objectCaching: false,
-                top: this.topPadding + 2
+                top: this.topPadding - 2
             };
 
-            const variableSpace = " ".repeat(maxHitIDLen - hit.hit_id.length);
+            const variableSpace = " ".repeat(
+                maxIDLen - (hit.hit_db.length + hit.hit_id.length)
+            );
             const spaceText: fabric.Text = new fabric.Text(
                 variableSpace,
                 textObj
@@ -579,12 +600,11 @@ export class FabricjsRenderer {
         // E-value scale tick mark labels
         this.topPadding += 5;
         textObj.top = this.topPadding;
-        textObj.fontType = "monospace";
         textObj.fontSize = CanvasDefaults.fontSize;
-            // Start Tick Label
-            (textObj.left =
-                CanvasDefaults.leftScalePaddingPixels -
-                numberToString(this.gradientSteps[0]).length * 3);
+        // Start Tick Label
+        textObj.left =
+            CanvasDefaults.leftScalePaddingPixels -
+            numberToString(this.gradientSteps[0]).length * 3;
         const startLabelText = new fabric.Text(
             numberToString(this.gradientSteps[0]),
             textObj

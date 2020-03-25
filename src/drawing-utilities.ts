@@ -10,7 +10,7 @@ export function drawLineTracks(
     topPadding: number,
     strokeWidth: number
 ): [fabric.Group, number] {
-    topPadding += 10;
+    topPadding += 5;
     let lineObj: LineType = {
         selectable: false,
         evented: false,
