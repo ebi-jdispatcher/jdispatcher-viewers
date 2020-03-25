@@ -5,7 +5,8 @@ import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
     getEvalPixelCoords,
-    getHspPixelCoords
+    getHspPixelCoords,
+    getTotalPixels
 } from "./coords-utilities";
 import { drawLineTracks, drawDomainTracks } from "./drawing-utilities";
 import { getRgbColor, getGradientSteps } from "./color-utilities";
@@ -170,26 +171,31 @@ export class FabricjsRenderer {
             selectable: false,
             evented: false,
             objectCaching: false,
-            top: this.topPadding + 2
+            top: this.topPadding + 2,
+            textAlign: "center"
         };
+        const totalQueryPixels = getTotalPixels(
+            this.queryLen,
+            this.subjLen,
+            this.queryLen
+        );
+        const totalSubjPixels = getTotalPixels(
+            this.queryLen,
+            this.subjLen,
+            this.subjLen
+        );
         // Query Match
-        textObj.left =
-            this.startQueryPixels +
-            (this.endQueryPixels - this.startQueryPixels) / 2 -
-            45;
+        textObj.left = this.startQueryPixels;
         const queryText = new fabric.Text("Sequence Match", textObj);
+        queryText.width = totalQueryPixels;
         // E-value
-        textObj.left =
-            this.startEvalPixels +
-            (this.endEvalPixels - this.startEvalPixels) / 2 -
-            20;
+        textObj.left = this.startEvalPixels;
         const evalueText = new fabric.Text("E-value", textObj);
+        evalueText.width = CanvasDefaults.evaluePixels;
         // Subject Match
-        textObj.left =
-            this.startSubjPixels +
-            (this.endSubjPixels - this.startSubjPixels) / 2 -
-            45;
+        textObj.left = this.startSubjPixels;
         const subjText = new fabric.Text("Subject Match", textObj);
+        subjText.width = totalSubjPixels;
         const textGroup = new fabric.Group(
             [queryText, evalueText, subjText],
             CanvasDefaults.groupConfig
