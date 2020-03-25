@@ -38,9 +38,7 @@ export class FabricjsRenderer {
         private limitNumberHsps: boolean = true,
         private scaleType: string = "dynamic"
     ) {
-        this.canvas = new fabric.Canvas("canvas", {
-            selectionLineWidth: 2
-        });
+        this.canvas = new fabric.Canvas("canvas", {});
         // canvas header
         this.drawHeaderTextGroup();
         // content header
@@ -223,6 +221,7 @@ export class FabricjsRenderer {
     private drawContentFooterTextGroup() {
         let textObj: TextType = {
             fontWeight: "normal",
+            fontType: "monospace",
             fontSize: CanvasDefaults.fontSize,
             selectable: false,
             evented: false,
@@ -267,13 +266,13 @@ export class FabricjsRenderer {
         let maxHitIDLen: number = 0;
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
-            if (hit.hit_id.length > maxHitIDLen) maxHitIDLen =
-                                                     hit.hit_id.length;
+            if (hit.hit_id.length > maxHitIDLen)
+                maxHitIDLen = hit.hit_id.length;
         }
         let minEval: number = Number.MAX_VALUE;
         let maxEval: number = 0;
         let minNotZeroEval: number = Number.MAX_VALUE;
-        
+
         for (const hit of this.canvasObj.dataObj.hits) {
             for (const hsp of hit.hit_hsps) {
                 if (hsp.hsp_expect! < minEval) minEval = hsp.hsp_expect!;
@@ -303,15 +302,20 @@ export class FabricjsRenderer {
                 objectCaching: false,
                 top: this.topPadding + 2
             };
-            
+
             const variableSpace = " ".repeat(maxHitIDLen - hit.hit_id.length);
-            const spaceText: fabric.Text = new fabric.Text(variableSpace, textObj);
+            const spaceText: fabric.Text = new fabric.Text(
+                variableSpace,
+                textObj
+            );
             this.canvas.add(spaceText);
 
             let hit_def: string = `${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
             let hit_def_full: string = `${variableSpace}${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
             if (hit_def_full.length > 40) {
-                hit_def = (hit_def_full.slice(0, 38) + "...").slice(variableSpace.length);
+                hit_def = (hit_def_full.slice(0, 38) + "...").slice(
+                    variableSpace.length
+                );
             }
             textObj.left = 10 + variableSpace.length * 6;
             textObj.evented = true;
@@ -419,7 +423,7 @@ export class FabricjsRenderer {
                         selectable: false,
                         evented: false,
                         objectCaching: false,
-                        top: this.topPadding - 20,
+                        top: this.topPadding - 15,
                         textAlign: "center"
                     };
 

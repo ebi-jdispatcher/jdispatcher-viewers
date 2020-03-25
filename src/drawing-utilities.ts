@@ -10,39 +10,39 @@ export function drawLineTracks(
     topPadding: number,
     strokeWidth: number
 ): [fabric.Group, number] {
-    const top: number = 10;
+    topPadding += 10;
     let lineObj: LineType = {
         selectable: false,
         evented: false,
         objectCaching: false,
-        top: topPadding + top,
+        top: topPadding,
         stroke: "black",
         strokeWidth: strokeWidth
     };
     //  Query
     const coordsQuery: [number, number, number, number] = [
         startQueryPixels,
-        topPadding + top,
+        topPadding,
         endQueryPixels,
-        topPadding + top
+        topPadding
     ];
     lineObj.left = startQueryPixels;
     const queryLine = new fabric.Line(coordsQuery, lineObj);
 
     const coordsQueryStartCap: [number, number, number, number] = [
         startQueryPixels,
-        topPadding + top - 3,
+        topPadding - 3,
         startQueryPixels,
-        topPadding + top + 3
+        topPadding + 3
     ];
-    lineObj.top = topPadding + top - 2;
+    lineObj.top = topPadding - 2;
     const queryStartCap = new fabric.Line(coordsQueryStartCap, lineObj);
 
     const coordsQueryEndCap: [number, number, number, number] = [
         endQueryPixels,
-        topPadding + top - 3,
+        topPadding - 3,
         endQueryPixels,
-        topPadding + top + 3
+        topPadding + 3
     ];
     lineObj.left = endQueryPixels;
     const queryEndCap = new fabric.Line(coordsQueryEndCap, lineObj);
@@ -50,28 +50,28 @@ export function drawLineTracks(
     // Subject
     const coordsSubj: [number, number, number, number] = [
         startSubjPixels,
-        topPadding + top,
+        topPadding,
         endSubjPixels,
-        topPadding + top
+        topPadding
     ];
-    lineObj.top = topPadding + top;
+    lineObj.top = topPadding;
     lineObj.left = startSubjPixels;
     const subjLine = new fabric.Line(coordsSubj, lineObj);
 
     const coordsSubjStartCap: [number, number, number, number] = [
         startSubjPixels,
-        topPadding + top - 3,
+        topPadding - 3,
         startSubjPixels,
-        topPadding + top + 3
+        topPadding + 3
     ];
-    lineObj.top = topPadding + top - 2;
+    lineObj.top = topPadding - 2;
     const subjStartCap = new fabric.Line(coordsSubjStartCap, lineObj);
 
     const coordsSubjEndCap: [number, number, number, number] = [
         endSubjPixels,
-        topPadding + top - 3,
+        topPadding - 3,
         endSubjPixels,
-        topPadding + top + 3
+        topPadding + 3
     ];
     lineObj.left = endSubjPixels;
     const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
@@ -88,7 +88,7 @@ export function drawLineTracks(
         ],
         CanvasDefaults.groupConfig
     );
-    return [lineGroup, topPadding + top];
+    return [lineGroup, topPadding];
 }
 
 export function drawDomainTracks(
@@ -99,28 +99,28 @@ export function drawDomainTracks(
     topPadding: number,
     fill: string
 ): [fabric.Group, number] {
-    const top: number = 10;
+    topPadding += 10;
     let rectObj: RectangleType = {
         selectable: false,
         evented: false,
         objectCaching: false,
-        top: topPadding + top,
+        top: topPadding,
         fill: fill,
         rx: 5,
         ry: 5
     };
     //  Query
-    rectObj.top = topPadding - 5;
+    rectObj.top = topPadding - 15;
     rectObj.left = startQueryPixels;
     rectObj.width = endQueryPixels;
-    rectObj.height = top;
+    rectObj.height = 10;
     const queryDomain = new fabric.Rect(rectObj);
 
     // Subject
-    rectObj.top = topPadding - 5;
+    rectObj.top = topPadding - 15;
     rectObj.left = startSubjPixels;
     rectObj.width = endSubjPixels;
-    rectObj.height = top;
+    rectObj.height = 10;
     const subjDomain = new fabric.Rect(rectObj);
 
     // Group
@@ -128,7 +128,7 @@ export function drawDomainTracks(
         [queryDomain, subjDomain],
         CanvasDefaults.groupConfig
     );
-    return [domainGroup, topPadding + top];
+    return [domainGroup, topPadding];
 }
 
 export function drawLineAxis(

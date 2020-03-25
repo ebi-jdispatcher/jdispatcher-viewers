@@ -4,9 +4,9 @@ export class CanvasDefaults {
     public static canvasWidth: number = 1000;
     public static canvasHeight: number = 110;
     public static maxPixels: number = 
-        (65.0 * CanvasDefaults.canvasWidth) / 100;
+        (66.0 * CanvasDefaults.canvasWidth) / 100;
     public static evaluePixels: number =
-        (8.0 * CanvasDefaults.canvasWidth) / 100;
+        (7.0 * CanvasDefaults.canvasWidth) / 100;
     public static leftPaddingPixels: number =
         (26.5 * CanvasDefaults.canvasWidth) / 100;
     public static borderPixels: number =
