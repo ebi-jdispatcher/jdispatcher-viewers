@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CanvasDefaults } from "./config";
-import { InputType, TextType } from "./custom-types";
+import { InputType, TextType, RectangleType } from "./custom-types";
 import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
@@ -432,12 +432,16 @@ export class FabricjsRenderer {
     }
 
     private drawColorScaleGroup() {
-        var colorScale = new fabric.Rect({
+        const rectObj: RectangleType = {
+            selectable: false,
+            evented: false,
+            objectCaching: false,
             left: CanvasDefaults.leftScalePaddingPixels,
             top: this.topPadding,
             width: CanvasDefaults.scalePixels,
             height: 15
-        });
+        };
+        var colorScale = new fabric.Rect(rectObj);
         colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
         this.canvas.add(colorScale);
     }
