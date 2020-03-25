@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { TextType } from "./custom-types";
 
-export function mouseOver(
+export function mouseOverText(
     fabricObj: fabric.Object,
     textObj: TextType,
     canvas: fabric.Canvas
@@ -16,7 +16,7 @@ export function mouseOver(
     });
 }
 
-export function mouseDown(
+export function mouseDownText(
     fabricObj: fabric.Object,
     href: string,
     canvas: fabric.Canvas
@@ -29,7 +29,7 @@ export function mouseDown(
     });
 }
 
-export function mouseOut(
+export function mouseOutText(
     fabricObj: fabric.Object,
     textObj: TextType,
     canvas: fabric.Canvas
@@ -38,6 +38,34 @@ export function mouseOut(
         if (e.target) {
             e.target.setOptions(textObj);
             e.target.setOptions({ underline: false });
+            canvas.renderAll();
+        }
+    });
+}
+
+export function mouseOverDomain(
+    fabricObj: fabric.Object,
+    fabricGroupObj: fabric.Object,
+    canvas: fabric.Canvas
+) {
+    fabricObj.on("mouseover", (e: fabric.IEvent) => {
+        if (e.target) {
+            e.target.set("hoverCursor", "pointer");
+            fabricGroupObj.set({ visible: true });
+            fabricGroupObj.bringToFront();
+            canvas.renderAll();
+        }
+    });
+}
+
+export function mouseOutDomain(
+    fabricObj: fabric.Object,
+    fabricGroupObj: fabric.Object,
+    canvas: fabric.Canvas
+) {
+    fabricObj.on("mouseout", (e: fabric.IEvent) => {
+        if (e.target) {
+            fabricGroupObj.set({ visible: false });
             canvas.renderAll();
         }
     });

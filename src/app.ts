@@ -14,7 +14,13 @@ import {
     drawLineAxis
 } from "./drawing-utilities";
 import { getRgbColor, getGradientSteps } from "./color-utilities";
-import { mouseDown, mouseOver, mouseOut } from "./custom-events";
+import {
+    mouseDownText,
+    mouseOverText,
+    mouseOutText,
+    mouseOverDomain,
+    mouseOutDomain
+} from "./custom-events";
 import { colorDefaultGradient, defaultGradient } from "./color-schemes";
 import { numberToString } from "./other-utilities";
 
