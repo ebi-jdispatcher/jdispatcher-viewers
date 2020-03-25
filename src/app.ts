@@ -407,7 +407,7 @@ export class FabricjsRenderer {
                     // E-value text tracks
                     let textObj: TextType = {
                         fontWeight: "normal",
-                        fontSize: CanvasDefaults.fontSize + 1,
+                        fontSize: CanvasDefaults.fontSize,
                         selectable: false,
                         evented: false,
                         objectCaching: false,

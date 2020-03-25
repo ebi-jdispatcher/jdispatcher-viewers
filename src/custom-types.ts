@@ -18,7 +18,7 @@ export interface TextType {
     fontSize: number;
     selectable: boolean;
     evented: boolean;
-    objectCaching: false;
+    objectCaching: boolean;
     top?: number;
     left?: number;
     right?: number;
@@ -32,7 +32,7 @@ export interface TextType {
 export interface LineType {
     selectable: boolean;
     evented: boolean;
-    objectCaching: false;
+    objectCaching: boolean;
     top?: number;
     left?: number;
     right?: number;
@@ -44,7 +44,7 @@ export interface LineType {
 export interface RectangleType {
     selectable: boolean;
     evented: boolean;
-    objectCaching: false;
+    objectCaching: boolean;
     top?: number;
     left?: number;
     width?: number;
@@ -56,7 +56,7 @@ export interface RectangleType {
 export interface GroupType {
     selectable: boolean;
     evented: boolean;
-    objectCaching: false;
+    objectCaching: boolean;
     [key: string]: any;
 }
 

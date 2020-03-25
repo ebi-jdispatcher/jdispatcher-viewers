@@ -27,7 +27,11 @@ class CanvasState {
         this.listener = listenerFn;
     }
 
-    addCanvas(jobId: string, dataObj: SSSResultModel, status: RenderStatusEnum) {
+    addCanvas(
+        jobId: string,
+        dataObj: SSSResultModel,
+        status: RenderStatusEnum
+    ) {
         if (this.jobIds.length === 0 || !this.jobIds.includes(jobId)) {
             this.canvasInstances = [];
             this.jobIds.push(jobId);
@@ -136,7 +140,11 @@ class JobIdInputForm {
 
         if (validateInput(formValidatable)) {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
-                canvasInstance.addCanvas(jobId, mockDataObj, RenderStatusEnum.New);
+                canvasInstance.addCanvas(
+                    jobId,
+                    mockDataObj,
+                    RenderStatusEnum.New
+                );
             } else {
                 alert("Fetching from live service not yet implemented!");
                 return;
@@ -195,11 +203,15 @@ class CanvasRenderer {
         )!.textContent = `Visual Output for ${this.canvasInstance[0].jobId}`;
         this.hostElement.insertAdjacentElement("beforeend", this.elementTitle);
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
-        const fabricjs = new FabricjsRenderer({
-            jobId: this.canvasInstance[0].jobId,
-            dataObj: this.canvasInstance[0].dataObj,
-            status: RenderStatusEnum.New
-        }, true, "dynamic");
+        const fabricjs = new FabricjsRenderer(
+            {
+                jobId: this.canvasInstance[0].jobId,
+                dataObj: this.canvasInstance[0].dataObj,
+                status: RenderStatusEnum.New
+            },
+            true,
+            "dynamic"
+        );
         // TODO add export as SVG and PNG - clickEvents
         console.log(fabricjs.canvas.renderCanvas);
     }
