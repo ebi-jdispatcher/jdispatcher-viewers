@@ -8,7 +8,11 @@ import {
     getHspPixelCoords,
     getTotalPixels
 } from "./coords-utilities";
-import { drawLineTracks, drawDomainTracks } from "./drawing-utilities";
+import {
+    drawLineTracks,
+    drawDomainTracks,
+    drawLineAxis
+} from "./drawing-utilities";
 import { getRgbColor, getGradientSteps } from "./color-utilities";
 import { mouseDown, mouseOver, mouseOut } from "./custom-events";
 import { colorDefaultGradient, defaultGradient } from "./color-schemes";
@@ -432,6 +436,20 @@ export class FabricjsRenderer {
     }
 
     private drawColorScaleGroup() {
+        // E-value Text
+        const textObj: TextType = {
+            fontSize: CanvasDefaults.fontSize + 1,
+            fontWeight: "normal",
+            selectable: false,
+            evented: false,
+            objectCaching: false,
+            left: CanvasDefaults.leftScalePaddingPixels - 50,
+            top: this.topPadding
+        };
+        var evalueText = new fabric.Text("E-value", textObj);
+        this.canvas.add(evalueText);
+
+        // E-value Color Gradient
         const rectObj: RectangleType = {
             selectable: false,
             evented: false,
@@ -444,6 +462,24 @@ export class FabricjsRenderer {
         var colorScale = new fabric.Rect(rectObj);
         colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
         this.canvas.add(colorScale);
+
+        // E-value Axis (line and ticks)
+        const oneForthGradPixels =
+            (CanvasDefaults.leftScalePaddingPixels +
+                CanvasDefaults.scalePixels -
+                CanvasDefaults.leftScalePaddingPixels) /
+            4;
+        let axisGroup: fabric.Group;
+        [axisGroup, this.topPadding] = drawLineAxis(
+            CanvasDefaults.leftScalePaddingPixels,
+            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels,
+            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 2,
+            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 3,
+            CanvasDefaults.leftScalePaddingPixels + CanvasDefaults.scalePixels,
+            this.topPadding,
+            1
+        );
+        this.canvas.add(axisGroup);
     }
 
     private drawFooterText() {
