@@ -252,12 +252,16 @@ export class FabricjsRenderer {
         // only display 10 hsps per hit
         const queryLen: number = this.canvasObj.dataObj.query_len;
         let subjLen: number = 0;
+        let maxHitIDLen: number = 0;
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
+            if (hit.hit_id.length > maxHitIDLen) maxHitIDLen =
+                                                     hit.hit_id.length;
         }
         let minEval: number = Number.MAX_VALUE;
         let maxEval: number = 0;
         let minNotZeroEval: number = Number.MAX_VALUE;
+        
         for (const hit of this.canvasObj.dataObj.hits) {
             for (const hsp of hit.hit_hsps) {
                 if (hsp.hsp_expect! < minEval) minEval = hsp.hsp_expect!;
@@ -269,6 +273,33 @@ export class FabricjsRenderer {
         for (const hit of this.canvasObj.dataObj.hits) {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
+            // Hit ID + Hit Description text tracks
+            let textObj: TextType = {
+                fontWeight: "normal",
+                fontFamily: "monospace",
+                fontSize: CanvasDefaults.fontSize - 2,
+                selectable: false,
+                evented: false,
+                objectCaching: false,
+                top: this.topPadding + 2
+            };
+            
+            const variableSpace = " ".repeat(maxHitIDLen - hit.hit_id.length);
+            const spaceText: fabric.Text = new fabric.Text(variableSpace, textObj);
+            this.canvas.add(spaceText);
+
+            let hit_def: string = `${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
+            let hit_def_full: string = `${variableSpace}${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
+            if (hit_def_full.length > 40) {
+                hit_def = (hit_def_full.slice(0, 38) + "...").slice(variableSpace.length);
+            }
+            textObj.left = 10 + variableSpace.length * 6;
+            textObj.evented = true;
+            const hitText: fabric.Text = new fabric.Text(hit_def, textObj);
+            this.canvas.add(hitText);
+            mouseOver(hitText, textObj, this.canvas);
+            mouseDown(hitText, hit.hit_url, this.canvas);
+            mouseOut(hitText, textObj, this.canvas);
             for (const hsp of hit.hit_hsps) {
                 numberHsps++;
                 if (this.limitNumberHsps && numberHsps > 10) {

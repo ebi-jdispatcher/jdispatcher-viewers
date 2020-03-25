@@ -37,6 +37,7 @@ export function mouseOut(
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
             e.target.setOptions(textObj);
+            e.target.setOptions({ underline: false });
             canvas.renderAll();
         }
     });
