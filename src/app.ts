@@ -327,9 +327,9 @@ export class FabricjsRenderer {
             textObj.evented = true;
             const hitText: fabric.Text = new fabric.Text(hit_def, textObj);
             this.canvas.add(hitText);
-            mouseOver(hitText, textObj, this.canvas);
-            mouseDown(hitText, hit.hit_url, this.canvas);
-            mouseOut(hitText, textObj, this.canvas);
+            mouseOverText(hitText, textObj, this.canvas);
+            mouseDownText(hitText, hit.hit_url, this.canvas);
+            mouseOutText(hitText, textObj, this.canvas);
             for (const hsp of hit.hit_hsps) {
                 numberHsps++;
                 if (this.limitNumberHsps && numberHsps > 10) {
@@ -411,8 +411,13 @@ export class FabricjsRenderer {
                         this.gradientSteps,
                         defaultGradient
                     );
-                    let domainsGroup: fabric.Group;
-                    [domainsGroup, this.topPadding] = drawDomainTracks(
+
+                    let queryDomain, subjDomain: fabric.Rect;
+                    [
+                        queryDomain,
+                        subjDomain,
+                        this.topPadding
+                    ] = drawDomainTracks(
                         startQueryHspPixels,
                         endQueryHspPixels,
                         startSubjHspPixels,
@@ -420,7 +425,8 @@ export class FabricjsRenderer {
                         this.topPadding,
                         color
                     );
-                    this.canvas.add(domainsGroup);
+                    this.canvas.add(queryDomain);
+                    this.canvas.add(subjDomain);
 
                     // E-value text tracks
                     let textObj: TextType = {
@@ -440,6 +446,85 @@ export class FabricjsRenderer {
                     );
                     evalText.width = CanvasDefaults.evaluePixels;
                     this.canvas.add(evalText);
+
+                    // Query tooltip
+                    const floatTextObj: TextType = {
+                        fontWeight: "normal",
+                        fontSize: CanvasDefaults.fontSize + 1,
+                        selectable: false,
+                        evented: false,
+                        objectCaching: false,
+                        textAlign: "left",
+                        originX: "top",
+                        originY: "top",
+                        top: 5
+                    };
+                    const queryTooltipText: fabric.Text = new fabric.Text(
+                        `Start: ${hsp.hsp_hit_from}\nEnd: ${
+                            hsp.hsp_hit_to
+                        }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
+                        floatTextObj
+                    );
+                    const rectObj: RectType = {
+                        selectable: false,
+                        evented: false,
+                        objectCaching: false,
+                        fill: "white",
+                        stroke: "lightseagreen",
+                        rx: 5,
+                        ry: 5,
+                        originX: "top",
+                        originY: "top",
+                        width: 140,
+                        height: 60,
+                        opacity: 0.95
+                    };
+                    const queryTooltipBox: fabric.Rect = new fabric.Rect(
+                        rectObj
+                    );
+                    const queryTooltipGroup: fabric.Group = new fabric.Group(
+                        [queryTooltipBox, queryTooltipText],
+                        {
+                            selectable: false,
+                            evented: false,
+                            objectCaching: false,
+                            visible: false,
+                            top: this.topPadding - 10,
+                            left: startQueryHspPixels + endQueryHspPixels / 2
+                        }
+                    );
+                    this.canvas.add(queryTooltipGroup);
+                    mouseOverDomain(
+                        queryDomain,
+                        queryTooltipGroup,
+                        this.canvas
+                    );
+                    mouseOutDomain(queryDomain, queryTooltipGroup, this.canvas);
+
+                    // Subject tooltip
+                    const subjTooltipText: fabric.Text = new fabric.Text(
+                        `Start: ${hsp.hsp_query_from}\nEnd: ${
+                            hsp.hsp_query_to
+                        }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
+                        floatTextObj
+                    );
+                    const subjTooltipBox: fabric.Rect = new fabric.Rect(
+                        rectObj
+                    );
+                    const subjTooltipGroup: fabric.Group = new fabric.Group(
+                        [subjTooltipBox, subjTooltipText],
+                        {
+                            selectable: false,
+                            evented: false,
+                            objectCaching: false,
+                            visible: false,
+                            top: this.topPadding - 10,
+                            left: startSubjHspPixels + endSubjHspPixels / 2
+                        }
+                    );
+                    this.canvas.add(subjTooltipGroup);
+                    mouseOverDomain(subjDomain, subjTooltipGroup, this.canvas);
+                    mouseOutDomain(subjDomain, subjTooltipGroup, this.canvas);
                 }
             }
         }
@@ -570,8 +655,8 @@ export class FabricjsRenderer {
             `EBI is an Outstation of the European Molecular Biology Laboratory.`;
         const copyrightText = new fabric.Text(`${copyright}`, textObj);
         this.canvas.add(copyrightText);
-        mouseOver(copyrightText, textObj, this.canvas);
-        mouseDown(copyrightText, "https://www.ebi.ac.uk", this.canvas);
-        mouseOut(copyrightText, textObj, this.canvas);
+        mouseOverText(copyrightText, textObj, this.canvas);
+        mouseDownText(copyrightText, "https://www.ebi.ac.uk", this.canvas);
+        mouseOutText(copyrightText, textObj, this.canvas);
     }
 }

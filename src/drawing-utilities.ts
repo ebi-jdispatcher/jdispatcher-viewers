@@ -98,11 +98,11 @@ export function drawDomainTracks(
     endSubjPixels: number,
     topPadding: number,
     fill: string
-): [fabric.Group, number] {
+): [fabric.Rect, fabric.Rect, number] {
     topPadding += 10;
     let rectObj: RectType = {
         selectable: false,
-        evented: false,
+        evented: true,
         objectCaching: false,
         top: topPadding,
         fill: fill,
@@ -123,12 +123,7 @@ export function drawDomainTracks(
     rectObj.height = 10;
     const subjDomain = new fabric.Rect(rectObj);
 
-    // Group
-    const domainGroup = new fabric.Group(
-        [queryDomain, subjDomain],
-        CanvasDefaults.groupConfig
-    );
-    return [domainGroup, topPadding];
+    return [queryDomain, subjDomain, topPadding];
 }
 
 export function drawLineAxis(
