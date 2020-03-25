@@ -30,6 +30,7 @@ export class FabricjsRenderer {
     private endEvalPixels: number;
     private startSubjPixels: number;
     private endSubjPixels: number;
+    private gradientSteps: number[] = [];
 
     constructor(
         public canvasObj: InputType,
@@ -280,6 +281,14 @@ export class FabricjsRenderer {
                     minNotZeroEval = hsp.hsp_expect!;
             }
         }
+
+        this.gradientSteps = getGradientSteps(
+            minEval,
+            maxEval,
+            minNotZeroEval,
+            this.scaleType
+        );
+
         for (const hit of this.canvasObj.dataObj.hits) {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
@@ -386,15 +395,9 @@ export class FabricjsRenderer {
                         hspSubjStart,
                         hspSubjEnd
                     );
-                    const gradientSetps = getGradientSteps(
-                        minEval,
-                        maxEval,
-                        minNotZeroEval,
-                        this.scaleType
-                    );
                     const color = getRgbColor(
                         hsp.hsp_expect!,
-                        gradientSetps,
+                        this.gradientSteps,
                         defaultGradient
                     );
                     let domainsGroup: fabric.Group;
@@ -480,6 +483,68 @@ export class FabricjsRenderer {
             1
         );
         this.canvas.add(axisGroup);
+
+        // E-value scale tick mark labels
+        this.topPadding += 5;
+        textObj.top = this.topPadding;
+        textObj.fontType = "monospace";
+        textObj.fontSize = CanvasDefaults.fontSize;
+            // Start Tick Label
+            (textObj.left =
+                CanvasDefaults.leftScalePaddingPixels -
+                numberToString(this.gradientSteps[0]).length * 3);
+        const startLabelText = new fabric.Text(
+            numberToString(this.gradientSteps[0]),
+            textObj
+        );
+        // 25% Tick Label
+        textObj.left =
+            CanvasDefaults.leftScalePaddingPixels +
+            oneForthGradPixels -
+            numberToString(this.gradientSteps[1]).length * 3;
+        const o25LabelText = new fabric.Text(
+            numberToString(this.gradientSteps[1]),
+            textObj
+        );
+        // 50% Tick Label
+        textObj.left =
+            CanvasDefaults.leftScalePaddingPixels +
+            oneForthGradPixels * 2 -
+            numberToString(this.gradientSteps[2]).length * 3;
+        const o50LabelText = new fabric.Text(
+            numberToString(this.gradientSteps[2]),
+            textObj
+        );
+        // 75% Tick Label
+        textObj.left =
+            CanvasDefaults.leftScalePaddingPixels +
+            oneForthGradPixels * 3 -
+            numberToString(this.gradientSteps[3]).length * 3;
+        const o75LabelText = new fabric.Text(
+            numberToString(this.gradientSteps[3]),
+            textObj
+        );
+        // End Tick Label
+        textObj.left =
+            CanvasDefaults.leftScalePaddingPixels +
+            CanvasDefaults.scalePixels -
+            numberToString(this.gradientSteps[4]).length * 3;
+        const endLabelText = new fabric.Text(
+            numberToString(this.gradientSteps[4]),
+            textObj
+        );
+
+        const textGroup = new fabric.Group(
+            [
+                startLabelText,
+                o25LabelText,
+                o50LabelText,
+                o75LabelText,
+                endLabelText
+            ],
+            CanvasDefaults.groupConfig
+        );
+        this.canvas.add(textGroup);
     }
 
     private drawFooterText() {
