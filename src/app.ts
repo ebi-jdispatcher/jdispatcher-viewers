@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CanvasDefaults } from "./config";
-import { InputType, TextType, RectangleType } from "./custom-types";
+import { InputType, TextType, RectType } from "./custom-types";
 import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
@@ -454,7 +454,7 @@ export class FabricjsRenderer {
         this.canvas.add(evalueText);
 
         // E-value Color Gradient
-        const rectObj: RectangleType = {
+        const rectObj: RectType = {
             selectable: false,
             evented: false,
             objectCaching: false,

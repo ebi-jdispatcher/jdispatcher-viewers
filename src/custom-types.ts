@@ -41,7 +41,7 @@ export interface LineType {
     [key: string]: any;
 }
 
-export interface RectangleType {
+export interface RectType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;

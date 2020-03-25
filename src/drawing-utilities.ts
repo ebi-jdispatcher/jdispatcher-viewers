@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CanvasDefaults } from "./config";
-import { LineType, RectangleType } from "./custom-types";
+import { LineType, RectType } from "./custom-types";
 
 export function drawLineTracks(
     startQueryPixels: number,
@@ -100,7 +100,7 @@ export function drawDomainTracks(
     fill: string
 ): [fabric.Group, number] {
     topPadding += 10;
-    let rectObj: RectangleType = {
+    let rectObj: RectType = {
         selectable: false,
         evented: false,
         objectCaching: false,
