@@ -16,6 +16,7 @@ import {
 import { getRgbColor, getGradientSteps } from "./color-utilities";
 import { mouseDown, mouseOver, mouseOut } from "./custom-events";
 import { colorDefaultGradient, defaultGradient } from "./color-schemes";
+import { numberToString } from "./other-utilities";
 
 export class FabricjsRenderer {
     public canvas: fabric.Canvas;
@@ -424,11 +425,7 @@ export class FabricjsRenderer {
 
                     textObj.left = this.startEvalPixels;
                     const evalText: fabric.Text = new fabric.Text(
-                        `${
-                            Number.isInteger(hsp.hsp_expect!)
-                                ? hsp.hsp_expect! + ".0"
-                                : hsp.hsp_expect!.toString()
-                        }`,
+                        numberToString(hsp.hsp_expect!),
                         textObj
                     );
                     evalText.width = CanvasDefaults.evaluePixels;
