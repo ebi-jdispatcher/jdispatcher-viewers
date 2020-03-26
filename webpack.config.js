@@ -9,6 +9,10 @@ module.exports = {
     publicPath: "dist"
   },
   devtool: "inline-source-map",
+  devServer: {
+    port: 8080,
+    compress: false
+  },
   module: {
     rules: [
       {
