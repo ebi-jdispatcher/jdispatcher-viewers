@@ -8,6 +8,12 @@
         "start": "webpack-dev-server",
         "build": "webpack --config webpack.config.prod.js"
     },
+    "keywords": [
+        "visual-output",
+        "functional-predictions",
+        "jdispatcher-viewers",
+        "jdispatcher-parsers"
+    ],
     "author": "Fábio Madeira",
     "repository": "https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers",
     "license": "Apache-2.0",
