@@ -50,6 +50,33 @@ export function getRgbColorGradient(
     }
 }
 
+export function getRgbColorFixed(
+    score: number,
+    gradientSteps: number[],
+    colorScheme: ColorType
+) {
+    // assumes length of gradientSteps is 5
+    const colorSchemeSteps: number[] = colorScheme.keys;
+    if (colorSchemeSteps.length != gradientSteps.length) {
+        throw Error(
+            "Color Scheme and Gradient Steps should have matching lengths!"
+        );
+    }
+    if (score + 0.0 === 0.0 || score < gradientSteps[0]) {
+        return `rgb(${colorScheme[colorSchemeSteps[0]].join(",")})`;
+    } else if (score >= gradientSteps[0] && score < gradientSteps[1]) {
+        return `rgb(${colorScheme[colorSchemeSteps[1]].join(",")})`;
+    } else if (score >= gradientSteps[1] && score < gradientSteps[2]) {
+        return `rgb(${colorScheme[colorSchemeSteps[2]].join(",")})`;
+    } else if (score >= gradientSteps[2] && score < gradientSteps[3]) {
+        return `rgb(${colorScheme[colorSchemeSteps[3]].join(",")})`;
+    } else if (score >= gradientSteps[3]) {
+        return `rgb(${colorScheme[colorSchemeSteps[4]].join(",")})`;
+    } else {
+        return `rgb(192,192,192)`;
+    }
+}
+
 export function getGradientSteps(
     minScore: number,
     maxScore: number,
