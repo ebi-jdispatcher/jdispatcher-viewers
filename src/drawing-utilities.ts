@@ -126,7 +126,7 @@ export function drawDomainTracks(
     return [queryDomain, subjDomain, topPadding];
 }
 
-export function drawLineAxis(
+export function drawLineAxis5Buckets(
     startGradPixels: number,
     o25GradPixels: number,
     o50GradPixels: number,
@@ -192,7 +192,7 @@ export function drawLineAxis(
     ];
     lineObj.left = o75GradPixels;
     const axis75Tick = new fabric.Line(coordsAxis75Tick, lineObj);
-    
+
     // End tick
     const coordsAxisEndTick: [number, number, number, number] = [
         endGradPixels,
@@ -202,7 +202,7 @@ export function drawLineAxis(
     ];
     lineObj.left = endGradPixels;
     const axisEndTick = new fabric.Line(coordsAxisEndTick, lineObj);
-    
+
     // Group
     const axisGroup = new fabric.Group(
         [
@@ -211,7 +211,7 @@ export function drawLineAxis(
             axis25Tick,
             axis50Tick,
             axis75Tick,
-            axisEndTick,
+            axisEndTick
         ],
         CanvasDefaults.groupConfig
     );

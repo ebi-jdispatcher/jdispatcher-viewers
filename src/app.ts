@@ -11,7 +11,7 @@ import {
 import {
     drawLineTracks,
     drawDomainTracks,
-    drawLineAxis
+    drawLineAxis5Buckets,
 } from "./drawing-utilities";
 import { getRgbColor, getGradientSteps } from "./color-utilities";
 import {
