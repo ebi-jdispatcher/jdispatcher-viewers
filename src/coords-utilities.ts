@@ -14,7 +14,11 @@ export function getTextLegendPaddingFactor(inputString: string): number {
     return positionFactor;
 }
 
-export function getTotalPixels(queryLen: number, subjLen: number, varLen: number) {
+export function getTotalPixels(
+    queryLen: number,
+    subjLen: number,
+    varLen: number
+) {
     const totalLen = queryLen + subjLen;
     const totalPixels =
         (varLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) /

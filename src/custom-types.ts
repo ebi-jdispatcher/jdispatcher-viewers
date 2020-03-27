@@ -63,4 +63,5 @@ export interface GroupType {
 export interface ColorType {
     keys: number[];
     [key: number]: [number, number, number];
-}[]
+}
+[];

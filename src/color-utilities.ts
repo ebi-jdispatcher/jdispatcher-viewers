@@ -162,7 +162,7 @@ export function getGradientSteps(
             ];
         }
     } else {
-        throw Error(`${scaleType} not yet implemented!`);
+        gradientSteps = [0, 40, 50, 80, 200];
     }
     return gradientSteps;
 }
