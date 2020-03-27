@@ -217,3 +217,107 @@ export function drawLineAxis5Buckets(
     );
     return [axisGroup, topPadding];
 }
+
+export function drawLineAxis6Buckets(
+    startGradPixels: number,
+    o20GradPixels: number,
+    o40GradPixels: number,
+    o60GradPixels: number,
+    o80GradPixels: number,
+    endGradPixels: number,
+    topPadding: number,
+    strokeWidth: number
+): [fabric.Group, number] {
+    // Axis
+    topPadding += 15;
+    let lineObj: LineType = {
+        selectable: false,
+        evented: false,
+        objectCaching: false,
+        top: topPadding,
+        stroke: "black",
+        strokeWidth: strokeWidth
+    };
+    const coordsAxis: [number, number, number, number] = [
+        startGradPixels,
+        topPadding,
+        endGradPixels,
+        topPadding
+    ];
+    lineObj.left = startGradPixels;
+    const axisLine = new fabric.Line(coordsAxis, lineObj);
+
+    // Start tick
+    const coordsAxisStartTick: [number, number, number, number] = [
+        startGradPixels,
+        topPadding,
+        startGradPixels,
+        topPadding + 4
+    ];
+    const axisStartTick = new fabric.Line(coordsAxisStartTick, lineObj);
+
+    // 20% tick
+    const coordsAxis20Tick: [number, number, number, number] = [
+        o20GradPixels,
+        topPadding,
+        o20GradPixels,
+        topPadding + 4
+    ];
+    lineObj.left = o20GradPixels;
+    const axis20Tick = new fabric.Line(coordsAxis20Tick, lineObj);
+
+    // 40% tick
+    const coordsAxis40Tick: [number, number, number, number] = [
+        o40GradPixels,
+        topPadding,
+        o40GradPixels,
+        topPadding + 4
+    ];
+    lineObj.left = o40GradPixels;
+    const axis40Tick = new fabric.Line(coordsAxis40Tick, lineObj);
+
+    // 60% tick
+    const coordsAxis60Tick: [number, number, number, number] = [
+        o60GradPixels,
+        topPadding,
+        o60GradPixels,
+        topPadding + 4
+    ];
+    lineObj.left = o60GradPixels;
+    const axis60Tick = new fabric.Line(coordsAxis60Tick, lineObj);
+
+    // 80% tick
+    const coordsAxis80Tick: [number, number, number, number] = [
+        o80GradPixels,
+        topPadding,
+        o80GradPixels,
+        topPadding + 4
+    ];
+    lineObj.left = o80GradPixels;
+    const axis80Tick = new fabric.Line(coordsAxis80Tick, lineObj);
+
+    // End tick
+    const coordsAxisEndTick: [number, number, number, number] = [
+        endGradPixels,
+        topPadding,
+        endGradPixels,
+        topPadding + 4
+    ];
+    lineObj.left = endGradPixels;
+    const axisEndTick = new fabric.Line(coordsAxisEndTick, lineObj);
+
+    // Group
+    const axisGroup = new fabric.Group(
+        [
+            axisLine,
+            axisStartTick,
+            axis20Tick,
+            axis40Tick,
+            axis60Tick,
+            axis80Tick,
+            axisEndTick
+        ],
+        CanvasDefaults.groupConfig
+    );
+    return [axisGroup, topPadding];
+}
