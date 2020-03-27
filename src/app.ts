@@ -12,23 +12,36 @@ import {
     drawLineTracks,
     drawDomainTracks,
     drawLineAxis5Buckets,
+    drawLineAxis6Buckets
 } from "./drawing-utilities";
-import { getRgbColor, getGradientSteps } from "./color-utilities";
+import {
+    getRgbColorGradient,
+    getRgbColorFixed,
+    getGradientSteps
+} from "./color-utilities";
 import {
     mouseDownText,
     mouseOverText,
     mouseOutText,
     mouseOverDomain,
-    mouseOutDomain
+    mouseOutDomain,
+    mouseOverCheckbox,
+    mouseDownCheckbox,
+    mouseOutCheckbox
 } from "./custom-events";
-import { colorDefaultGradient, defaultGradient } from "./color-schemes";
+import {
+    colorDefaultGradient,
+    colorNcbiBlastGradient,
+    defaultGradient,
+    ncbiBlastGradient
+} from "./color-schemes";
 import { numberToString } from "./other-utilities";
 
 export class FabricjsRenderer {
     public canvas: fabric.Canvas;
     private canvasHeight: number = CanvasDefaults.canvasHeight;
     private canvasWidth: number = CanvasDefaults.canvasWidth;
-    private topPadding: number = 2;
+    private topPadding: number = 0;
     private queryLen: number = 0;
     private subjLen: number = 0;
     private startQueryPixels: number;
@@ -40,13 +53,10 @@ export class FabricjsRenderer {
 
     constructor(
         public canvasObj: InputType,
-        private limitNumberHsps: boolean = true,
-        private scaleType: string = "dynamic"
+        public limitNumberHsps: boolean = true,
+        public scaleType: string = "dynamic"
     ) {
         this.canvas = new fabric.Canvas("canvas", {});
-        // canvas header
-        this.drawHeaderTextGroup();
-        // content header
         this.queryLen = this.canvasObj.dataObj.query_len;
         for (const hit of this.canvasObj.dataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
@@ -57,10 +67,18 @@ export class FabricjsRenderer {
             this.startSubjPixels,
             this.endSubjPixels
         ] = getQuerySubjPixelCoords(this.queryLen, this.subjLen, this.subjLen);
-        this.startEvalPixels = getEvalPixelCoords(
-            this.endQueryPixels
-        );
+        this.startEvalPixels = getEvalPixelCoords(this.endQueryPixels);
 
+        // render All components
+        this.renderAll();
+    }
+    public renderAll() {
+        this.canvas.clear();
+        this.topPadding = 2;
+        // canvas header
+        this.drawHeaderTextGroup();
+
+        // content header
         if (this.canvasObj.dataObj.hits.length > 0) {
             // content header
             this.topPadding += 25;
@@ -87,6 +105,7 @@ export class FabricjsRenderer {
         this.setFrameSize();
         this.renderCanvas();
     }
+
     private setFrameSize() {
         this.canvas.setHeight(this.canvasHeight);
         this.canvas.setWidth(this.canvasWidth);
@@ -218,9 +237,15 @@ export class FabricjsRenderer {
         textObj.left = this.startQueryPixels;
         const queryText = new fabric.Text("Sequence Match", textObj);
         queryText.width = totalQueryPixels;
-        // E-value
+        this.topPadding += 5;
         textObj.left = this.startEvalPixels;
-        const evalueText = new fabric.Text("E-value", textObj);
+        let evalueText;
+        // E-value/ Bits
+        if (this.scaleType === "ncbiblast") {
+            evalueText = new fabric.Text("Bit score", textObj);
+        } else {
+            evalueText = new fabric.Text("E-value", textObj);
+        }
         evalueText.width = CanvasDefaults.evaluePixels;
         // Subject Match
         textObj.left = this.startSubjPixels;
@@ -294,25 +319,48 @@ export class FabricjsRenderer {
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
         }
-        let minEval: number = Number.MAX_VALUE;
-        let maxEval: number = 0;
-        let minNotZeroEval: number = Number.MAX_VALUE;
-
+        let minScore: number = Number.MAX_VALUE;
+        let maxScore: number = 0;
+        let minNotZeroScore: number = Number.MAX_VALUE;
         for (const hit of this.canvasObj.dataObj.hits) {
             for (const hsp of hit.hit_hsps) {
-                if (hsp.hsp_expect! < minEval) minEval = hsp.hsp_expect!;
-                if (hsp.hsp_expect! > maxEval) maxEval = hsp.hsp_expect!;
-                if (hsp.hsp_expect! < minNotZeroEval && hsp.hsp_expect! > 0.0)
-                    minNotZeroEval = hsp.hsp_expect!;
+                if (this.scaleType === "ncbiblast") {
+                    if (hsp.hsp_bit_score! < minScore)
+                        minScore = hsp.hsp_bit_score!;
+                    if (hsp.hsp_bit_score! > maxScore)
+                        maxScore = hsp.hsp_bit_score!;
+                    if (
+                        hsp.hsp_bit_score! < minNotZeroScore &&
+                        hsp.hsp_bit_score! > 0.0
+                    )
+                        minNotZeroScore = hsp.hsp_bit_score!;
+                } else {
+                    if (hsp.hsp_expect! < minScore) minScore = hsp.hsp_expect!;
+                    if (hsp.hsp_expect! > maxScore) maxScore = hsp.hsp_expect!;
+                    if (
+                        hsp.hsp_expect! < minNotZeroScore &&
+                        hsp.hsp_expect! > 0.0
+                    )
+                        minNotZeroScore = hsp.hsp_expect!;
+                }
             }
         }
 
-        this.gradientSteps = getGradientSteps(
-            minEval,
-            maxEval,
-            minNotZeroEval,
-            this.scaleType
-        );
+        if (this.scaleType === "ncbiblast") {
+            this.gradientSteps = getGradientSteps(
+                minScore,
+                maxScore,
+                minNotZeroScore,
+                this.scaleType
+            );
+        } else {
+            this.gradientSteps = getGradientSteps(
+                minScore,
+                maxScore,
+                minNotZeroScore,
+                this.scaleType
+            );
+        }
 
         for (const hit of this.canvasObj.dataObj.hits) {
             let numberHsps: number = 0;
@@ -427,12 +475,20 @@ export class FabricjsRenderer {
                         hspSubjStart,
                         hspSubjEnd
                     );
-                    const color = getRgbColor(
-                        hsp.hsp_expect!,
-                        this.gradientSteps,
-                        defaultGradient
-                    );
-
+                    let color: string;
+                    if (this.scaleType === "ncbiblast") {
+                        color = getRgbColorFixed(
+                            hsp.hsp_bit_score!,
+                            this.gradientSteps,
+                            ncbiBlastGradient
+                        );
+                    } else {
+                        color = getRgbColorGradient(
+                            hsp.hsp_expect!,
+                            this.gradientSteps,
+                            defaultGradient
+                        );
+                    }
                     let queryDomain, subjDomain: fabric.Rect;
                     [
                         queryDomain,
@@ -461,10 +517,18 @@ export class FabricjsRenderer {
                     };
 
                     textObj.left = this.startEvalPixels;
-                    const evalText: fabric.Text = new fabric.Text(
-                        numberToString(hsp.hsp_expect!),
-                        textObj
-                    );
+                    let evalText: fabric.Text; 
+                    if (this.scaleType === "ncbiblast") {
+                        evalText = new fabric.Text(
+                            numberToString(hsp.hsp_bit_score!),
+                            textObj
+                        );
+                    } else {
+                        evalText = new fabric.Text(
+                            numberToString(hsp.hsp_expect!),
+                            textObj
+                        );
+                    }
                     evalText.width = CanvasDefaults.evaluePixels;
                     this.canvas.add(evalText);
 
@@ -480,12 +544,24 @@ export class FabricjsRenderer {
                         originY: "top",
                         top: 5
                     };
-                    const queryTooltipText: fabric.Text = new fabric.Text(
-                        `Start: ${hsp.hsp_hit_from}\nEnd: ${
-                            hsp.hsp_hit_to
-                        }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
-                        floatTextObj
-                    );
+                    let queryTooltipText: fabric.Text;
+                    if (this.scaleType === "ncbiblast") {
+                        queryTooltipText = new fabric.Text(
+                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
+                                hsp.hsp_hit_to
+                            }\nBit score: ${numberToString(
+                                hsp.hsp_bit_score!
+                            )}`,
+                            floatTextObj
+                        );
+                    } else {
+                        queryTooltipText = new fabric.Text(
+                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
+                                hsp.hsp_hit_to
+                            }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
+                            floatTextObj
+                        );
+                    }
                     const rectObj: RectType = {
                         selectable: false,
                         evented: false,
@@ -523,12 +599,25 @@ export class FabricjsRenderer {
                     mouseOutDomain(queryDomain, queryTooltipGroup, this.canvas);
 
                     // Subject tooltip
-                    const subjTooltipText: fabric.Text = new fabric.Text(
-                        `Start: ${hsp.hsp_query_from}\nEnd: ${
-                            hsp.hsp_query_to
-                        }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
-                        floatTextObj
-                    );
+                    let subjTooltipText: fabric.Text;
+                    if (this.scaleType === "ncbiblast") {
+                        subjTooltipText = new fabric.Text(
+                            `Start: ${hsp.hsp_query_from}\nEnd: ${
+                                hsp.hsp_query_to
+                            }\nBit score: ${numberToString(
+                                hsp.hsp_bit_score!
+                            )}`,
+                            floatTextObj
+                        );
+                    } else {
+                        subjTooltipText = new fabric.Text(
+                            `Start: ${hsp.hsp_query_from}\nEnd: ${
+                                hsp.hsp_query_to
+                            }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
+                            floatTextObj
+                        );
+                    }
+
                     const subjTooltipBox: fabric.Rect = new fabric.Rect(
                         rectObj
                     );
@@ -552,17 +641,101 @@ export class FabricjsRenderer {
     }
 
     private drawColorScaleGroup() {
-        // E-value Text
+        // Scale Type selection
+        const textSelObj: TextType = {
+            fontSize: CanvasDefaults.fontSize + 1,
+            fontWeight: "bold",
+            selectable: false,
+            evented: false,
+            objectCaching: false,
+            left: CanvasDefaults.leftScalePaddingPixels,
+            top: this.topPadding
+        };
+
+        var fixedText = new fabric.Text("Scale Type:", textSelObj);
+        this.canvas.add(fixedText);
+
+        const textCheckDynObj: TextType = {
+            fontSize: CanvasDefaults.fontSize + 12,
+            fontWeight: "normal",
+            fill: "grey",
+            selectable: false,
+            evented: true,
+            objectCaching: false,
+            left: CanvasDefaults.leftScalePaddingPixels,
+            top: this.topPadding - 8
+        };
+        const textCheckFixObj: TextType = { ...textCheckDynObj };
+        const textCheckNcbiObj: TextType = { ...textCheckDynObj };
+
+        let checkSym: string;
+        this.scaleType === "dynamic" ? (checkSym = "☒") : (checkSym = "☐");
+        if (this.scaleType === "dynamic") textCheckDynObj.fill = "black";
+        textCheckDynObj.left! += 80;
+        var dynamicText = new fabric.Text(checkSym, textCheckDynObj);
+        mouseOverCheckbox(dynamicText, textCheckDynObj, this);
+        mouseOutCheckbox(dynamicText, textCheckDynObj, "dynamic", this);
+        mouseDownCheckbox(dynamicText, "dynamic", this);
+        this.canvas.add(dynamicText);
+        textSelObj.fontWeight = "normal";
+        textSelObj.left! += 100;
+        this.canvas.add(dynamicText);
+        var dynamicText = new fabric.Text(
+            "Dynamic (E-value: min to max)",
+            textSelObj
+        );
+        this.canvas.add(dynamicText);
+
+        this.scaleType === "fixed" ? (checkSym = "☒") : (checkSym = "☐");
+        // this.scaleType === "fixed" ? (checkSym = "◉") : (checkSym = "○");
+        if (this.scaleType === "fixed") textCheckFixObj.fill = "black";
+        textCheckFixObj.left! += 290;
+        var fixedText = new fabric.Text(checkSym, textCheckFixObj);
+        mouseOverCheckbox(fixedText, textCheckFixObj, this);
+        mouseOutCheckbox(fixedText, textCheckFixObj, "fixed", this);
+        mouseDownCheckbox(fixedText, "fixed", this);
+        this.canvas.add(fixedText);
+        textSelObj.left! += 210;
+        var fixedText = new fabric.Text(
+            "Fixed (E-value: 0.0 to 100.0)",
+            textSelObj
+        );
+        this.canvas.add(fixedText);
+
+        // this.scaleType === "ncbiblast" ? (checkSym = "☑︎") : (checkSym = "☐");
+        this.scaleType === "ncbiblast" ? (checkSym = "☒") : (checkSym = "☐");
+        if (this.scaleType === "ncbiblast") textCheckNcbiObj.fill = "black";
+        textCheckNcbiObj.left! += 480;
+        var ncbiblastText = new fabric.Text(checkSym, textCheckNcbiObj);
+        mouseOverCheckbox(ncbiblastText, textCheckNcbiObj, this);
+        mouseOutCheckbox(ncbiblastText, textCheckNcbiObj, "ncbiblast", this);
+        mouseDownCheckbox(ncbiblastText, "ncbiblast", this);
+        this.canvas.add(ncbiblastText);
+        textSelObj.left! += 190;
+        var ncbiblastText = new fabric.Text(
+            "NCBI BLAST+ (Bit score: <40 to ≥200)",
+            textSelObj
+        );
+        this.canvas.add(ncbiblastText);
+
+        // E-value/Bit Score Text
+        this.topPadding += 25;
         const textObj: TextType = {
             fontSize: CanvasDefaults.fontSize + 1,
             fontWeight: "normal",
             selectable: false,
             evented: false,
             objectCaching: false,
-            left: CanvasDefaults.leftScalePaddingPixels - 50,
             top: this.topPadding
         };
-        var evalueText = new fabric.Text("E-value", textObj);
+        let scaleTypeLabel: string;
+        this.scaleType === "ncbiblast"
+            ? (scaleTypeLabel = "Bit score")
+            : (scaleTypeLabel = "E-value");
+        this.scaleType === "ncbiblast"
+            ? (textObj.left = CanvasDefaults.leftScalePaddingPixels - 56)
+            : (textObj.left = CanvasDefaults.leftScalePaddingPixels - 50);
+        var evalueText = new fabric.Text(`${scaleTypeLabel}`, textObj);
         this.canvas.add(evalueText);
 
         // E-value Color Gradient
@@ -576,87 +749,171 @@ export class FabricjsRenderer {
             height: 15
         };
         var colorScale = new fabric.Rect(rectObj);
-        colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
+        if (this.scaleType === "ncbiblast") {
+            colorNcbiBlastGradient(colorScale, 0, CanvasDefaults.scalePixels);
+        } else {
+            colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
+        }
+
         this.canvas.add(colorScale);
 
         // E-value Axis (line and ticks)
-        const oneForthGradPixels =
-            (CanvasDefaults.leftScalePaddingPixels +
+        if (this.scaleType === "ncbiblast") {
+            const oneFifthGradPixels =
+                (CanvasDefaults.leftScalePaddingPixels +
+                    CanvasDefaults.scalePixels -
+                    CanvasDefaults.leftScalePaddingPixels) /
+                5;
+            let axisGroup: fabric.Group;
+            [axisGroup, this.topPadding] = drawLineAxis6Buckets(
+                CanvasDefaults.leftScalePaddingPixels,
+                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels,
+                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 2,
+                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 3,
+                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 4,
+                CanvasDefaults.leftScalePaddingPixels +
+                    CanvasDefaults.scalePixels,
+                this.topPadding,
+                1
+            );
+            this.canvas.add(axisGroup);
+
+            // Bits scale tick mark labels
+            this.topPadding += 5;
+            textObj.top = this.topPadding;
+            textObj.fontSize = CanvasDefaults.fontSize;
+            // 20% Tick Label
+            let label = `<${this.gradientSteps[1]}`;
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneFifthGradPixels -
+                label.length * 3 -
+                72;
+            const o20LabelText = new fabric.Text(label, textObj);
+            // 40% Tick Label
+            label = `${this.gradientSteps[1]} - ${this.gradientSteps[2]}`;
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneFifthGradPixels * 2 -
+                label.length * 3 -
+                72;
+            const o40LabelText = new fabric.Text(label, textObj);
+            // 60% Tick Label
+            label = `${this.gradientSteps[2]} - ${this.gradientSteps[3]}`;
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneFifthGradPixels * 3 -
+                label.length * 3 -
+                72;
+            const o60LabelText = new fabric.Text(label, textObj);
+            // 60% Tick Label
+            label = `${this.gradientSteps[3]} - ${this.gradientSteps[4]}`;
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneFifthGradPixels * 4 -
+                label.length * 3 -
+                72;
+            const o80LabelText = new fabric.Text(label, textObj);
+            // End Tick Label
+            label = `≥${this.gradientSteps[4]}`;
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
                 CanvasDefaults.scalePixels -
-                CanvasDefaults.leftScalePaddingPixels) /
-            4;
-        let axisGroup: fabric.Group;
-        [axisGroup, this.topPadding] = drawLineAxis(
-            CanvasDefaults.leftScalePaddingPixels,
-            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels,
-            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 2,
-            CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 3,
-            CanvasDefaults.leftScalePaddingPixels + CanvasDefaults.scalePixels,
-            this.topPadding,
-            1
-        );
-        this.canvas.add(axisGroup);
+                label.length * 3 -
+                72;
+            const endLabelText = new fabric.Text(label, textObj);
 
-        // E-value scale tick mark labels
-        this.topPadding += 5;
-        textObj.top = this.topPadding;
-        textObj.fontSize = CanvasDefaults.fontSize;
-        // Start Tick Label
-        textObj.left =
-            CanvasDefaults.leftScalePaddingPixels -
-            numberToString(this.gradientSteps[0]).length * 3;
-        const startLabelText = new fabric.Text(
-            numberToString(this.gradientSteps[0]),
-            textObj
-        );
-        // 25% Tick Label
-        textObj.left =
-            CanvasDefaults.leftScalePaddingPixels +
-            oneForthGradPixels -
-            numberToString(this.gradientSteps[1]).length * 3;
-        const o25LabelText = new fabric.Text(
-            numberToString(this.gradientSteps[1]),
-            textObj
-        );
-        // 50% Tick Label
-        textObj.left =
-            CanvasDefaults.leftScalePaddingPixels +
-            oneForthGradPixels * 2 -
-            numberToString(this.gradientSteps[2]).length * 3;
-        const o50LabelText = new fabric.Text(
-            numberToString(this.gradientSteps[2]),
-            textObj
-        );
-        // 75% Tick Label
-        textObj.left =
-            CanvasDefaults.leftScalePaddingPixels +
-            oneForthGradPixels * 3 -
-            numberToString(this.gradientSteps[3]).length * 3;
-        const o75LabelText = new fabric.Text(
-            numberToString(this.gradientSteps[3]),
-            textObj
-        );
-        // End Tick Label
-        textObj.left =
-            CanvasDefaults.leftScalePaddingPixels +
-            CanvasDefaults.scalePixels -
-            numberToString(this.gradientSteps[4]).length * 3;
-        const endLabelText = new fabric.Text(
-            numberToString(this.gradientSteps[4]),
-            textObj
-        );
+            const textGroup = new fabric.Group(
+                [
+                    o20LabelText,
+                    o40LabelText,
+                    o60LabelText,
+                    o80LabelText,
+                    endLabelText
+                ],
+                CanvasDefaults.groupConfig
+            );
+            this.canvas.add(textGroup);
+        } else {
+            const oneForthGradPixels =
+                (CanvasDefaults.leftScalePaddingPixels +
+                    CanvasDefaults.scalePixels -
+                    CanvasDefaults.leftScalePaddingPixels) /
+                4;
+            let axisGroup: fabric.Group;
+            [axisGroup, this.topPadding] = drawLineAxis5Buckets(
+                CanvasDefaults.leftScalePaddingPixels,
+                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels,
+                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 2,
+                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 3,
+                CanvasDefaults.leftScalePaddingPixels +
+                    CanvasDefaults.scalePixels,
+                this.topPadding,
+                1
+            );
+            this.canvas.add(axisGroup);
 
-        const textGroup = new fabric.Group(
-            [
-                startLabelText,
-                o25LabelText,
-                o50LabelText,
-                o75LabelText,
-                endLabelText
-            ],
-            CanvasDefaults.groupConfig
-        );
-        this.canvas.add(textGroup);
+            // E-value scale tick mark labels
+            this.topPadding += 5;
+            textObj.top = this.topPadding;
+            textObj.fontSize = CanvasDefaults.fontSize;
+            // Start Tick Label
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels -
+                numberToString(this.gradientSteps[0]).length * 3;
+            const startLabelText = new fabric.Text(
+                numberToString(this.gradientSteps[0]),
+                textObj
+            );
+            // 25% Tick Label
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneForthGradPixels -
+                numberToString(this.gradientSteps[1]).length * 3;
+            const o25LabelText = new fabric.Text(
+                numberToString(this.gradientSteps[1]),
+                textObj
+            );
+            // 50% Tick Label
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneForthGradPixels * 2 -
+                numberToString(this.gradientSteps[2]).length * 3;
+            const o50LabelText = new fabric.Text(
+                numberToString(this.gradientSteps[2]),
+                textObj
+            );
+            // 75% Tick Label
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                oneForthGradPixels * 3 -
+                numberToString(this.gradientSteps[3]).length * 3;
+            const o75LabelText = new fabric.Text(
+                numberToString(this.gradientSteps[3]),
+                textObj
+            );
+            // End Tick Label
+            textObj.left =
+                CanvasDefaults.leftScalePaddingPixels +
+                CanvasDefaults.scalePixels -
+                numberToString(this.gradientSteps[4]).length * 3;
+            const endLabelText = new fabric.Text(
+                numberToString(this.gradientSteps[4]),
+                textObj
+            );
+
+            const textGroup = new fabric.Group(
+                [
+                    startLabelText,
+                    o25LabelText,
+                    o50LabelText,
+                    o75LabelText,
+                    endLabelText
+                ],
+                CanvasDefaults.groupConfig
+            );
+            this.canvas.add(textGroup);
+        }
     }
 
     private drawFooterText() {
