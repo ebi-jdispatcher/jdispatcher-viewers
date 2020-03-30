@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import { CanvasDefaults } from "./config";
 import { LineType, RectType } from "./custom-types";
 
 export function drawLineTracks(
@@ -86,7 +85,11 @@ export function drawLineTracks(
             subjStartCap,
             subjEndCap
         ],
-        CanvasDefaults.groupConfig
+        {
+            selectable: false,
+            evented: false,
+            objectCaching: false
+        }
     );
     return [lineGroup, topPadding];
 }
@@ -213,7 +216,11 @@ export function drawLineAxis5Buckets(
             axis75Tick,
             axisEndTick
         ],
-        CanvasDefaults.groupConfig
+        {
+            selectable: false,
+            evented: false,
+            objectCaching: false
+        }
     );
     return [axisGroup, topPadding];
 }
@@ -317,7 +324,11 @@ export function drawLineAxis6Buckets(
             axis80Tick,
             axisEndTick
         ],
-        CanvasDefaults.groupConfig
+        {
+            selectable: false,
+            evented: false,
+            objectCaching: false
+        }
     );
     return [axisGroup, topPadding];
 }

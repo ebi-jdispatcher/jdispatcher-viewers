@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { TextType } from "./custom-types";
-import { FabricjsRenderer } from "./app";
+import { TextType, ColorSchemeEnum } from "./custom-types";
+import { CanvasRenderer } from "./app";
 
 export function mouseOverText(
     fabricObj: fabric.Object,
@@ -75,7 +75,7 @@ export function mouseOutDomain(
 export function mouseOverCheckbox(
     fabricObj: fabric.Object,
     textObj: TextType,
-    _this: FabricjsRenderer
+    _this: CanvasRenderer
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
@@ -89,13 +89,13 @@ export function mouseOverCheckbox(
 
 export function mouseDownCheckbox(
     fabricObj: fabric.Object,
-    value: string,
-    _this: FabricjsRenderer
+    value: ColorSchemeEnum,
+    _this: CanvasRenderer
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
-            if (_this.scaleType != value) {
-                _this.scaleType = value;
+            if (_this.colorScheme != value) {
+                _this.colorScheme = value;
                 _this.renderAll();
             }
         }
@@ -105,13 +105,13 @@ export function mouseDownCheckbox(
 export function mouseOutCheckbox(
     fabricObj: fabric.Object,
     textObj: TextType,
-    value: string,
-    _this: FabricjsRenderer
+    value: ColorSchemeEnum,
+    _this: CanvasRenderer
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
             e.target.setOptions(textObj);
-            if (_this.scaleType != value) {
+            if (_this.colorScheme != value) {
                 e.target.setOptions({
                     fill: "grey"
                 });

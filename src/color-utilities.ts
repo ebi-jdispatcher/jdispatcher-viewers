@@ -1,4 +1,4 @@
-import { ColorType } from "./custom-types";
+import { ColorType, ColorSchemeEnum } from "./custom-types";
 
 export function getRgbColorGradient(
     score: number,
@@ -81,10 +81,10 @@ export function getGradientSteps(
     minScore: number,
     maxScore: number,
     minNotZeroScore: number,
-    scaleType: string
+    colorScheme: ColorSchemeEnum
 ): number[] {
     let gradientSteps: number[] = [];
-    if (scaleType === "fixed") {
+    if (colorScheme === ColorSchemeEnum.fixed) {
         gradientSteps = [
             0,
             Math.pow(10, -1),
@@ -92,7 +92,7 @@ export function getGradientSteps(
             Math.pow(10, 1),
             Math.pow(10, 2)
         ];
-    } else if (scaleType === "dynamic") {
+    } else if (colorScheme === ColorSchemeEnum.dynamic) {
         if (maxScore < 1e-304) {
             const eScale = -304;
             gradientSteps = [
@@ -161,8 +161,11 @@ export function getGradientSteps(
                 maxScore
             ];
         }
-    } else {
+    } else if (colorScheme === ColorSchemeEnum.ncbiblast) {
         gradientSteps = [0, 40, 50, 80, 200];
+    } else {
+        // fixed (based on E-value)
+        gradientSteps = [0, 1e-5, 1e-2, 1, 100];
     }
     return gradientSteps;
 }
