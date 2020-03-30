@@ -262,9 +262,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         const sequenceDefText = new fabric.Text(`${sequence}`, textSeqObj);
         this.canvas.add(sequenceDefText);
         if (this.dataObj.query_url != null) {
-            mouseOverText(sequenceDefText, textSeqObj, this.canvas);
-            mouseDownText(sequenceDefText, this.dataObj.query_url, this.canvas);
-            mouseOutText(sequenceDefText, textSeqObj, this.canvas);
+            mouseOverText(sequenceDefText, textSeqObj, this);
+            mouseDownText(sequenceDefText, this.dataObj.query_url, this);
+            mouseOutText(sequenceDefText, textSeqObj, this);
         }
         // Length
         const length = this.dataObj.query_len;
@@ -498,9 +498,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             textObj.evented = true;
             const hitText: fabric.Text = new fabric.Text(hit_def, textObj);
             this.canvas.add(hitText);
-            mouseOverText(hitText, textObj, this.canvas);
-            mouseDownText(hitText, hit.hit_url, this.canvas);
-            mouseOutText(hitText, textObj, this.canvas);
+            mouseOverText(hitText, textObj, this);
+            mouseDownText(hitText, hit.hit_url, this);
+            mouseOutText(hitText, textObj, this);
             for (const hsp of hit.hit_hsps) {
                 numberHsps++;
                 if (numberHsps > this.numberHsps) {
@@ -712,9 +712,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     mouseOverDomain(
                         queryDomain,
                         queryTooltipGroup,
-                        this.canvas
+                        this
                     );
-                    mouseOutDomain(queryDomain, queryTooltipGroup, this.canvas);
+                    mouseOutDomain(queryDomain, queryTooltipGroup, this);
 
                     // Subject tooltip
                     let subjTooltipText: fabric.Text;
@@ -751,8 +751,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                         }
                     );
                     this.canvas.add(subjTooltipGroup);
-                    mouseOverDomain(subjDomain, subjTooltipGroup, this.canvas);
-                    mouseOutDomain(subjDomain, subjTooltipGroup, this.canvas);
+                    mouseOverDomain(subjDomain, subjTooltipGroup, this);
+                    mouseOutDomain(subjDomain, subjTooltipGroup, this);
                 }
             }
         }
@@ -1067,8 +1067,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             `EBI is an Outstation of the European Molecular Biology Laboratory.`;
         const copyrightText = new fabric.Text(`${copyright}`, textObj);
         this.canvas.add(copyrightText);
-        mouseOverText(copyrightText, textObj, this.canvas);
-        mouseDownText(copyrightText, "https://www.ebi.ac.uk", this.canvas);
-        mouseOutText(copyrightText, textObj, this.canvas);
+        mouseOverText(copyrightText, textObj, this);
+        mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
+        mouseOutText(copyrightText, textObj, this);
     }
 }
