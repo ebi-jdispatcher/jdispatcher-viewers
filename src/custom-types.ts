@@ -30,8 +30,8 @@ export interface TextType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
-    fontWeight: string;
-    fontSize: number;
+    fontWeight?: string;
+    fontSize?: number;
     fontFamily?: string;
     top?: number;
     left?: number;
@@ -43,7 +43,7 @@ export interface TextType {
     [key: string]: any;
 }
 
-export interface LineType {
+interface LineType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
@@ -55,7 +55,7 @@ export interface LineType {
     [key: string]: any;
 }
 
-export interface RectType {
+interface RectType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
@@ -67,7 +67,7 @@ export interface RectType {
     [key: string]: any;
 }
 
-export interface GroupType {
+interface ObjectType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
@@ -78,3 +78,13 @@ export interface ColorType {
     keys: number[];
     [key: number]: [number, number, number];
 }
+
+export const objectDefaults: ObjectType = {
+    selectable: false,
+    evented: false,
+    objectCaching: false
+};
+
+export const textDefaults: TextType = { ...objectDefaults };
+export const rectDefaults: RectType = { ...objectDefaults };
+export const LineDefaults: LineType = { ...objectDefaults };

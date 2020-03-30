@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { LineType, RectType } from "./custom-types";
+import { LineDefaults, rectDefaults } from "./custom-types";
 
 export function drawLineTracks(
     startQueryPixels: number,
@@ -10,14 +10,10 @@ export function drawLineTracks(
     strokeWidth: number
 ): [fabric.Group, number] {
     topPadding += 5;
-    let lineObj: LineType = {
-        selectable: false,
-        evented: false,
-        objectCaching: false,
-        top: topPadding,
-        stroke: "black",
-        strokeWidth: strokeWidth
-    };
+    const lineObj = { ...LineDefaults };
+    lineObj.top = topPadding;
+    lineObj.stroke = "black";
+    lineObj.strokeWidth = strokeWidth;
     //  Query
     const coordsQuery: [number, number, number, number] = [
         startQueryPixels,
@@ -103,15 +99,12 @@ export function drawDomainTracks(
     fill: string
 ): [fabric.Rect, fabric.Rect, number] {
     topPadding += 10;
-    let rectObj: RectType = {
-        selectable: false,
-        evented: true,
-        objectCaching: false,
-        top: topPadding,
-        fill: fill,
-        rx: 5,
-        ry: 5
-    };
+    const rectObj = { ...rectDefaults };
+    rectObj.evented = true;
+    rectObj.top = topPadding;
+    rectObj.fill = fill;
+    rectObj.rx = 5;
+    rectObj.ry = 5;
     //  Query
     rectObj.top = topPadding - 15;
     rectObj.left = startQueryPixels;
@@ -140,14 +133,10 @@ export function drawLineAxis5Buckets(
 ): [fabric.Group, number] {
     // Axis
     topPadding += 15;
-    let lineObj: LineType = {
-        selectable: false,
-        evented: false,
-        objectCaching: false,
-        top: topPadding,
-        stroke: "black",
-        strokeWidth: strokeWidth
-    };
+    const lineObj = { ...LineDefaults };
+    lineObj.top = topPadding;
+    lineObj.stroke = "black";
+    lineObj.strokeWidth = strokeWidth;
     const coordsAxis: [number, number, number, number] = [
         startGradPixels,
         topPadding,
@@ -237,14 +226,10 @@ export function drawLineAxis6Buckets(
 ): [fabric.Group, number] {
     // Axis
     topPadding += 15;
-    let lineObj: LineType = {
-        selectable: false,
-        evented: false,
-        objectCaching: false,
-        top: topPadding,
-        stroke: "black",
-        strokeWidth: strokeWidth
-    };
+    const lineObj = { ...LineDefaults };
+    lineObj.top = topPadding;
+    lineObj.stroke = "black";
+    lineObj.strokeWidth = strokeWidth;
     const coordsAxis: [number, number, number, number] = [
         startGradPixels,
         topPadding,

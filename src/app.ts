@@ -1,11 +1,10 @@
 import { fabric } from "fabric";
 import {
     RenderOptions,
-    TextType,
-    RectType,
-    LineType,
-    GroupType,
-    ColorSchemeEnum
+    ColorSchemeEnum,
+    objectDefaults,
+    textDefaults,
+    rectDefaults
 } from "./custom-types";
 import {
     getTextLegendPaddingFactor,
@@ -42,12 +41,6 @@ import {
 } from "./color-schemes";
 import { numberToString } from "./other-utilities";
 import { SSSResultModel } from "./data-model";
-
-const groupDefaults: GroupType = {
-    selectable: false,
-    evented: false,
-    objectCaching: false
-};
 
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
@@ -217,15 +210,12 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
     private drawHeaderTextGroup() {
         const origTopPadding = this.topPadding;
-        let textObj: TextType = {
-            fontWeight: "bold",
-            fontSize: this.fontSize + 1,
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            top: this.topPadding,
-            left: 5
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontWeight = "bold";
+        textObj.fontSize = this.fontSize + 1;
+        textObj.top = this.topPadding;
+        textObj.left = 5;
+
         // program & version
         const program = this.dataObj.program;
         const version = this.dataObj.version;
@@ -249,16 +239,12 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         this.topPadding += 15;
         textObj.top = this.topPadding;
         const sequenceText = new fabric.Text("Sequence: ", textObj);
-        let textSeqObj: TextType = {
-            fontWeight: "normal",
-            fontFamily: "Menlo",
-            fontSize: this.fontSize - 2,
-            selectable: false,
-            evented: true,
-            objectCaching: false,
-            top: this.topPadding,
-            left: 57.5
-        };
+        const textSeqObj = { ...textDefaults };
+        textSeqObj.fontFamily = "Menlo";
+        textSeqObj.fontSize = this.fontSize - 2;
+        textSeqObj.evented = true;
+        textSeqObj.top = this.topPadding;
+        textSeqObj.left = 57.5;
         const sequenceDefText = new fabric.Text(`${sequence}`, textSeqObj);
         this.canvas.add(sequenceDefText);
         if (this.dataObj.query_url != null) {
@@ -289,21 +275,17 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 startText,
                 endText
             ],
-            groupDefaults
+            objectDefaults
         );
         this.canvas.add(textGroup);
     }
     private drawNoHitsFoundText() {
-        let textObj: TextType = {
-            fontWeight: "bold",
-            fontSize: this.fontSize + 1,
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            top: this.topPadding,
-            left: this.contentWidth / 2,
-            fill: "red"
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontWeight = "bold";
+        textObj.fontSize = this.fontSize + 1;
+        textObj.top = this.topPadding;
+        textObj.left = this.contentWidth / 2;
+        textObj.fill = "red";
         this.canvas.add(
             new fabric.Text(
                 "--------------------No hits found--------------------",
@@ -312,15 +294,11 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         );
     }
     private drawContentHeaderTextGroup() {
-        let textObj: TextType = {
-            fontWeight: "bold",
-            fontSize: this.fontSize + 1,
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            top: this.topPadding + 2,
-            textAlign: "center"
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontWeight = "bold";
+        textObj.fontSize = this.fontSize + 1;
+        textObj.top = this.topPadding + 2;
+        textObj.textAlign = "center";
         const totalQueryPixels = getTotalPixels(
             this.queryLen,
             this.subjLen,
@@ -355,7 +333,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         subjText.width = totalSubjPixels;
         const textGroup = new fabric.Group(
             [queryText, evalueText, subjText],
-            groupDefaults
+            objectDefaults
         );
         this.canvas.add(textGroup);
     }
@@ -372,14 +350,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         this.canvas.add(lineGroup);
     }
     private drawContentFooterTextGroup() {
-        let textObj: TextType = {
-            fontWeight: "normal",
-            fontSize: this.fontSize,
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            top: this.topPadding
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontSize = this.fontSize;
+        textObj.top = this.topPadding;
         // Start Query
         textObj.left = this.startQueryPixels - 2.5;
         const startQueryText = new fabric.Text("1", textObj);
@@ -398,7 +371,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
         const textGroup = new fabric.Group(
             [startQueryText, endQueryText, startSubjText, endSubjText],
-            groupDefaults
+            objectDefaults
         );
         this.canvas.add(textGroup);
     }
@@ -468,15 +441,10 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
             // Hit ID + Hit Description text tracks
-            let textObj: TextType = {
-                fontWeight: "normal",
-                fontFamily: "Menlo",
-                fontSize: this.fontSize - 2,
-                selectable: false,
-                evented: false,
-                objectCaching: false,
-                top: this.topPadding - 2
-            };
+            const textObj = { ...textDefaults };
+            textObj.fontFamily = "Menlo";
+            textObj.fontSize = this.fontSize - 2;
+            textObj.top = this.topPadding - 2;
 
             const variableSpace = " ".repeat(
                 maxIDLen - (hit.hit_db.length + hit.hit_id.length)
@@ -506,16 +474,11 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 if (numberHsps > this.numberHsps) {
                     if (this.logSkippedHsps === true) {
                         // notice about not all HSPs being displayed
-                        let textObj: TextType = {
-                            fontWeight: "normal",
-                            fontSize: this.fontSize,
-                            selectable: false,
-                            evented: false,
-                            objectCaching: false,
-                            top: this.topPadding,
-                            left: this.contentWidth / 2,
-                            fill: "red"
-                        };
+                        const textObj = { ...textDefaults };
+                        textObj.fontSize = this.fontSize;
+                        textObj.top = this.topPadding;
+                        textObj.left = this.contentWidth / 2;
+                        textObj.fill = "red";
                         this.canvas.add(
                             new fabric.Text(
                                 `This hit contains ${totalNumberHsps} alignments, ` +
@@ -624,15 +587,10 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.canvas.add(subjDomain);
 
                     // E-value text tracks
-                    let textObj: TextType = {
-                        fontWeight: "normal",
-                        fontSize: this.fontSize,
-                        selectable: false,
-                        evented: false,
-                        objectCaching: false,
-                        top: this.topPadding - 15,
-                        textAlign: "center"
-                    };
+                    const textObj = { ...textDefaults };
+                    textObj.fontSize = this.fontSize;
+                    textObj.top = this.topPadding - 15;
+                    textObj.textAlign = "center";
 
                     textObj.left = this.startEvalPixels;
                     let evalText: fabric.Text;
@@ -651,17 +609,12 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.canvas.add(evalText);
 
                     // Query tooltip
-                    const floatTextObj: TextType = {
-                        fontWeight: "normal",
-                        fontSize: this.fontSize + 1,
-                        selectable: false,
-                        evented: false,
-                        objectCaching: false,
-                        textAlign: "left",
-                        originX: "top",
-                        originY: "top",
-                        top: 5
-                    };
+                    const floatTextObj = { ...textDefaults };
+                    floatTextObj.fontSize = this.fontSize + 1;
+                    floatTextObj.textAlign = "left";
+                    floatTextObj.originX = "top";
+                    floatTextObj.originY = "top";
+                    floatTextObj.top = 5;
                     let queryTooltipText: fabric.Text;
                     if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         queryTooltipText = new fabric.Text(
@@ -680,20 +633,17 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                             floatTextObj
                         );
                     }
-                    const rectObj: RectType = {
-                        selectable: false,
-                        evented: false,
-                        objectCaching: false,
-                        fill: "white",
-                        stroke: "lightseagreen",
-                        rx: 5,
-                        ry: 5,
-                        originX: "top",
-                        originY: "top",
-                        width: 140,
-                        height: 60,
-                        opacity: 0.95
-                    };
+                    const rectObj = { ...rectDefaults };
+                    rectObj.fill = "white";
+                    rectObj.stroke = "lightseagreen";
+                    rectObj.rx = 5;
+                    rectObj.ry = 5;
+                    rectObj.originX = "top";
+                    rectObj.originY = "top";
+                    rectObj.width = 140;
+                    rectObj.height = 60;
+                    rectObj.opacity = 0.95;
+
                     const queryTooltipBox: fabric.Rect = new fabric.Rect(
                         rectObj
                     );
@@ -709,11 +659,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                         }
                     );
                     this.canvas.add(queryTooltipGroup);
-                    mouseOverDomain(
-                        queryDomain,
-                        queryTooltipGroup,
-                        this
-                    );
+                    mouseOverDomain(queryDomain, queryTooltipGroup, this);
                     mouseOutDomain(queryDomain, queryTooltipGroup, this);
 
                     // Subject tooltip
@@ -760,31 +706,23 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
     private drawColorScaleGroup() {
         // Scale Type selection
-        const textSelObj: TextType = {
-            fontSize: this.fontSize + 1,
-            fontWeight: "bold",
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            left: this.scaleLabelWidth,
-            top: this.topPadding
-        };
+        const textSelObj = { ...textDefaults };
+        textSelObj.fontSize = this.fontSize + 1;
+        textSelObj.fontWeight = "bold";
+        textSelObj.top = this.topPadding;
+        textSelObj.left = this.scaleLabelWidth;
 
         var fixedText = new fabric.Text("Scale Type:", textSelObj);
         this.canvas.add(fixedText);
 
-        const textCheckDynObj: TextType = {
-            fontSize: this.fontSize + 12,
-            fontWeight: "normal",
-            fill: "grey",
-            selectable: false,
-            evented: true,
-            objectCaching: false,
-            left: this.scaleLabelWidth,
-            top: this.topPadding - 8
-        };
-        const textCheckFixObj: TextType = { ...textCheckDynObj };
-        const textCheckNcbiObj: TextType = { ...textCheckDynObj };
+        const textCheckDynObj = { ...textDefaults };
+        textCheckDynObj.fontSize = this.fontSize + 12;
+        textCheckDynObj.fill = "grey";
+        textCheckDynObj.evented = true;
+        textCheckDynObj.top = this.topPadding - 8;
+        textCheckDynObj.left = this.scaleLabelWidth;
+        const textCheckFixObj = { ...textCheckDynObj };
+        const textCheckNcbiObj = { ...textCheckDynObj };
 
         let checkSym: string;
         this.colorScheme === ColorSchemeEnum.dynamic
@@ -860,14 +798,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
         // E-value/Bit Score Text
         this.topPadding += 25;
-        const textObj: TextType = {
-            fontSize: this.fontSize + 1,
-            fontWeight: "normal",
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            top: this.topPadding
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontSize = this.fontSize + 1;
+        textObj.top = this.topPadding;
         let scaleTypeLabel: string;
         this.colorScheme === ColorSchemeEnum.ncbiblast
             ? (scaleTypeLabel = "Bit score")
@@ -879,15 +812,11 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         this.canvas.add(evalueText);
 
         // E-value Color Gradient
-        const rectObj: RectType = {
-            selectable: false,
-            evented: false,
-            objectCaching: false,
-            left: this.scaleLabelWidth,
-            top: this.topPadding,
-            width: this.scaleWidth,
-            height: 15
-        };
+        const rectObj = { ...rectDefaults };
+        rectObj.top = this.topPadding;
+        rectObj.left = this.scaleLabelWidth;
+        rectObj.width = this.scaleWidth;
+        rectObj.height = 15;
         var colorScale = new fabric.Rect(rectObj);
         if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
             colorNcbiBlastGradient(colorScale, 0, this.scaleWidth);
@@ -967,7 +896,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     o80LabelText,
                     endLabelText
                 ],
-                groupDefaults
+                objectDefaults
             );
             this.canvas.add(textGroup);
         } else {
@@ -1045,23 +974,18 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     o75LabelText,
                     endLabelText
                 ],
-                groupDefaults
+                objectDefaults
             );
             this.canvas.add(textGroup);
         }
     }
 
     private drawFooterText() {
-        let textObj: TextType = {
-            fontWeight: "normal",
-            fontSize: this.fontSize,
-            selectable: false,
-            evented: true,
-            objectCaching: false,
-            top: this.topPadding,
-            left: 225,
-            underline: false
-        };
+        const textObj = { ...textDefaults };
+        textObj.fontSize = this.fontSize;
+        textObj.evented = true;
+        textObj.top = this.topPadding;
+        textObj.left = 225;
         const copyright =
             `European Bioinformatics Institute 2006-2020. ` +
             `EBI is an Outstation of the European Molecular Biology Laboratory.`;
