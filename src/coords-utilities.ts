@@ -1,5 +1,3 @@
-import { CanvasDefaults } from "./config";
-
 export function getTextLegendPaddingFactor(inputString: string): number {
     let positionFactor = 0;
     if (inputString.length === 1) {
@@ -17,50 +15,53 @@ export function getTextLegendPaddingFactor(inputString: string): number {
 export function getTotalPixels(
     queryLen: number,
     subjLen: number,
-    varLen: number
+    varLen: number,
+    contentWidth: number,
+    contentScoringWidth: number
 ) {
     const totalLen = queryLen + subjLen;
     const totalPixels =
-        (varLen * CanvasDefaults.maxPixels - CanvasDefaults.evaluePixels) /
-        totalLen;
+        (varLen * contentWidth - contentScoringWidth) / totalLen;
     return totalPixels;
 }
 
 export function getQuerySubjPixelCoords(
     queryLen: number,
     subjLen: number,
-    subjHspLen: number
+    subjHspLen: number,
+    contentWidth: number,
+    contentScoringWidth: number,
+    contentLabelWidth: number,
+    marginWidth: number
 ) {
-    const totalQueryPixels = getTotalPixels(queryLen, subjLen, queryLen);
-    const totalSubjPixels = getTotalPixels(queryLen, subjLen, subjHspLen);
-    const startQueryPixels =
-        CanvasDefaults.leftPaddingPixels + CanvasDefaults.borderPixels;
-    const endQueryPixels =
-        CanvasDefaults.leftPaddingPixels +
-        totalQueryPixels -
-        CanvasDefaults.borderPixels;
+    const totalQueryPixels = getTotalPixels(
+        queryLen,
+        subjLen,
+        queryLen,
+        contentWidth,
+        contentScoringWidth
+    );
+    const totalSubjPixels = getTotalPixels(
+        queryLen,
+        subjLen,
+        subjHspLen,
+        contentWidth,
+        contentScoringWidth
+    );
+    const startQueryPixels = contentLabelWidth + marginWidth;
+    const endQueryPixels = contentLabelWidth + totalQueryPixels - marginWidth;
     const startSubjPixels =
-        CanvasDefaults.leftPaddingPixels +
+        contentLabelWidth +
         totalQueryPixels +
-        CanvasDefaults.evaluePixels +
-        CanvasDefaults.borderPixels;
+        contentScoringWidth +
+        marginWidth;
     const endSubjPixels =
-        CanvasDefaults.leftPaddingPixels +
+        contentLabelWidth +
         totalQueryPixels +
-        CanvasDefaults.evaluePixels +
+        contentScoringWidth +
         totalSubjPixels -
-        CanvasDefaults.borderPixels;
+        marginWidth;
     return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
-}
-
-export function getEvalPixelCoords(endQueryPixels: number) {
-    const startEvalPixels = endQueryPixels + 2 * CanvasDefaults.borderPixels;
-    // const endEvalPixels =
-    //     endQueryPixels +
-    //     CanvasDefaults.borderPixels +
-    //     CanvasDefaults.evaluePixels -
-    //     CanvasDefaults.borderPixels;
-    return startEvalPixels;
 }
 
 export function getHspPixelCoords(
@@ -69,12 +70,21 @@ export function getHspPixelCoords(
     varLen: number,
     paddingPixels: number,
     hspStart: number,
-    hspEnd: number
+    hspEnd: number,
+    contentWidth: number,
+    contentScoringWidth: number,
+    marginWidth: number
 ) {
-    const totalPixels = getTotalPixels(queryLen, subjLen, varLen);
+    const totalPixels = getTotalPixels(
+        queryLen,
+        subjLen,
+        varLen,
+        contentWidth,
+        contentScoringWidth
+    );
     const startPixels = (hspStart * totalPixels) / varLen;
     const endPixels = ((hspEnd - hspStart - 1) * totalPixels) / varLen;
     const startHspPixels = paddingPixels + startPixels;
-    const endHspPixels = endPixels - 2 * CanvasDefaults.borderPixels;
+    const endHspPixels = endPixels - 2 * marginWidth;
     return [startHspPixels, endHspPixels];
 }
