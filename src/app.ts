@@ -1,10 +1,15 @@
 import { fabric } from "fabric";
-import { CanvasDefaults } from "./config";
-import { InputType, TextType, RectType } from "./custom-types";
+import {
+    RenderOptions,
+    TextType,
+    RectType,
+    LineType,
+    GroupType,
+    ColorSchemeEnum
+} from "./custom-types";
 import {
     getTextLegendPaddingFactor,
     getQuerySubjPixelCoords,
-    getEvalPixelCoords,
     getHspPixelCoords,
     getTotalPixels
 } from "./coords-utilities";
@@ -36,11 +41,92 @@ import {
     ncbiBlastGradient
 } from "./color-schemes";
 import { numberToString } from "./other-utilities";
+import { SSSResultModel } from "./data-model";
 
-export class FabricjsRenderer {
+const groupDefaults: GroupType = {
+    selectable: false,
+    evented: false,
+    objectCaching: false
+};
+
+export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
-    private canvasHeight: number = CanvasDefaults.canvasHeight;
-    private canvasWidth: number = CanvasDefaults.canvasWidth;
+    protected canvasWidth: number;
+    protected canvasHeight: number;
+    protected contentWidth: number;
+    protected contentScoringWidth: number;
+    protected contentLabelWidth: number;
+    protected scaleWidth: number;
+    protected scaleLabelWidth: number;
+    protected marginWidth: number;
+    public colorScheme: ColorSchemeEnum;
+    protected numberHsps: number;
+    protected logSkippedHsps: boolean;
+    protected fontSize: number;
+    protected fontWeigth: string;
+    protected fontFamily: string;
+    protected canvasWrapperStroke: boolean;
+
+    constructor(renderOptions: RenderOptions) {
+        renderOptions.canvasWidth != undefined
+            ? (this.canvasWidth = renderOptions.canvasWidth)
+            : (this.canvasWidth = 1000);
+        renderOptions.canvasHeight != undefined
+            ? (this.canvasHeight = renderOptions.canvasHeight)
+            : (this.canvasHeight = 110);
+        renderOptions.contentWidth != undefined
+            ? (this.contentWidth = renderOptions.contentWidth)
+            : (this.contentWidth = (65.5 * this.canvasWidth) / 100);
+        renderOptions.contentScoringWidth != undefined
+            ? (this.contentScoringWidth = renderOptions.contentScoringWidth)
+            : (this.contentScoringWidth = (7.0 * this.canvasWidth) / 100);
+        renderOptions.contentLabelWidth != undefined
+            ? (this.contentLabelWidth = renderOptions.contentLabelWidth)
+            : (this.contentLabelWidth = (26.5 * this.canvasWidth) / 100);
+        renderOptions.scaleWidth != undefined
+            ? (this.scaleWidth = renderOptions.scaleWidth)
+            : (this.scaleWidth = (75.0 * this.canvasWidth) / 100);
+        renderOptions.scaleLabelWidth != undefined
+            ? (this.scaleLabelWidth = renderOptions.scaleLabelWidth)
+            : (this.scaleLabelWidth = (20.0 * this.canvasWidth) / 100);
+        renderOptions.marginWidth != undefined
+            ? (this.marginWidth = renderOptions.marginWidth)
+            : (this.marginWidth = (0.15 * this.canvasWidth) / 100);
+        renderOptions.colorScheme != undefined
+            ? (this.colorScheme = renderOptions.colorScheme)
+            : (this.colorScheme = ColorSchemeEnum.fixed);
+        renderOptions.numberHsps != undefined
+            ? (this.numberHsps = renderOptions.numberHsps)
+            : (this.numberHsps = 10);
+        renderOptions.logSkippedHsps != undefined
+            ? (this.logSkippedHsps = renderOptions.logSkippedHsps)
+            : (this.logSkippedHsps = true);
+        renderOptions.fontSize != undefined
+            ? (this.fontSize = renderOptions.fontSize)
+            : (this.fontSize = 12);
+        renderOptions.fontWeigth != undefined
+            ? (this.fontWeigth = renderOptions.fontWeigth)
+            : (this.fontWeigth = "normal");
+        renderOptions.fontFamily != undefined
+            ? (this.fontFamily = renderOptions.fontFamily)
+            : (this.fontFamily = "Times New Roman");
+        renderOptions.canvasWrapperStroke != undefined
+            ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
+            : (this.canvasWrapperStroke = false);
+
+        this.canvas = new fabric.Canvas("canvas", {});
+    }
+
+    protected setFrameSize() {
+        this.canvas.setWidth(this.canvasWidth);
+        this.canvas.setHeight(this.canvasHeight);
+    }
+    protected renderCanvas() {
+        this.canvas.renderAll();
+    }
+}
+
+export class CanvasRenderer extends BasicCanvasRenderer {
     private topPadding: number = 0;
     private queryLen: number = 0;
     private subjLen: number = 0;
@@ -52,13 +138,12 @@ export class FabricjsRenderer {
     private gradientSteps: number[] = [];
 
     constructor(
-        public canvasObj: InputType,
-        public limitNumberHsps: boolean = true,
-        public scaleType: string = "dynamic"
+        public dataObj: SSSResultModel,
+        public renderOptions: RenderOptions
     ) {
-        this.canvas = new fabric.Canvas("canvas", {});
-        this.queryLen = this.canvasObj.dataObj.query_len;
-        for (const hit of this.canvasObj.dataObj.hits) {
+        super(renderOptions);
+        this.queryLen = this.dataObj.query_len;
+        for (const hit of this.dataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
         }
         [
@@ -66,8 +151,16 @@ export class FabricjsRenderer {
             this.endQueryPixels,
             this.startSubjPixels,
             this.endSubjPixels
-        ] = getQuerySubjPixelCoords(this.queryLen, this.subjLen, this.subjLen);
-        this.startEvalPixels = getEvalPixelCoords(this.endQueryPixels);
+        ] = getQuerySubjPixelCoords(
+            this.queryLen,
+            this.subjLen,
+            this.subjLen,
+            this.contentWidth,
+            this.contentScoringWidth,
+            this.contentLabelWidth,
+            this.marginWidth
+        );
+        this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
 
         // render All components
         this.renderAll();
@@ -79,7 +172,7 @@ export class FabricjsRenderer {
         this.drawHeaderTextGroup();
 
         // content header
-        if (this.canvasObj.dataObj.hits.length > 0) {
+        if (this.dataObj.hits.length > 0) {
             // content header
             this.topPadding += 25;
             this.drawContentHeaderGroup();
@@ -102,22 +195,31 @@ export class FabricjsRenderer {
         if (this.canvasHeight < this.topPadding) {
             this.canvasHeight = this.topPadding;
         }
+        if (this.canvasWrapperStroke) {
+            // final canvas wrapper rect
+            const canvasWrapper = new fabric.Rect({
+                selectable: false,
+                evented: false,
+                objectCaching: false,
+                top: 0,
+                left: 0,
+                width: this.canvasWidth - 1,
+                height: this.canvasHeight - 1,
+                strokeWidth: 1,
+                stroke: "lightseagreen",
+                fill: "transparent"
+            });
+            this.canvas.add(canvasWrapper);
+        }
         this.setFrameSize();
         this.renderCanvas();
     }
 
-    private setFrameSize() {
-        this.canvas.setHeight(this.canvasHeight);
-        this.canvas.setWidth(this.canvasWidth);
-    }
-    private renderCanvas() {
-        this.canvas.renderAll();
-    }
     private drawHeaderTextGroup() {
         const origTopPadding = this.topPadding;
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: CanvasDefaults.fontSize + 1,
+            fontSize: this.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -125,32 +227,32 @@ export class FabricjsRenderer {
             left: 5
         };
         // program & version
-        const program = this.canvasObj.dataObj.program;
-        const version = this.canvasObj.dataObj.version;
+        const program = this.dataObj.program;
+        const version = this.dataObj.version;
         const programText = new fabric.Text(
             `${program} (version: ${version})`,
             textObj
         );
         // Database(s)
         let db_names: string[] = [];
-        for (const db of this.canvasObj.dataObj.dbs) {
+        for (const db of this.dataObj.dbs) {
             db_names.push(db.name);
         }
         const dbs: string = db_names.join(", ");
         textObj.fontWeight = "normal";
-        textObj.fontSize = CanvasDefaults.fontSize;
+        textObj.fontSize = this.fontSize;
         this.topPadding += 15;
         textObj.top = this.topPadding;
         const databaseText = new fabric.Text(`Database(s): ${dbs}`, textObj);
         // Sequence
-        const sequence = this.canvasObj.dataObj.query_def;
+        const sequence = this.dataObj.query_def;
         this.topPadding += 15;
         textObj.top = this.topPadding;
         const sequenceText = new fabric.Text("Sequence: ", textObj);
         let textSeqObj: TextType = {
             fontWeight: "normal",
             fontFamily: "Menlo",
-            fontSize: CanvasDefaults.fontSize - 2,
+            fontSize: this.fontSize - 2,
             selectable: false,
             evented: true,
             objectCaching: false,
@@ -159,27 +261,23 @@ export class FabricjsRenderer {
         };
         const sequenceDefText = new fabric.Text(`${sequence}`, textSeqObj);
         this.canvas.add(sequenceDefText);
-        if (this.canvasObj.dataObj.query_url != null) {
+        if (this.dataObj.query_url != null) {
             mouseOverText(sequenceDefText, textSeqObj, this.canvas);
-            mouseDownText(
-                sequenceDefText,
-                this.canvasObj.dataObj.query_url,
-                this.canvas
-            );
+            mouseDownText(sequenceDefText, this.dataObj.query_url, this.canvas);
             mouseOutText(sequenceDefText, textSeqObj, this.canvas);
         }
         // Length
-        const length = this.canvasObj.dataObj.query_len;
+        const length = this.dataObj.query_len;
         this.topPadding += 15;
         textObj.top = this.topPadding;
         const lengthText = new fabric.Text(`Length: ${length}`, textObj);
         // Start
-        const start = this.canvasObj.dataObj.start;
+        const start = this.dataObj.start;
         textObj.top = origTopPadding;
-        textObj.left = CanvasDefaults.canvasWidth - 133;
+        textObj.left = this.canvasWidth - 135;
         const startText = new fabric.Text(`${start}`, textObj);
         // End
-        const end = this.canvasObj.dataObj.end;
+        const end = this.dataObj.end;
         textObj.top = origTopPadding + 15;
         const endText = new fabric.Text(`${end}`, textObj);
         const textGroup = new fabric.Group(
@@ -191,19 +289,19 @@ export class FabricjsRenderer {
                 startText,
                 endText
             ],
-            CanvasDefaults.groupConfig
+            groupDefaults
         );
         this.canvas.add(textGroup);
     }
     private drawNoHitsFoundText() {
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: CanvasDefaults.fontSize + 1,
+            fontSize: this.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
             top: this.topPadding,
-            left: CanvasDefaults.maxPixels / 2,
+            left: this.contentWidth / 2,
             fill: "red"
         };
         this.canvas.add(
@@ -216,7 +314,7 @@ export class FabricjsRenderer {
     private drawContentHeaderTextGroup() {
         let textObj: TextType = {
             fontWeight: "bold",
-            fontSize: CanvasDefaults.fontSize + 1,
+            fontSize: this.fontSize + 1,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -226,12 +324,16 @@ export class FabricjsRenderer {
         const totalQueryPixels = getTotalPixels(
             this.queryLen,
             this.subjLen,
-            this.queryLen
+            this.queryLen,
+            this.contentWidth,
+            this.contentScoringWidth
         );
         const totalSubjPixels = getTotalPixels(
             this.queryLen,
             this.subjLen,
-            this.subjLen
+            this.subjLen,
+            this.contentWidth,
+            this.contentScoringWidth
         );
         // Query Match
         textObj.left = this.startQueryPixels;
@@ -241,19 +343,19 @@ export class FabricjsRenderer {
         textObj.left = this.startEvalPixels;
         let evalueText;
         // E-value/ Bits
-        if (this.scaleType === "ncbiblast") {
+        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
             evalueText = new fabric.Text("Bit score", textObj);
         } else {
             evalueText = new fabric.Text("E-value", textObj);
         }
-        evalueText.width = CanvasDefaults.evaluePixels;
+        evalueText.width = this.contentScoringWidth;
         // Subject Match
         textObj.left = this.startSubjPixels;
         const subjText = new fabric.Text("Subject Match", textObj);
         subjText.width = totalSubjPixels;
         const textGroup = new fabric.Group(
             [queryText, evalueText, subjText],
-            CanvasDefaults.groupConfig
+            groupDefaults
         );
         this.canvas.add(textGroup);
     }
@@ -272,7 +374,7 @@ export class FabricjsRenderer {
     private drawContentFooterTextGroup() {
         let textObj: TextType = {
             fontWeight: "normal",
-            fontSize: CanvasDefaults.fontSize,
+            fontSize: this.fontSize,
             selectable: false,
             evented: false,
             objectCaching: false,
@@ -296,7 +398,7 @@ export class FabricjsRenderer {
         const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
         const textGroup = new fabric.Group(
             [startQueryText, endQueryText, startSubjText, endSubjText],
-            CanvasDefaults.groupConfig
+            groupDefaults
         );
         this.canvas.add(textGroup);
     }
@@ -311,10 +413,10 @@ export class FabricjsRenderer {
     private drawDynamicContentGroup() {
         // draw a new track per hsp for each hit
         // only display 10 hsps per hit
-        const queryLen: number = this.canvasObj.dataObj.query_len;
+        const queryLen: number = this.dataObj.query_len;
         let subjLen: number = 0;
         let maxIDLen: number = 0;
-        for (const hit of this.canvasObj.dataObj.hits) {
+        for (const hit of this.dataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
@@ -322,9 +424,9 @@ export class FabricjsRenderer {
         let minScore: number = Number.MAX_VALUE;
         let maxScore: number = 0;
         let minNotZeroScore: number = Number.MAX_VALUE;
-        for (const hit of this.canvasObj.dataObj.hits) {
+        for (const hit of this.dataObj.hits) {
             for (const hsp of hit.hit_hsps) {
-                if (this.scaleType === "ncbiblast") {
+                if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                     if (hsp.hsp_bit_score! < minScore)
                         minScore = hsp.hsp_bit_score!;
                     if (hsp.hsp_bit_score! > maxScore)
@@ -346,30 +448,30 @@ export class FabricjsRenderer {
             }
         }
 
-        if (this.scaleType === "ncbiblast") {
+        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
             this.gradientSteps = getGradientSteps(
                 minScore,
                 maxScore,
                 minNotZeroScore,
-                this.scaleType
+                this.colorScheme
             );
         } else {
             this.gradientSteps = getGradientSteps(
                 minScore,
                 maxScore,
                 minNotZeroScore,
-                this.scaleType
+                this.colorScheme
             );
         }
 
-        for (const hit of this.canvasObj.dataObj.hits) {
+        for (const hit of this.dataObj.hits) {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
             // Hit ID + Hit Description text tracks
             let textObj: TextType = {
                 fontWeight: "normal",
                 fontFamily: "Menlo",
-                fontSize: CanvasDefaults.fontSize - 2,
+                fontSize: this.fontSize - 2,
                 selectable: false,
                 evented: false,
                 objectCaching: false,
@@ -401,26 +503,28 @@ export class FabricjsRenderer {
             mouseOutText(hitText, textObj, this.canvas);
             for (const hsp of hit.hit_hsps) {
                 numberHsps++;
-                if (this.limitNumberHsps && numberHsps > 10) {
-                    // notice about not all HSPs being displayed
-                    let textObj: TextType = {
-                        fontWeight: "normal",
-                        fontSize: CanvasDefaults.fontSize,
-                        selectable: false,
-                        evented: false,
-                        objectCaching: false,
-                        top: this.topPadding,
-                        left: CanvasDefaults.maxPixels / 2,
-                        fill: "red"
-                    };
-                    this.canvas.add(
-                        new fabric.Text(
-                            `This hit contains ${totalNumberHsps} alignments, ` +
-                                `but only the first 10 are displayed`,
-                            textObj
-                        )
-                    );
-                    this.topPadding += 20;
+                if (numberHsps > this.numberHsps) {
+                    if (this.logSkippedHsps === true) {
+                        // notice about not all HSPs being displayed
+                        let textObj: TextType = {
+                            fontWeight: "normal",
+                            fontSize: this.fontSize,
+                            selectable: false,
+                            evented: false,
+                            objectCaching: false,
+                            top: this.topPadding,
+                            left: this.contentWidth / 2,
+                            fill: "red"
+                        };
+                        this.canvas.add(
+                            new fabric.Text(
+                                `This hit contains ${totalNumberHsps} alignments, ` +
+                                    `but only the first ${this.numberHsps} are displayed`,
+                                textObj
+                            )
+                        );
+                        this.topPadding += 20;
+                    }
                     break;
                 } else {
                     // line Tracks
@@ -434,7 +538,15 @@ export class FabricjsRenderer {
                         endQueryPixels,
                         startSubjPixels,
                         endSubjPixels
-                    ] = getQuerySubjPixelCoords(queryLen, subjLen, subjHspLen);
+                    ] = getQuerySubjPixelCoords(
+                        queryLen,
+                        subjLen,
+                        subjHspLen,
+                        this.contentWidth,
+                        this.contentScoringWidth,
+                        this.contentLabelWidth,
+                        this.marginWidth
+                    );
 
                     let linesGroup: fabric.Group;
                     [linesGroup, this.topPadding] = drawLineTracks(
@@ -465,7 +577,10 @@ export class FabricjsRenderer {
                         queryLen,
                         startQueryPixels,
                         hspQueryStart,
-                        hspQueryEnd
+                        hspQueryEnd,
+                        this.contentWidth,
+                        this.contentScoringWidth,
+                        this.marginWidth
                     );
                     [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
                         queryLen,
@@ -473,10 +588,13 @@ export class FabricjsRenderer {
                         subjHspLen,
                         startSubjPixels,
                         hspSubjStart,
-                        hspSubjEnd
+                        hspSubjEnd,
+                        this.contentWidth,
+                        this.contentScoringWidth,
+                        this.marginWidth
                     );
                     let color: string;
-                    if (this.scaleType === "ncbiblast") {
+                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         color = getRgbColorFixed(
                             hsp.hsp_bit_score!,
                             this.gradientSteps,
@@ -508,7 +626,7 @@ export class FabricjsRenderer {
                     // E-value text tracks
                     let textObj: TextType = {
                         fontWeight: "normal",
-                        fontSize: CanvasDefaults.fontSize,
+                        fontSize: this.fontSize,
                         selectable: false,
                         evented: false,
                         objectCaching: false,
@@ -517,8 +635,8 @@ export class FabricjsRenderer {
                     };
 
                     textObj.left = this.startEvalPixels;
-                    let evalText: fabric.Text; 
-                    if (this.scaleType === "ncbiblast") {
+                    let evalText: fabric.Text;
+                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         evalText = new fabric.Text(
                             numberToString(hsp.hsp_bit_score!),
                             textObj
@@ -529,13 +647,13 @@ export class FabricjsRenderer {
                             textObj
                         );
                     }
-                    evalText.width = CanvasDefaults.evaluePixels;
+                    evalText.width = this.contentScoringWidth;
                     this.canvas.add(evalText);
 
                     // Query tooltip
                     const floatTextObj: TextType = {
                         fontWeight: "normal",
-                        fontSize: CanvasDefaults.fontSize + 1,
+                        fontSize: this.fontSize + 1,
                         selectable: false,
                         evented: false,
                         objectCaching: false,
@@ -545,10 +663,10 @@ export class FabricjsRenderer {
                         top: 5
                     };
                     let queryTooltipText: fabric.Text;
-                    if (this.scaleType === "ncbiblast") {
+                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         queryTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
-                                hsp.hsp_hit_to
+                            `Start: ${hsp.hsp_query_from}\nEnd: ${
+                                hsp.hsp_query_to
                             }\nBit score: ${numberToString(
                                 hsp.hsp_bit_score!
                             )}`,
@@ -556,8 +674,8 @@ export class FabricjsRenderer {
                         );
                     } else {
                         queryTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
-                                hsp.hsp_hit_to
+                            `Start: ${hsp.hsp_query_from}\nEnd: ${
+                                hsp.hsp_query_to
                             }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
                             floatTextObj
                         );
@@ -600,10 +718,10 @@ export class FabricjsRenderer {
 
                     // Subject tooltip
                     let subjTooltipText: fabric.Text;
-                    if (this.scaleType === "ncbiblast") {
+                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         subjTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_query_from}\nEnd: ${
-                                hsp.hsp_query_to
+                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
+                                hsp.hsp_hit_to
                             }\nBit score: ${numberToString(
                                 hsp.hsp_bit_score!
                             )}`,
@@ -611,8 +729,8 @@ export class FabricjsRenderer {
                         );
                     } else {
                         subjTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_query_from}\nEnd: ${
-                                hsp.hsp_query_to
+                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
+                                hsp.hsp_hit_to
                             }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
                             floatTextObj
                         );
@@ -643,12 +761,12 @@ export class FabricjsRenderer {
     private drawColorScaleGroup() {
         // Scale Type selection
         const textSelObj: TextType = {
-            fontSize: CanvasDefaults.fontSize + 1,
+            fontSize: this.fontSize + 1,
             fontWeight: "bold",
             selectable: false,
             evented: false,
             objectCaching: false,
-            left: CanvasDefaults.leftScalePaddingPixels,
+            left: this.scaleLabelWidth,
             top: this.topPadding
         };
 
@@ -656,26 +774,34 @@ export class FabricjsRenderer {
         this.canvas.add(fixedText);
 
         const textCheckDynObj: TextType = {
-            fontSize: CanvasDefaults.fontSize + 12,
+            fontSize: this.fontSize + 12,
             fontWeight: "normal",
             fill: "grey",
             selectable: false,
             evented: true,
             objectCaching: false,
-            left: CanvasDefaults.leftScalePaddingPixels,
+            left: this.scaleLabelWidth,
             top: this.topPadding - 8
         };
         const textCheckFixObj: TextType = { ...textCheckDynObj };
         const textCheckNcbiObj: TextType = { ...textCheckDynObj };
 
         let checkSym: string;
-        this.scaleType === "dynamic" ? (checkSym = "☒") : (checkSym = "☐");
-        if (this.scaleType === "dynamic") textCheckDynObj.fill = "black";
+        this.colorScheme === ColorSchemeEnum.dynamic
+            ? (checkSym = "☒")
+            : (checkSym = "☐");
+        if (this.colorScheme === ColorSchemeEnum.dynamic)
+            textCheckDynObj.fill = "black";
         textCheckDynObj.left! += 80;
         var dynamicText = new fabric.Text(checkSym, textCheckDynObj);
         mouseOverCheckbox(dynamicText, textCheckDynObj, this);
-        mouseOutCheckbox(dynamicText, textCheckDynObj, "dynamic", this);
-        mouseDownCheckbox(dynamicText, "dynamic", this);
+        mouseOutCheckbox(
+            dynamicText,
+            textCheckDynObj,
+            ColorSchemeEnum.dynamic,
+            this
+        );
+        mouseDownCheckbox(dynamicText, ColorSchemeEnum.dynamic, this);
         this.canvas.add(dynamicText);
         textSelObj.fontWeight = "normal";
         textSelObj.left! += 100;
@@ -686,14 +812,21 @@ export class FabricjsRenderer {
         );
         this.canvas.add(dynamicText);
 
-        this.scaleType === "fixed" ? (checkSym = "☒") : (checkSym = "☐");
-        // this.scaleType === "fixed" ? (checkSym = "◉") : (checkSym = "○");
-        if (this.scaleType === "fixed") textCheckFixObj.fill = "black";
+        this.colorScheme === ColorSchemeEnum.fixed
+            ? (checkSym = "☒")
+            : (checkSym = "☐");
+        if (this.colorScheme === ColorSchemeEnum.fixed)
+            textCheckFixObj.fill = "black";
         textCheckFixObj.left! += 290;
         var fixedText = new fabric.Text(checkSym, textCheckFixObj);
         mouseOverCheckbox(fixedText, textCheckFixObj, this);
-        mouseOutCheckbox(fixedText, textCheckFixObj, "fixed", this);
-        mouseDownCheckbox(fixedText, "fixed", this);
+        mouseOutCheckbox(
+            fixedText,
+            textCheckFixObj,
+            ColorSchemeEnum.fixed,
+            this
+        );
+        mouseDownCheckbox(fixedText, ColorSchemeEnum.fixed, this);
         this.canvas.add(fixedText);
         textSelObj.left! += 210;
         var fixedText = new fabric.Text(
@@ -702,14 +835,21 @@ export class FabricjsRenderer {
         );
         this.canvas.add(fixedText);
 
-        // this.scaleType === "ncbiblast" ? (checkSym = "☑︎") : (checkSym = "☐");
-        this.scaleType === "ncbiblast" ? (checkSym = "☒") : (checkSym = "☐");
-        if (this.scaleType === "ncbiblast") textCheckNcbiObj.fill = "black";
+        this.colorScheme === ColorSchemeEnum.ncbiblast
+            ? (checkSym = "☒")
+            : (checkSym = "☐");
+        if (this.colorScheme === ColorSchemeEnum.ncbiblast)
+            textCheckNcbiObj.fill = "black";
         textCheckNcbiObj.left! += 480;
         var ncbiblastText = new fabric.Text(checkSym, textCheckNcbiObj);
         mouseOverCheckbox(ncbiblastText, textCheckNcbiObj, this);
-        mouseOutCheckbox(ncbiblastText, textCheckNcbiObj, "ncbiblast", this);
-        mouseDownCheckbox(ncbiblastText, "ncbiblast", this);
+        mouseOutCheckbox(
+            ncbiblastText,
+            textCheckNcbiObj,
+            ColorSchemeEnum.ncbiblast,
+            this
+        );
+        mouseDownCheckbox(ncbiblastText, ColorSchemeEnum.ncbiblast, this);
         this.canvas.add(ncbiblastText);
         textSelObj.left! += 190;
         var ncbiblastText = new fabric.Text(
@@ -721,7 +861,7 @@ export class FabricjsRenderer {
         // E-value/Bit Score Text
         this.topPadding += 25;
         const textObj: TextType = {
-            fontSize: CanvasDefaults.fontSize + 1,
+            fontSize: this.fontSize + 1,
             fontWeight: "normal",
             selectable: false,
             evented: false,
@@ -729,12 +869,12 @@ export class FabricjsRenderer {
             top: this.topPadding
         };
         let scaleTypeLabel: string;
-        this.scaleType === "ncbiblast"
+        this.colorScheme === ColorSchemeEnum.ncbiblast
             ? (scaleTypeLabel = "Bit score")
             : (scaleTypeLabel = "E-value");
-        this.scaleType === "ncbiblast"
-            ? (textObj.left = CanvasDefaults.leftScalePaddingPixels - 56)
-            : (textObj.left = CanvasDefaults.leftScalePaddingPixels - 50);
+        this.colorScheme === ColorSchemeEnum.ncbiblast
+            ? (textObj.left = this.scaleLabelWidth - 56)
+            : (textObj.left = this.scaleLabelWidth - 50);
         var evalueText = new fabric.Text(`${scaleTypeLabel}`, textObj);
         this.canvas.add(evalueText);
 
@@ -743,36 +883,35 @@ export class FabricjsRenderer {
             selectable: false,
             evented: false,
             objectCaching: false,
-            left: CanvasDefaults.leftScalePaddingPixels,
+            left: this.scaleLabelWidth,
             top: this.topPadding,
-            width: CanvasDefaults.scalePixels,
+            width: this.scaleWidth,
             height: 15
         };
         var colorScale = new fabric.Rect(rectObj);
-        if (this.scaleType === "ncbiblast") {
-            colorNcbiBlastGradient(colorScale, 0, CanvasDefaults.scalePixels);
+        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
+            colorNcbiBlastGradient(colorScale, 0, this.scaleWidth);
         } else {
-            colorDefaultGradient(colorScale, 0, CanvasDefaults.scalePixels);
+            colorDefaultGradient(colorScale, 0, this.scaleWidth);
         }
 
         this.canvas.add(colorScale);
 
         // E-value Axis (line and ticks)
-        if (this.scaleType === "ncbiblast") {
+        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
             const oneFifthGradPixels =
-                (CanvasDefaults.leftScalePaddingPixels +
-                    CanvasDefaults.scalePixels -
-                    CanvasDefaults.leftScalePaddingPixels) /
+                (this.scaleLabelWidth +
+                    this.scaleWidth -
+                    this.scaleLabelWidth) /
                 5;
             let axisGroup: fabric.Group;
             [axisGroup, this.topPadding] = drawLineAxis6Buckets(
-                CanvasDefaults.leftScalePaddingPixels,
-                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels,
-                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 2,
-                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 3,
-                CanvasDefaults.leftScalePaddingPixels + oneFifthGradPixels * 4,
-                CanvasDefaults.leftScalePaddingPixels +
-                    CanvasDefaults.scalePixels,
+                this.scaleLabelWidth,
+                this.scaleLabelWidth + oneFifthGradPixels,
+                this.scaleLabelWidth + oneFifthGradPixels * 2,
+                this.scaleLabelWidth + oneFifthGradPixels * 3,
+                this.scaleLabelWidth + oneFifthGradPixels * 4,
+                this.scaleLabelWidth + this.scaleWidth,
                 this.topPadding,
                 1
             );
@@ -781,11 +920,11 @@ export class FabricjsRenderer {
             // Bits scale tick mark labels
             this.topPadding += 5;
             textObj.top = this.topPadding;
-            textObj.fontSize = CanvasDefaults.fontSize;
+            textObj.fontSize = this.fontSize;
             // 20% Tick Label
             let label = `<${this.gradientSteps[1]}`;
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneFifthGradPixels -
                 label.length * 3 -
                 72;
@@ -793,7 +932,7 @@ export class FabricjsRenderer {
             // 40% Tick Label
             label = `${this.gradientSteps[1]} - ${this.gradientSteps[2]}`;
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneFifthGradPixels * 2 -
                 label.length * 3 -
                 72;
@@ -801,7 +940,7 @@ export class FabricjsRenderer {
             // 60% Tick Label
             label = `${this.gradientSteps[2]} - ${this.gradientSteps[3]}`;
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneFifthGradPixels * 3 -
                 label.length * 3 -
                 72;
@@ -809,7 +948,7 @@ export class FabricjsRenderer {
             // 60% Tick Label
             label = `${this.gradientSteps[3]} - ${this.gradientSteps[4]}`;
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneFifthGradPixels * 4 -
                 label.length * 3 -
                 72;
@@ -817,10 +956,7 @@ export class FabricjsRenderer {
             // End Tick Label
             label = `≥${this.gradientSteps[4]}`;
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
-                CanvasDefaults.scalePixels -
-                label.length * 3 -
-                72;
+                this.scaleLabelWidth + this.scaleWidth - label.length * 3 - 72;
             const endLabelText = new fabric.Text(label, textObj);
 
             const textGroup = new fabric.Group(
@@ -831,23 +967,22 @@ export class FabricjsRenderer {
                     o80LabelText,
                     endLabelText
                 ],
-                CanvasDefaults.groupConfig
+                groupDefaults
             );
             this.canvas.add(textGroup);
         } else {
             const oneForthGradPixels =
-                (CanvasDefaults.leftScalePaddingPixels +
-                    CanvasDefaults.scalePixels -
-                    CanvasDefaults.leftScalePaddingPixels) /
+                (this.scaleLabelWidth +
+                    this.scaleWidth -
+                    this.scaleLabelWidth) /
                 4;
             let axisGroup: fabric.Group;
             [axisGroup, this.topPadding] = drawLineAxis5Buckets(
-                CanvasDefaults.leftScalePaddingPixels,
-                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels,
-                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 2,
-                CanvasDefaults.leftScalePaddingPixels + oneForthGradPixels * 3,
-                CanvasDefaults.leftScalePaddingPixels +
-                    CanvasDefaults.scalePixels,
+                this.scaleLabelWidth,
+                this.scaleLabelWidth + oneForthGradPixels,
+                this.scaleLabelWidth + oneForthGradPixels * 2,
+                this.scaleLabelWidth + oneForthGradPixels * 3,
+                this.scaleLabelWidth + this.scaleWidth,
                 this.topPadding,
                 1
             );
@@ -856,10 +991,10 @@ export class FabricjsRenderer {
             // E-value scale tick mark labels
             this.topPadding += 5;
             textObj.top = this.topPadding;
-            textObj.fontSize = CanvasDefaults.fontSize;
+            textObj.fontSize = this.fontSize;
             // Start Tick Label
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels -
+                this.scaleLabelWidth -
                 numberToString(this.gradientSteps[0]).length * 3;
             const startLabelText = new fabric.Text(
                 numberToString(this.gradientSteps[0]),
@@ -867,7 +1002,7 @@ export class FabricjsRenderer {
             );
             // 25% Tick Label
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneForthGradPixels -
                 numberToString(this.gradientSteps[1]).length * 3;
             const o25LabelText = new fabric.Text(
@@ -876,7 +1011,7 @@ export class FabricjsRenderer {
             );
             // 50% Tick Label
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneForthGradPixels * 2 -
                 numberToString(this.gradientSteps[2]).length * 3;
             const o50LabelText = new fabric.Text(
@@ -885,7 +1020,7 @@ export class FabricjsRenderer {
             );
             // 75% Tick Label
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
+                this.scaleLabelWidth +
                 oneForthGradPixels * 3 -
                 numberToString(this.gradientSteps[3]).length * 3;
             const o75LabelText = new fabric.Text(
@@ -894,8 +1029,8 @@ export class FabricjsRenderer {
             );
             // End Tick Label
             textObj.left =
-                CanvasDefaults.leftScalePaddingPixels +
-                CanvasDefaults.scalePixels -
+                this.scaleLabelWidth +
+                this.scaleWidth -
                 numberToString(this.gradientSteps[4]).length * 3;
             const endLabelText = new fabric.Text(
                 numberToString(this.gradientSteps[4]),
@@ -910,7 +1045,7 @@ export class FabricjsRenderer {
                     o75LabelText,
                     endLabelText
                 ],
-                CanvasDefaults.groupConfig
+                groupDefaults
             );
             this.canvas.add(textGroup);
         }
@@ -919,7 +1054,7 @@ export class FabricjsRenderer {
     private drawFooterText() {
         let textObj: TextType = {
             fontWeight: "normal",
-            fontSize: CanvasDefaults.fontSize,
+            fontSize: this.fontSize,
             selectable: false,
             evented: true,
             objectCaching: false,
