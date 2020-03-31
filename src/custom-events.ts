@@ -96,7 +96,7 @@ export function mouseDownCheckbox(
         if (e.target) {
             if (_this.colorScheme != value) {
                 _this.colorScheme = value;
-                _this.renderAll();
+                _this.render();
             }
         }
     });

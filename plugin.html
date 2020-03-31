@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>jdistpatcher-viewers</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+        <script type="text/javascript" src="dist/bundle.js" defer></script>
+    </head>
+    <body>
+        <div id="canvas-wrapper">
+            <canvas id="canvas" />
+        </div>
+    </body>
+    <script>
+        async function getJSONAsync(jobId) {
+            let url;
+            if (jobId != null) {
+                const toolName = jobId.split("-")[0];
+                url = `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
+            } else {
+                console.log("Loading local example JSON");
+                url = './src/testdata/ncbiblast.json';
+            }
+            return await (await fetch(url)).json();
+        }
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Get Sequence Similirity Search JSON object
+            const jobId = "ncbiblast-I20200331-100051-0683-57319148-np2";
+            let dataObj = await getJSONAsync(jobId)
+                .then(json => json)
+                .catch(json => getJSONAsync());
+
+            // Render Options
+            const options = {
+                canvasWidth: 1000,
+                canvasHeight: 100,
+                numberHsps: 10,
+                logSkippedHsps: true,
+                colorScheme: "dynamic",
+                canvasWrapperStroke: true
+            };
+            // Call render method to display the viz
+            new CanvasRenderer("canvas", dataObj, options).render();
+        });
+    </script>
+</html>

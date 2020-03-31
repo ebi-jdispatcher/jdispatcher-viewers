@@ -60,7 +60,10 @@ export class BasicCanvasRenderer {
     protected fontFamily: string;
     protected canvasWrapperStroke: boolean;
 
-    constructor(renderOptions: RenderOptions) {
+    constructor(
+        element: string | HTMLCanvasElement,
+        renderOptions: RenderOptions
+    ) {
         renderOptions.canvasWidth != undefined
             ? (this.canvasWidth = renderOptions.canvasWidth)
             : (this.canvasWidth = 1000);
@@ -107,7 +110,7 @@ export class BasicCanvasRenderer {
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
 
-        this.canvas = new fabric.Canvas("canvas", {});
+        this.canvas = new fabric.Canvas(element, {});
     }
 
     protected setFrameSize() {
@@ -131,10 +134,12 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     private gradientSteps: number[] = [];
 
     constructor(
-        public dataObj: SSSResultModel,
-        public renderOptions: RenderOptions
+        element: string | HTMLCanvasElement,
+        private dataObj: SSSResultModel,
+        renderOptions: RenderOptions
     ) {
-        super(renderOptions);
+        super(element, renderOptions);
+        
         this.queryLen = this.dataObj.query_len;
         for (const hit of this.dataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
@@ -154,11 +159,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             this.marginWidth
         );
         this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
-
-        // render All components
-        this.renderAll();
     }
-    public renderAll() {
+    public render() {
         this.canvas.clear();
         this.topPadding = 2;
         // canvas header
@@ -996,3 +998,5 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         mouseOutText(copyrightText, textObj, this);
     }
 }
+
+(window as any).CanvasRenderer = CanvasRenderer;

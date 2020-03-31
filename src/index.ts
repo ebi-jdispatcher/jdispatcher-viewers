@@ -177,14 +177,14 @@ class FabricjsRenderer {
 
     private renderCanvas() {
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
-        const fabricjs = new CanvasRenderer(this.canvasInstance[0], {
+        const fabricjs = new CanvasRenderer("canvas", this.canvasInstance[0], {
             canvasWidth: 1000,
             canvasHeight: 100,
             numberHsps: 10,
             logSkippedHsps: true,
             colorScheme: ColorSchemeEnum.dynamic,
             canvasWrapperStroke: true
-        });
+        }).render();
         // TODO add export as SVG and PNG - clickEvents
         console.log(fabricjs.canvas.renderCanvas);
     }
