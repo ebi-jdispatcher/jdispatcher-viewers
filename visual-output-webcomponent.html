@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>jdistpatcher-viewers</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+        <script src="/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+        <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <script type="text/javascript" src="dist/jd_viewers_bundle.js" defer></script>
+    </head>
+    <body>
+        <!-- JD Visual Output Web-component -->
+        <!-- data="https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers/raw/master/src/testdata/ncbiblast.json" -->
+        <!-- data="data="https://wwwdev.ebi.ac.uk/Tools/services/rest/ncbiblast/result/ncbiblast-I20200331-100051-0683-57319148-np2/jdp?format=json"" -->
+        <jd-visual-output
+            data="ncbiblast-I20200331-100051-0683-57319148-np2"
+            canvasWidth="1000"
+            canvasHeight="100"
+            numberHsps="10"
+            logSkippedHsps="true"
+            colorScheme="dynamic"
+            canvasWrapperStroke="true"
+        ></jd-visual-output>
+    </body>
+</html>
