@@ -1,4 +1,6 @@
 #canvas-wrapper {
     /* border: 1.0px solid lightseagreen; */
     width: 1000px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

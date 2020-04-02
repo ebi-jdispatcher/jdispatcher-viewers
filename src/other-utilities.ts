@@ -1,3 +1,6 @@
+import { SSSResultModel } from "./data-model";
+import { JobIdValitable } from "./custom-types";
+
 function countDecimals(n: number) {
     if (Math.floor(n) === n) return 0;
     return n.toString().split(".")[1].length || 0;
@@ -14,4 +17,53 @@ export function numberToString(n: number) {
     } else {
         return (stringNumber = n.toString());
     }
+}
+
+export async function getDataFromURLorFile(
+    dataLoc: string
+): Promise<SSSResultModel> {
+    const request = new Request(dataLoc);
+    try {
+        return fetch(request).then(response => {
+            if (!response.ok) {
+                throw new Error(`Could not retrieve data from ${dataLoc}`);
+            }
+            try {
+                return response.json();
+            } catch (error) {
+                throw new Error(`Could not decode JSON data from ${dataLoc}`);
+            }
+        });
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+export function getServiceURLfromJobId(jobId: string) {
+    const toolName = jobId.split("-")[0];
+    return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
+}
+
+export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false) {
+    let isValid = true;
+    if (jobIdObj.required) {
+        isValid = isValid && jobIdObj.value.trim().length !== 0;
+    }
+    if (jobIdObj.minLength) {
+        isValid = isValid && jobIdObj.value.trim().length >= jobIdObj.minLength;
+    }
+    if (jobIdObj.maxLength) {
+        isValid = isValid && jobIdObj.value.trim().length <= jobIdObj.maxLength;
+    }
+    if (jobIdObj.pattern) {
+        isValid = isValid && jobIdObj.pattern.test(jobIdObj.value.trim());
+    }
+    if (verbose){
+        if (isValid) {
+            console.log(`JobId "${jobIdObj.value}" is valid!`);
+        } else {
+            console.log(`JobId "${jobIdObj.value}" is not valid!`);
+        }
+    }
+    return isValid;
 }

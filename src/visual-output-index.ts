@@ -1,13 +1,14 @@
 import { CanvasRenderer } from "./app";
-import { SSSResultModel } from "./data-model";
-import { ColorSchemeEnum } from "./custom-types";
-import { default as mockDataObj } from "./testdata/ncbiblast3.json";
+import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
+import { validateJobId } from "./other-utilities";
+// import { writeFile } from "fs";
+// import { join } from "path";
 
-type Listener = (items: SSSResultModel[]) => void;
+type Listener = (items: string[]) => void;
 
 // Canvas State Management
 class CanvasState {
-    private canvasInstances: SSSResultModel[] = [];
+    private canvasInstances: string[] = [];
     private static instance: CanvasState;
     private listener: Listener = () => {};
     private jobIds: string[] = [];
@@ -27,11 +28,11 @@ class CanvasState {
         this.listener = listenerFn;
     }
 
-    addCanvas(jobId: string, dataObj: SSSResultModel) {
+    addCanvas(jobId: string, data: string) {
         if (this.jobIds.length === 0 || !this.jobIds.includes(jobId)) {
             this.canvasInstances = [];
             this.jobIds.push(jobId);
-            this.canvasInstances.push(dataObj);
+            this.canvasInstances.push(data);
             this.listener(this.canvasInstances.slice());
         }
     }
@@ -55,34 +56,6 @@ function autobind(
     return adjDescriptor;
 }
 
-// input validation
-interface Valitable {
-    value: string;
-    required: boolean;
-    minLength?: number;
-    maxLength?: number;
-    pattern?: RegExp;
-}
-
-function validateInput(validInput: Valitable) {
-    let isValid = true;
-    if (validInput.required) {
-        isValid = isValid && validInput.value.trim().length !== 0;
-    }
-    if (validInput.minLength) {
-        isValid =
-            isValid && validInput.value.trim().length >= validInput.minLength;
-    }
-    if (validInput.maxLength) {
-        isValid =
-            isValid && validInput.value.trim().length <= validInput.maxLength;
-    }
-    if (validInput.pattern) {
-        isValid = isValid && validInput.pattern.test(validInput.value.trim());
-    }
-    return isValid;
-}
-
 // jobId Input Form
 class JobIdInputForm {
     private templateElement: HTMLTemplateElement;
@@ -98,19 +71,20 @@ class JobIdInputForm {
         this.hostElement = document.getElementById(
             "visual-output-app"
         )! as HTMLDivElement;
+        if (this.templateElement !== null) {
+            const importedHTMLcontent = document.importNode(
+                this.templateElement.content,
+                true
+            );
+            this.element = importedHTMLcontent.firstElementChild as HTMLFormElement;
 
-        const importedHTMLcontent = document.importNode(
-            this.templateElement.content,
-            true
-        );
-        this.element = importedHTMLcontent.firstElementChild as HTMLFormElement;
+            this.jobIdElement = this.element.querySelector(
+                "#jobid"
+            )! as HTMLInputElement;
 
-        this.jobIdElement = this.element.querySelector(
-            "#jobid"
-        )! as HTMLInputElement;
-
-        this.submitListener();
-        this.renderForm();
+            this.submitListener();
+            this.renderForm();
+        }
     }
 
     private submitListener() {
@@ -125,19 +99,17 @@ class JobIdInputForm {
     private submitHandler(event: Event) {
         event.preventDefault();
         const jobId = this.jobIdElement.value.trim();
-        const formValidatable = {
-            value: jobId,
-            required: true,
-            minLength: 35,
-            maxLength: 60,
-            pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)/g
-        };
+        let formValidatable = { ...jobIdDefaults };
+        formValidatable.value = jobId;
 
-        if (validateInput(formValidatable)) {
+        if (validateJobId(formValidatable)) {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
-                canvasInstance.addCanvas(jobId, mockDataObj);
+                canvasInstance.addCanvas(
+                    jobId,
+                    "./src/testdata/ncbiblast.json"
+                );
             } else {
-                alert("Fetching from live service not yet implemented!");
+                canvasInstance.addCanvas(jobId, jobId);
                 return;
             }
         } else {
@@ -152,7 +124,7 @@ class FabricjsRenderer {
     private templateElement: HTMLTemplateElement;
     private hostElement: HTMLDivElement;
     private elementCanvas: HTMLDivElement;
-    private canvasInstance: SSSResultModel[];
+    private canvasInstance: string[];
 
     constructor() {
         this.templateElement = document.getElementById(
@@ -162,17 +134,19 @@ class FabricjsRenderer {
             "visual-output-app"
         )! as HTMLDivElement;
 
-        const importedHTMLcontent = document.importNode(
-            this.templateElement.content,
-            true
-        );
-        this.elementCanvas = importedHTMLcontent.firstElementChild as HTMLDivElement;
+        if (this.templateElement !== null) {
+            const importedHTMLcontent = document.importNode(
+                this.templateElement.content,
+                true
+            );
+            this.elementCanvas = importedHTMLcontent.firstElementChild as HTMLDivElement;
 
-        this.canvasInstance = [];
-        canvasInstance.addListener((canvasInstance: SSSResultModel[]) => {
-            this.canvasInstance = canvasInstance;
-            this.renderCanvas();
-        });
+            this.canvasInstance = [];
+            canvasInstance.addListener((canvasInstance: string[]) => {
+                this.canvasInstance = canvasInstance;
+                this.renderCanvas();
+            });
+        }
     }
 
     private renderCanvas() {
@@ -185,8 +159,6 @@ class FabricjsRenderer {
             colorScheme: ColorSchemeEnum.dynamic,
             canvasWrapperStroke: true
         }).render();
-        // TODO add export as SVG and PNG - clickEvents
-        console.log(fabricjs.canvas.renderCanvas);
     }
 }
 

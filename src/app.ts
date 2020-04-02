@@ -4,7 +4,8 @@ import {
     ColorSchemeEnum,
     objectDefaults,
     textDefaults,
-    rectDefaults
+    rectDefaults,
+    jobIdDefaults
 } from "./custom-types";
 import {
     getTextLegendPaddingFactor,
@@ -39,7 +40,12 @@ import {
     defaultGradient,
     ncbiBlastGradient
 } from "./color-schemes";
-import { numberToString } from "./other-utilities";
+import {
+    numberToString,
+    getDataFromURLorFile,
+    validateJobId,
+    getServiceURLfromJobId
+} from "./other-utilities";
 import { SSSResultModel } from "./data-model";
 
 export class BasicCanvasRenderer {
@@ -61,7 +67,7 @@ export class BasicCanvasRenderer {
     protected canvasWrapperStroke: boolean;
 
     constructor(
-        element: string | HTMLCanvasElement,
+        private element: string | HTMLCanvasElement,
         renderOptions: RenderOptions
     ) {
         renderOptions.canvasWidth != undefined
@@ -109,14 +115,17 @@ export class BasicCanvasRenderer {
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
+    }
 
-        this.canvas = new fabric.Canvas(element, {});
+    protected getFabricCanvas() {
+        this.canvas = new fabric.Canvas(this.element, {});
     }
 
     protected setFrameSize() {
         this.canvas.setWidth(this.canvasWidth);
         this.canvas.setHeight(this.canvasHeight);
     }
+
     protected renderCanvas() {
         this.canvas.renderAll();
     }
@@ -132,82 +141,112 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     private startSubjPixels: number;
     private endSubjPixels: number;
     private gradientSteps: number[] = [];
+    private dataObj: SSSResultModel;
 
     constructor(
         element: string | HTMLCanvasElement,
-        private dataObj: SSSResultModel,
+        private data: string,
         renderOptions: RenderOptions
     ) {
         super(element, renderOptions);
-        
-        this.queryLen = this.dataObj.query_len;
-        for (const hit of this.dataObj.hits) {
-            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
-        }
-        [
-            this.startQueryPixels,
-            this.endQueryPixels,
-            this.startSubjPixels,
-            this.endSubjPixels
-        ] = getQuerySubjPixelCoords(
-            this.queryLen,
-            this.subjLen,
-            this.subjLen,
-            this.contentWidth,
-            this.contentScoringWidth,
-            this.contentLabelWidth,
-            this.marginWidth
-        );
-        this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
+        this.validateInput();
     }
-    public render() {
-        this.canvas.clear();
-        this.topPadding = 2;
-        // canvas header
-        this.drawHeaderTextGroup();
+    private validateInput() {
+        // check if input is a jobId
+        const jobId = { ...jobIdDefaults };
+        jobId.value = this.data;
+        // if so, get the service URL, else use as is
+        if (
+            !jobId.value.startsWith("http") &&
+            !jobId.value.includes("/") &&
+            validateJobId(jobId)
+        ) {
+            this.data = getServiceURLfromJobId(this.data);
+        }
+    }
 
-        // content header
-        if (this.dataObj.hits.length > 0) {
+    private loadData() {
+        const json = getDataFromURLorFile(this.data).then(data => data);
+        json.then(data => {
+            if (typeof this.dataObj === "undefined") {
+                this.dataObj = data;
+                this.render();
+            }
+        }).catch(error => console.log(error));
+    }
+
+    public render() {
+        this.loadData();
+        if (typeof this.dataObj !== "undefined") {
+            this.getFabricCanvas();
+            this.queryLen = this.dataObj.query_len;
+            for (const hit of this.dataObj.hits) {
+                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+            }
+            [
+                this.startQueryPixels,
+                this.endQueryPixels,
+                this.startSubjPixels,
+                this.endSubjPixels
+            ] = getQuerySubjPixelCoords(
+                this.queryLen,
+                this.subjLen,
+                this.subjLen,
+                this.contentWidth,
+                this.contentScoringWidth,
+                this.contentLabelWidth,
+                this.marginWidth
+            );
+            this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
+
+            this.canvas.clear();
+            this.topPadding = 2;
+            // canvas header
+            this.drawHeaderTextGroup();
+
             // content header
-            this.topPadding += 25;
-            this.drawContentHeaderGroup();
-            // dynamic content
-            this.topPadding += 25;
-            this.drawDynamicContentGroup();
-            // color scale
+            if (this.dataObj.hits.length > 0) {
+                // content header
+                this.topPadding += 25;
+                this.drawContentHeaderGroup();
+                // dynamic content
+                this.topPadding += 25;
+                this.drawDynamicContentGroup();
+                // color scale
+                this.topPadding += 20;
+                this.drawColorScaleGroup();
+            } else {
+                // text content: "No hits found!"
+                this.topPadding += 20;
+                this.drawNoHitsFoundText();
+            }
+            // canvas footer
+            this.topPadding += 30;
+            this.drawFooterText();
+            // finishing off
             this.topPadding += 20;
-            this.drawColorScaleGroup();
-        } else {
-            // text content: "No hits found!"
-            this.topPadding += 20;
-            this.drawNoHitsFoundText();
+            if (this.canvasHeight < this.topPadding) {
+                this.canvasHeight = this.topPadding;
+            }
+            if (this.canvasWrapperStroke) {
+                // final canvas wrapper rect
+                const canvasWrapper = new fabric.Rect({
+                    selectable: false,
+                    evented: false,
+                    objectCaching: false,
+                    top: 0,
+                    left: 0,
+                    width: this.canvasWidth - 1,
+                    height: this.canvasHeight - 1,
+                    strokeWidth: 1,
+                    stroke: "lightseagreen",
+                    fill: "transparent"
+                });
+                this.canvas.add(canvasWrapper);
+            }
+            this.setFrameSize();
+            this.renderCanvas();
         }
-        // canvas footer
-        this.topPadding += 30;
-        this.drawFooterText();
-        // finishing off
-        this.topPadding += 20;
-        if (this.canvasHeight < this.topPadding) {
-            this.canvasHeight = this.topPadding;
-        }
-        if (this.canvasWrapperStroke) {
-            // final canvas wrapper rect
-            const canvasWrapper = new fabric.Rect({
-                selectable: false,
-                evented: false,
-                objectCaching: false,
-                top: 0,
-                left: 0,
-                width: this.canvasWidth - 1,
-                height: this.canvasHeight - 1,
-                strokeWidth: 1,
-                stroke: "lightseagreen",
-                fill: "transparent"
-            });
-            this.canvas.add(canvasWrapper);
-        }
-        this.setFrameSize();
-        this.renderCanvas();
     }
 
     private drawHeaderTextGroup() {

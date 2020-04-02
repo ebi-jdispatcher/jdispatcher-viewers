@@ -9,6 +9,7 @@ export enum ColorSchemeEnum {
  * Width and Height in Pixels (px)
  */
 export interface RenderOptions {
+    jobId?: string,
     canvasWidth?: number;
     canvasHeight?: number;
     contentWidth?: number; // Vizualisation
@@ -25,6 +26,23 @@ export interface RenderOptions {
     fontFamily?: string;
     canvasWrapperStroke?: boolean;
 }
+
+// jobId validation
+export interface JobIdValitable {
+    value: string;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: RegExp;
+}
+
+export const jobIdDefaults: JobIdValitable = {
+    value: "",
+    required: true,
+    minLength: 35,
+    maxLength: 60,
+    pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)$/
+};
 
 export interface TextType {
     selectable: boolean;
