@@ -1,8 +1,6 @@
 import { CanvasRenderer } from "./app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 import { validateJobId } from "./other-utilities";
-// import { writeFile } from "fs";
-// import { join } from "path";
 
 type Listener = (items: string[]) => void;
 

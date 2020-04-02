@@ -32,7 +32,7 @@ To play with the development server, run:
 
 .. code-block:: bash
 
-  npm run start
+  npm run dev
 
 
 Production Application
