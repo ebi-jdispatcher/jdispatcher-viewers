@@ -2,7 +2,8 @@ const path = require("path");
 
 module.exports = {
     mode: "development",
-    entry: "./src/app.ts",
+    entry: "./src/visual-output-index.ts",
+    // entry: "./src/functional-predictions-index.ts",
     output: {
         filename: "jd_viewers_bundle.js",
         path: path.resolve(__dirname, "dist"),
@@ -10,7 +11,7 @@ module.exports = {
     },
     devtool: "inline-source-map",
     devServer: {
-        port: 8081,
+        port: 8080,
         compress: false
     },
     module: {
