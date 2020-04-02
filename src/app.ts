@@ -48,6 +48,9 @@ import {
 } from "./other-utilities";
 import { SSSResultModel } from "./data-model";
 
+// web-component support
+import "./visual-output-webcomponent.ts";
+
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
     protected canvasWidth: number;
