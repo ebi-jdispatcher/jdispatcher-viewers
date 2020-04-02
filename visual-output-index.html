@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>jdistpatcher-viewers</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all">
+        <script type="module" src="dist/jd_viewers_bundle.js"></script>
+    </head>
+    <body>
+        <div id="visual-output-app">
+            <template id="input-jobid">
+                <form>
+                    <div class="form-control">
+                        <label for="jobid">JobId:</label>
+                        <input type="text" size="60" id="jobid" required="true"
+                        value="mock_jobid-I20200317-103136-0485-5599422-np2" />
+                        <button type="submit">Generate Visual-Output</button>
+                    </div>
+                </form>    
+            </template>
+            </br>
+            <template id="output-vis-canvas">
+                <div id="canvas-wrapper">
+                    <canvas id="canvas"/>
+                </div>
+            </template>
+        </div>
+    </body>
+</html>

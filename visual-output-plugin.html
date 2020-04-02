@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>jdistpatcher-viewers</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-        <script type="text/javascript" src="dist/bundle.js" defer></script>
+        <script type="text/javascript" src="dist/jd_viewers_bundle.js" defer></script>
     </head>
     <body>
         <div id="canvas-wrapper">
@@ -14,23 +14,14 @@
         </div>
     </body>
     <script>
-        async function getJSONAsync(jobId) {
-            let url;
-            if (jobId != null) {
-                const toolName = jobId.split("-")[0];
-                url = `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
-            } else {
-                console.log("Loading local example JSON");
-                url = './src/testdata/ncbiblast.json';
-            }
-            return await (await fetch(url)).json();
+        function getDataURL(jobId) {
+            const toolName = jobId.split("-")[0];
+            return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
         }
-        document.addEventListener("DOMContentLoaded", async () => {
-            // Get Sequence Similirity Search JSON object
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get Sequence Similirity Search JSON URL
             const jobId = "ncbiblast-I20200331-100051-0683-57319148-np2";
-            let dataObj = await getJSONAsync(jobId)
-                .then(json => json)
-                .catch(json => getJSONAsync());
+            const data = getDataURL(jobId);
 
             // Render Options
             const options = {
@@ -42,7 +33,7 @@
                 canvasWrapperStroke: true
             };
             // Call render method to display the viz
-            new CanvasRenderer("canvas", dataObj, options).render();
+            new CanvasRenderer("canvas", data, options).render();
         });
     </script>
 </html>
