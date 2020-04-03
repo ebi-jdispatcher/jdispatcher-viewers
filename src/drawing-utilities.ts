@@ -76,7 +76,7 @@ export function drawHeaderTextGroup(
     return textGroup;
 }
 
-export function drawHeaderTextLinkGroup(
+export function drawHeaderLinkText(
     dataObj: SSSResultModel,
     renderOptions: RenderOptions,
     topPadding: number
@@ -121,7 +121,6 @@ export function drawContentHeaderTextGroup(
     textObj.left = coordValues.startQueryPixels;
     const queryText = new fabric.Text("Sequence Match", textObj);
     queryText.width = totalQueryPixels;
-    topPadding += 5;
     textObj.left = coordValues.startEvalPixels;
     let evalueText;
     // E-value/ Bits
@@ -509,7 +508,7 @@ export function drawCheckBoxText(
     textCheckNcbiObj.left! += 480;
     const ncbiblastCheckboxText = new fabric.Text(checkSym, textCheckNcbiObj);
     textSelObj.left! += 190;
-    var ncbiblastText = new fabric.Text(
+    const ncbiblastText = new fabric.Text(
         "NCBI BLAST+ (Bit score: <40 to ≥200)",
         textSelObj
     );

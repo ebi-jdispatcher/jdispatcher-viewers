@@ -30,7 +30,7 @@ import {
 } from "./custom-events";
 import {
     drawHeaderTextGroup,
-    drawHeaderTextLinkGroup,
+    drawHeaderLinkText,
     drawContentHeaderTextGroup,
     drawLineTracks,
     drawContentSequenceInfoText,
@@ -103,7 +103,7 @@ export class BasicCanvasRenderer {
             : (this.marginWidth = (0.15 * this.canvasWidth) / 100);
         renderOptions.colorScheme != undefined
             ? (this.colorScheme = renderOptions.colorScheme)
-            : (this.colorScheme = ColorSchemeEnum.fixed);
+            : (this.colorScheme = ColorSchemeEnum.dynamic);
         renderOptions.numberHsps != undefined
             ? (this.numberHsps = renderOptions.numberHsps)
             : (this.numberHsps = 10);
@@ -235,8 +235,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     private drawHeaderGroup() {
         // canvas header
         this.topPadding = 2;
-        let textHeaderGroup: fabric.Group;
-        textHeaderGroup = drawHeaderTextGroup(
+        const textHeaderGroup = drawHeaderTextGroup(
             this.dataObj,
             {
                 fontSize: this.fontSize,
@@ -248,18 +247,18 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
         // canvas header (sequence info)
         this.topPadding += 45;
-        let sequenceDefText: fabric.Text;
+        let textHeaderLink: fabric.Text;
         let textSeqObj: TextType;
-        [sequenceDefText, textSeqObj] = drawHeaderTextLinkGroup(
+        [textHeaderLink, textSeqObj] = drawHeaderLinkText(
             this.dataObj,
             { fontSize: this.fontSize },
             this.topPadding
         );
-        this.canvas.add(sequenceDefText);
+        this.canvas.add(textHeaderLink);
         if (this.dataObj.query_url != null) {
-            mouseOverText(sequenceDefText, textSeqObj, this);
-            mouseDownText(sequenceDefText, this.dataObj.query_url, this);
-            mouseOutText(sequenceDefText, textSeqObj, this);
+            mouseOverText(textHeaderLink, textSeqObj, this);
+            mouseDownText(textHeaderLink, this.dataObj.query_url, this);
+            mouseOutText(textHeaderLink, textSeqObj, this);
         }
     }
 
@@ -267,8 +266,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         if (this.dataObj.hits.length > 0) {
             // content header
             this.topPadding += 25;
-            let textContentHeaderGroup: fabric.Group;
-            textContentHeaderGroup = drawContentHeaderTextGroup(
+            const textContentHeaderGroup = drawContentHeaderTextGroup(
                 {
                     queryLen: this.queryLen,
                     subjLen: this.subjLen,
@@ -287,8 +285,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
             // content header line tracks
             this.topPadding += 20;
-            let lineGroup: fabric.Group;
-            lineGroup = drawLineTracks(
+            const lineTrackGroup = drawLineTracks(
                 {
                     startQueryPixels: this.startQueryPixels,
                     endQueryPixels: this.endQueryPixels,
@@ -298,11 +295,10 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 { strokeWidth: 2 },
                 this.topPadding
             );
-            this.canvas.add(lineGroup);
+            this.canvas.add(lineTrackGroup);
 
             this.topPadding += 5;
-            let textContentFooterGroup: fabric.Group;
-            textContentFooterGroup = drawContentFooterTextGroup(
+            const textContentFooterGroup = drawContentFooterTextGroup(
                 {
                     queryLen: this.queryLen,
                     subjLen: this.subjLen,
@@ -328,8 +324,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         } else {
             // text content: "No hits found!"
             this.topPadding += 20;
-            let noHitsTextGroup: fabric.Text;
-            noHitsTextGroup = drawNoHitsFoundText(
+            const noHitsTextGroup = drawNoHitsFoundText(
                 {
                     fontSize: this.fontSize,
                     contentWidth: this.contentWidth
@@ -399,8 +394,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             const totalNumberHsps: number = hit.hit_hsps.length;
             // Hit ID + Hit Description text tracks
             let textObj: TextType;
-            let spaceText: fabric.Text;
-            let hitText: fabric.Text;
+            let spaceText, hitText: fabric.Text;
             [spaceText, hitText, textObj] = drawContentSequenceInfoText(
                 maxIDLen,
                 hit,
@@ -416,8 +410,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 numberHsps++;
                 if (numberHsps > this.numberHsps) {
                     if (this.logSkippedHsps === true) {
-                        let hspTextNotice: fabric.Text;
-                        hspTextNotice = drawHspNoticeText(
+                        const hspTextNotice = drawHspNoticeText(
                             totalNumberHsps,
                             this.numberHsps,
                             {
@@ -453,13 +446,12 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     );
 
                     this.topPadding += 5;
-                    let linesGroup: fabric.Group;
-                    linesGroup = drawLineTracks(
+                    const linesGroup = drawLineTracks(
                         {
-                            startQueryPixels: this.startQueryPixels,
-                            endQueryPixels: this.endQueryPixels,
-                            startSubjPixels: this.startSubjPixels,
-                            endSubjPixels: this.endSubjPixels
+                            startQueryPixels: startQueryPixels,
+                            endQueryPixels: endQueryPixels,
+                            startSubjPixels: startSubjPixels,
+                            endSubjPixels: endSubjPixels
                         },
                         { strokeWidth: 1 },
                         this.topPadding
@@ -528,8 +520,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.canvas.add(subjDomain);
 
                     // E-value text tracks
-                    let scoreText: fabric.Text;
-                    scoreText = drawScoreText(
+                    const scoreText = drawScoreText(
                         this.startEvalPixels,
                         hsp,
                         {
@@ -542,8 +533,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.canvas.add(scoreText);
 
                     // Query tooltip
-                    let queryTooltipGroup: fabric.Group;
-                    queryTooltipGroup = drawDomainTooltips(
+                    const queryTooltipGroup = drawDomainTooltips(
                         startQueryHspPixels,
                         endQueryHspPixels,
                         hsp.hsp_query_from,
@@ -560,8 +550,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     mouseOutDomain(queryDomain, queryTooltipGroup, this);
 
                     // Subject tooltip
-                    let subjTooltipGroup: fabric.Group;
-                    subjTooltipGroup = drawDomainTooltips(
+                    const subjTooltipGroup = drawDomainTooltips(
                         startSubjHspPixels,
                         endSubjHspPixels,
                         hsp.hsp_hit_from,
@@ -583,8 +572,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
     private drawColorScaleGroup() {
         // Scale Type
-        let scaleTypeText: fabric.Text;
-        scaleTypeText = drawScaleTypeText(
+        const scaleTypeText = drawScaleTypeText(
             {
                 fontSize: this.fontSize,
                 scaleLabelWidth: this.scaleLabelWidth
@@ -594,15 +582,13 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         this.canvas.add(scaleTypeText);
 
         // Scale Type selection
-        let textCheckDynObj: TextType;
-        let dynamicBoxText: fabric.Text;
-        let dynamicText: fabric.Text;
-        let textCheckFixObj: TextType;
-        let fixedBoxText: fabric.Text;
-        let fixedText: fabric.Text;
-        let textCheckNcbiObj: TextType;
-        let ncbiblastBoxText: fabric.Text;
-        let ncbiblastText: fabric.Text;
+        let textCheckDynObj, textCheckFixObj, textCheckNcbiObj: TextType;
+        let dynamicBoxText,
+            dynamicText,
+            fixedBoxText,
+            fixedText,
+            ncbiblastBoxText,
+            ncbiblastText: fabric.Text;
         [
             dynamicBoxText,
             dynamicText,
@@ -656,8 +642,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
         // E-value/Bit Score Text
         this.topPadding += 25;
-        let scaleScoreText: fabric.Text;
-        scaleScoreText = drawScaleScoreText(
+        const scaleScoreText = drawScaleScoreText(
             {
                 fontSize: this.fontSize,
                 scaleLabelWidth: this.scaleLabelWidth
@@ -666,9 +651,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         );
         this.canvas.add(scaleScoreText);
 
-        // E-value Color Gradient
-        let colorScale: fabric.Rect;
-        colorScale = drawScaleColorGradient(
+        // E-value/Bit score Color Gradient
+        const colorScale = drawScaleColorGradient(
             {
                 scaleWidth: this.scaleWidth,
                 scaleLabelWidth: this.scaleLabelWidth,
@@ -679,7 +663,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
         this.canvas.add(colorScale);
 
-        // E-value Axis (line and ticks)
+        // E-value/Bit score Axis (line and ticks)
         if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
             const oneFifthGradPixels =
                 (this.scaleLabelWidth +
@@ -687,8 +671,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.scaleLabelWidth) /
                 5;
             this.topPadding += 15;
-            let axisGroup: fabric.Group;
-            axisGroup = drawLineAxis6Buckets(
+            const axisGroup = drawLineAxis6Buckets(
                 this.scaleLabelWidth,
                 this.scaleLabelWidth + oneFifthGradPixels,
                 this.scaleLabelWidth + oneFifthGradPixels * 2,
@@ -702,8 +685,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
             // Bits scale tick mark labels
             this.topPadding += 5;
-            let tickLabels5Group: fabric.Group;
-            tickLabels5Group = drawScaleTick5LabelsGroup(
+            const tickLabels5Group = drawScaleTick5LabelsGroup(
                 this.gradientSteps,
                 oneFifthGradPixels,
                 {
@@ -721,8 +703,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.scaleLabelWidth) /
                 4;
             this.topPadding += 15;
-            let axisGroup: fabric.Group;
-            axisGroup = drawLineAxis5Buckets(
+            const axisGroup = drawLineAxis5Buckets(
                 this.scaleLabelWidth,
                 this.scaleLabelWidth + oneForthGradPixels,
                 this.scaleLabelWidth + oneForthGradPixels * 2,
@@ -735,8 +716,7 @@ export class CanvasRenderer extends BasicCanvasRenderer {
 
             // E-value scale tick mark labels
             this.topPadding += 5;
-            let tickLabels4Group: fabric.Group;
-            tickLabels4Group = drawScaleTick4LabelsGroup(
+            const tickLabels4Group = drawScaleTick4LabelsGroup(
                 this.gradientSteps,
                 oneForthGradPixels,
                 {
