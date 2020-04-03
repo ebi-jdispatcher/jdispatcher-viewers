@@ -396,7 +396,7 @@ export function drawDomainTooltips(
     floatTextObj.top = 5;
     let tooltip: string;
     if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) {
-        tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nE-value: ${numberToString(
+        tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nBit score: ${numberToString(
             hsp.hsp_bit_score!
         )}`;
     } else {

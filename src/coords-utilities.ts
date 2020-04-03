@@ -83,7 +83,7 @@ export function getHspPixelCoords(
         contentScoringWidth
     );
     const startPixels = (hspStart * totalPixels) / varLen;
-    const endPixels = ((hspEnd - hspStart - 1) * totalPixels) / varLen;
+    const endPixels = ((hspEnd - hspStart) * totalPixels) / varLen;
     const startHspPixels = paddingPixels + startPixels;
     const endHspPixels = endPixels - 2 * marginWidth;
     return [startHspPixels, endHspPixels];

@@ -277,7 +277,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 {
                     contentWidth: this.contentWidth,
                     contentScoringWidth: this.contentScoringWidth,
-                    fontSize: this.fontSize
+                    fontSize: this.fontSize,
+                    colorScheme: this.colorScheme
                 },
                 this.topPadding
             );
@@ -645,7 +646,8 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         const scaleScoreText = drawScaleScoreText(
             {
                 fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth
+                scaleLabelWidth: this.scaleLabelWidth,
+                colorScheme: this.colorScheme
             },
             this.topPadding
         );
