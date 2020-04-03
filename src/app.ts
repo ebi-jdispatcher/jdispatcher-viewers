@@ -1,29 +1,23 @@
 import { fabric } from "fabric";
-import {
-    RenderOptions,
-    ColorSchemeEnum,
-    objectDefaults,
-    textDefaults,
-    rectDefaults,
-    jobIdDefaults
-} from "./custom-types";
-import {
-    getTextLegendPaddingFactor,
-    getQuerySubjPixelCoords,
-    getHspPixelCoords,
-    getTotalPixels
-} from "./coords-utilities";
-import {
-    drawLineTracks,
-    drawDomainTracks,
-    drawLineAxis5Buckets,
-    drawLineAxis6Buckets
-} from "./drawing-utilities";
+import { SSSResultModel } from "./data-model";
+import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
+import { getQuerySubjPixelCoords, getHspPixelCoords } from "./coords-utilities";
 import {
     getRgbColorGradient,
     getRgbColorFixed,
     getGradientSteps
 } from "./color-utilities";
+import {
+    getDataFromURLorFile,
+    validateJobId,
+    getServiceURLfromJobId
+} from "./other-utilities";
+import {
+    RenderOptions,
+    ColorSchemeEnum,
+    jobIdDefaults,
+    TextType
+} from "./custom-types";
 import {
     mouseDownText,
     mouseOverText,
@@ -35,18 +29,28 @@ import {
     mouseOutCheckbox
 } from "./custom-events";
 import {
-    colorDefaultGradient,
-    colorNcbiBlastGradient,
-    defaultGradient,
-    ncbiBlastGradient
-} from "./color-schemes";
-import {
-    numberToString,
-    getDataFromURLorFile,
-    validateJobId,
-    getServiceURLfromJobId
-} from "./other-utilities";
-import { SSSResultModel } from "./data-model";
+    drawHeaderTextGroup,
+    drawHeaderTextLinkGroup,
+    drawContentHeaderTextGroup,
+    drawLineTracks,
+    drawContentSequenceInfoText,
+    drawHspNoticeText,
+    drawScoreText,
+    drawContentFooterTextGroup,
+    drawNoHitsFoundText,
+    drawDomainTracks,
+    drawDomainTooltips,
+    drawScaleTypeText,
+    drawCheckBoxText,
+    drawScaleScoreText,
+    drawScaleColorGradient,
+    drawLineAxis5Buckets,
+    drawLineAxis6Buckets,
+    drawScaleTick5LabelsGroup,
+    drawScaleTick4LabelsGroup,
+    drawFooterText,
+    drawCanvasWrapperStroke
+} from "./drawing-utilities";
 
 // web-component support
 import "./visual-output-webcomponent.ts";
@@ -121,7 +125,11 @@ export class BasicCanvasRenderer {
     }
 
     protected getFabricCanvas() {
-        this.canvas = new fabric.Canvas(this.element, {});
+        this.canvas = new fabric.Canvas(this.element, {
+            defaultCursor: "default",
+            moveCursor: "default",
+            hoverCursor: "default"
+        });
     }
 
     protected setFrameSize() {
@@ -153,7 +161,28 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     ) {
         super(element, renderOptions);
         this.validateInput();
+        this.getFabricCanvas();
     }
+    public render() {
+        this.loadData();
+        if (typeof this.dataObj !== "undefined") {
+            this.loadInitalProperties();
+            this.loadInitialCoords();
+            // clear the canvas
+            this.canvas.clear();
+            // canvas header
+            this.drawHeaderGroup();
+            // canvas content
+            this.drawContentGroup();
+            // canvas footer
+            this.drawFooterGroup();
+            // finishing off
+            this.wrapCanvas();
+            this.setFrameSize();
+            this.renderCanvas();
+        }
+    }
+
     private validateInput() {
         // check if input is a jobId
         const jobId = { ...jobIdDefaults };
@@ -178,253 +207,137 @@ export class CanvasRenderer extends BasicCanvasRenderer {
         }).catch(error => console.log(error));
     }
 
-    public render() {
-        this.loadData();
-        if (typeof this.dataObj !== "undefined") {
-            this.getFabricCanvas();
-            this.queryLen = this.dataObj.query_len;
-            for (const hit of this.dataObj.hits) {
-                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
-            }
-            [
-                this.startQueryPixels,
-                this.endQueryPixels,
-                this.startSubjPixels,
-                this.endSubjPixels
-            ] = getQuerySubjPixelCoords(
-                this.queryLen,
-                this.subjLen,
-                this.subjLen,
-                this.contentWidth,
-                this.contentScoringWidth,
-                this.contentLabelWidth,
-                this.marginWidth
-            );
-            this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
-
-            this.canvas.clear();
-            this.topPadding = 2;
-            // canvas header
-            this.drawHeaderTextGroup();
-
-            // content header
-            if (this.dataObj.hits.length > 0) {
-                // content header
-                this.topPadding += 25;
-                this.drawContentHeaderGroup();
-                // dynamic content
-                this.topPadding += 25;
-                this.drawDynamicContentGroup();
-                // color scale
-                this.topPadding += 20;
-                this.drawColorScaleGroup();
-            } else {
-                // text content: "No hits found!"
-                this.topPadding += 20;
-                this.drawNoHitsFoundText();
-            }
-            // canvas footer
-            this.topPadding += 30;
-            this.drawFooterText();
-            // finishing off
-            this.topPadding += 20;
-            if (this.canvasHeight < this.topPadding) {
-                this.canvasHeight = this.topPadding;
-            }
-            if (this.canvasWrapperStroke) {
-                // final canvas wrapper rect
-                const canvasWrapper = new fabric.Rect({
-                    selectable: false,
-                    evented: false,
-                    objectCaching: false,
-                    top: 0,
-                    left: 0,
-                    width: this.canvasWidth - 1,
-                    height: this.canvasHeight - 1,
-                    strokeWidth: 1,
-                    stroke: "lightseagreen",
-                    fill: "transparent"
-                });
-                this.canvas.add(canvasWrapper);
-            }
-            this.setFrameSize();
-            this.renderCanvas();
+    private loadInitalProperties() {
+        this.queryLen = this.dataObj.query_len;
+        for (const hit of this.dataObj.hits) {
+            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
         }
     }
 
-    private drawHeaderTextGroup() {
-        const origTopPadding = this.topPadding;
-        const textObj = { ...textDefaults };
-        textObj.fontWeight = "bold";
-        textObj.fontSize = this.fontSize + 1;
-        textObj.top = this.topPadding;
-        textObj.left = 5;
-
-        // program & version
-        const program = this.dataObj.program;
-        const version = this.dataObj.version;
-        const programText = new fabric.Text(
-            `${program} (version: ${version})`,
-            textObj
+    private loadInitialCoords() {
+        [
+            this.startQueryPixels,
+            this.endQueryPixels,
+            this.startSubjPixels,
+            this.endSubjPixels
+        ] = getQuerySubjPixelCoords(
+            this.queryLen,
+            this.subjLen,
+            this.subjLen,
+            this.contentWidth,
+            this.contentScoringWidth,
+            this.contentLabelWidth,
+            this.marginWidth
         );
-        // Database(s)
-        let db_names: string[] = [];
-        for (const db of this.dataObj.dbs) {
-            db_names.push(db.name);
-        }
-        const dbs: string = db_names.join(", ");
-        textObj.fontWeight = "normal";
-        textObj.fontSize = this.fontSize;
-        this.topPadding += 15;
-        textObj.top = this.topPadding;
-        const databaseText = new fabric.Text(`Database(s): ${dbs}`, textObj);
-        // Sequence
-        const sequence = this.dataObj.query_def;
-        this.topPadding += 15;
-        textObj.top = this.topPadding;
-        const sequenceText = new fabric.Text("Sequence: ", textObj);
-        const textSeqObj = { ...textDefaults };
-        textSeqObj.fontFamily = "Menlo";
-        textSeqObj.fontSize = this.fontSize - 2;
-        textSeqObj.evented = true;
-        textSeqObj.top = this.topPadding;
-        textSeqObj.left = 57.5;
-        const sequenceDefText = new fabric.Text(`${sequence}`, textSeqObj);
+        this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
+    }
+
+    private drawHeaderGroup() {
+        // canvas header
+        this.topPadding = 2;
+        let textHeaderGroup: fabric.Group;
+        textHeaderGroup = drawHeaderTextGroup(
+            this.dataObj,
+            {
+                fontSize: this.fontSize,
+                canvasWidth: this.canvasWidth
+            },
+            this.topPadding
+        );
+        this.canvas.add(textHeaderGroup);
+
+        // canvas header (sequence info)
+        this.topPadding += 45;
+        let sequenceDefText: fabric.Text;
+        let textSeqObj: TextType;
+        [sequenceDefText, textSeqObj] = drawHeaderTextLinkGroup(
+            this.dataObj,
+            { fontSize: this.fontSize },
+            this.topPadding
+        );
         this.canvas.add(sequenceDefText);
         if (this.dataObj.query_url != null) {
             mouseOverText(sequenceDefText, textSeqObj, this);
             mouseDownText(sequenceDefText, this.dataObj.query_url, this);
             mouseOutText(sequenceDefText, textSeqObj, this);
         }
-        // Length
-        const length = this.dataObj.query_len;
-        this.topPadding += 15;
-        textObj.top = this.topPadding;
-        const lengthText = new fabric.Text(`Length: ${length}`, textObj);
-        // Start
-        const start = this.dataObj.start;
-        textObj.top = origTopPadding;
-        textObj.left = this.canvasWidth - 135;
-        const startText = new fabric.Text(`${start}`, textObj);
-        // End
-        const end = this.dataObj.end;
-        textObj.top = origTopPadding + 15;
-        const endText = new fabric.Text(`${end}`, textObj);
-        const textGroup = new fabric.Group(
-            [
-                programText,
-                databaseText,
-                sequenceText,
-                lengthText,
-                startText,
-                endText
-            ],
-            objectDefaults
-        );
-        this.canvas.add(textGroup);
     }
-    private drawNoHitsFoundText() {
-        const textObj = { ...textDefaults };
-        textObj.fontWeight = "bold";
-        textObj.fontSize = this.fontSize + 1;
-        textObj.top = this.topPadding;
-        textObj.left = this.contentWidth / 2;
-        textObj.fill = "red";
-        this.canvas.add(
-            new fabric.Text(
-                "--------------------No hits found--------------------",
-                textObj
-            )
-        );
-    }
-    private drawContentHeaderTextGroup() {
-        const textObj = { ...textDefaults };
-        textObj.fontWeight = "bold";
-        textObj.fontSize = this.fontSize + 1;
-        textObj.top = this.topPadding + 2;
-        textObj.textAlign = "center";
-        const totalQueryPixels = getTotalPixels(
-            this.queryLen,
-            this.subjLen,
-            this.queryLen,
-            this.contentWidth,
-            this.contentScoringWidth
-        );
-        const totalSubjPixels = getTotalPixels(
-            this.queryLen,
-            this.subjLen,
-            this.subjLen,
-            this.contentWidth,
-            this.contentScoringWidth
-        );
-        // Query Match
-        textObj.left = this.startQueryPixels;
-        const queryText = new fabric.Text("Sequence Match", textObj);
-        queryText.width = totalQueryPixels;
-        this.topPadding += 5;
-        textObj.left = this.startEvalPixels;
-        let evalueText;
-        // E-value/ Bits
-        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-            evalueText = new fabric.Text("Bit score", textObj);
+
+    private drawContentGroup() {
+        if (this.dataObj.hits.length > 0) {
+            // content header
+            this.topPadding += 25;
+            let textContentHeaderGroup: fabric.Group;
+            textContentHeaderGroup = drawContentHeaderTextGroup(
+                {
+                    queryLen: this.queryLen,
+                    subjLen: this.subjLen,
+                    startQueryPixels: this.startQueryPixels,
+                    startEvalPixels: this.startEvalPixels,
+                    startSubjPixels: this.startSubjPixels
+                },
+                {
+                    contentWidth: this.contentWidth,
+                    contentScoringWidth: this.contentScoringWidth,
+                    fontSize: this.fontSize
+                },
+                this.topPadding
+            );
+            this.canvas.add(textContentHeaderGroup);
+
+            // content header line tracks
+            this.topPadding += 20;
+            let lineGroup: fabric.Group;
+            lineGroup = drawLineTracks(
+                {
+                    startQueryPixels: this.startQueryPixels,
+                    endQueryPixels: this.endQueryPixels,
+                    startSubjPixels: this.startSubjPixels,
+                    endSubjPixels: this.endSubjPixels
+                },
+                { strokeWidth: 2 },
+                this.topPadding
+            );
+            this.canvas.add(lineGroup);
+
+            this.topPadding += 5;
+            let textContentFooterGroup: fabric.Group;
+            textContentFooterGroup = drawContentFooterTextGroup(
+                {
+                    queryLen: this.queryLen,
+                    subjLen: this.subjLen,
+                    startQueryPixels: this.startQueryPixels,
+                    endQueryPixels: this.endQueryPixels,
+                    startSubjPixels: this.startSubjPixels,
+                    endSubjPixels: this.endSubjPixels
+                },
+                {
+                    fontSize: this.fontSize
+                },
+                this.topPadding
+            );
+            this.canvas.add(textContentFooterGroup);
+
+            // dynamic content
+            this.topPadding += 25;
+            this.drawDynamicContentGroup();
+
+            // color scale
+            this.topPadding += 20;
+            this.drawColorScaleGroup();
         } else {
-            evalueText = new fabric.Text("E-value", textObj);
+            // text content: "No hits found!"
+            this.topPadding += 20;
+            let noHitsTextGroup: fabric.Text;
+            noHitsTextGroup = drawNoHitsFoundText(
+                {
+                    fontSize: this.fontSize,
+                    contentWidth: this.contentWidth
+                },
+                this.topPadding
+            );
+            this.canvas.add(noHitsTextGroup);
         }
-        evalueText.width = this.contentScoringWidth;
-        // Subject Match
-        textObj.left = this.startSubjPixels;
-        const subjText = new fabric.Text("Subject Match", textObj);
-        subjText.width = totalSubjPixels;
-        const textGroup = new fabric.Group(
-            [queryText, evalueText, subjText],
-            objectDefaults
-        );
-        this.canvas.add(textGroup);
-    }
-    private drawContentMiddleLineGroup() {
-        let lineGroup: fabric.Group;
-        [lineGroup, this.topPadding] = drawLineTracks(
-            this.startQueryPixels,
-            this.endQueryPixels,
-            this.startSubjPixels,
-            this.endSubjPixels,
-            this.topPadding,
-            2
-        );
-        this.canvas.add(lineGroup);
-    }
-    private drawContentFooterTextGroup() {
-        const textObj = { ...textDefaults };
-        textObj.fontSize = this.fontSize;
-        textObj.top = this.topPadding;
-        // Start Query
-        textObj.left = this.startQueryPixels - 2.5;
-        const startQueryText = new fabric.Text("1", textObj);
-        // End Query
-        let positionFactor: number = getTextLegendPaddingFactor(
-            `${this.queryLen}`
-        );
-        textObj.left = this.endQueryPixels - positionFactor;
-        const endQueryText = new fabric.Text(`${this.queryLen}`, textObj);
-        // Start Subject
-        textObj.left = this.startSubjPixels - 2.5;
-        const startSubjText = new fabric.Text("1", textObj);
-        // End Subject
-        positionFactor = getTextLegendPaddingFactor(`${this.subjLen}`);
-        textObj.left = this.endSubjPixels - positionFactor;
-        const endSubjText = new fabric.Text(`${this.subjLen}`, textObj);
-        const textGroup = new fabric.Group(
-            [startQueryText, endQueryText, startSubjText, endSubjText],
-            objectDefaults
-        );
-        this.canvas.add(textGroup);
-    }
-    private drawContentHeaderGroup() {
-        this.drawContentHeaderTextGroup();
-        this.topPadding += 10;
-        this.drawContentMiddleLineGroup();
-        this.topPadding += 5;
-        this.drawContentFooterTextGroup();
     }
 
     private drawDynamicContentGroup() {
@@ -485,30 +398,16 @@ export class CanvasRenderer extends BasicCanvasRenderer {
             let numberHsps: number = 0;
             const totalNumberHsps: number = hit.hit_hsps.length;
             // Hit ID + Hit Description text tracks
-            const textObj = { ...textDefaults };
-            textObj.fontFamily = "Menlo";
-            textObj.fontSize = this.fontSize - 2;
-            textObj.top = this.topPadding - 2;
-
-            const variableSpace = " ".repeat(
-                maxIDLen - (hit.hit_db.length + hit.hit_id.length)
-            );
-            const spaceText: fabric.Text = new fabric.Text(
-                variableSpace,
-                textObj
+            let textObj: TextType;
+            let spaceText: fabric.Text;
+            let hitText: fabric.Text;
+            [spaceText, hitText, textObj] = drawContentSequenceInfoText(
+                maxIDLen,
+                hit,
+                { fontSize: this.fontSize },
+                this.topPadding
             );
             this.canvas.add(spaceText);
-
-            let hit_def: string = `${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
-            let hit_def_full: string = `${variableSpace}${hit.hit_db}:${hit.hit_id}  ${hit.hit_desc}`;
-            if (hit_def_full.length > 40) {
-                hit_def = (hit_def_full.slice(0, 38) + "...").slice(
-                    variableSpace.length
-                );
-            }
-            textObj.left = 10 + variableSpace.length * 6;
-            textObj.evented = true;
-            const hitText: fabric.Text = new fabric.Text(hit_def, textObj);
             this.canvas.add(hitText);
             mouseOverText(hitText, textObj, this);
             mouseDownText(hitText, hit.hit_url, this);
@@ -517,19 +416,17 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                 numberHsps++;
                 if (numberHsps > this.numberHsps) {
                     if (this.logSkippedHsps === true) {
-                        // notice about not all HSPs being displayed
-                        const textObj = { ...textDefaults };
-                        textObj.fontSize = this.fontSize;
-                        textObj.top = this.topPadding;
-                        textObj.left = this.contentWidth / 2;
-                        textObj.fill = "red";
-                        this.canvas.add(
-                            new fabric.Text(
-                                `This hit contains ${totalNumberHsps} alignments, ` +
-                                    `but only the first ${this.numberHsps} are displayed`,
-                                textObj
-                            )
+                        let hspTextNotice: fabric.Text;
+                        hspTextNotice = drawHspNoticeText(
+                            totalNumberHsps,
+                            this.numberHsps,
+                            {
+                                fontSize: this.fontSize,
+                                contentWidth: this.contentWidth
+                            },
+                            this.topPadding
                         );
+                        this.canvas.add(hspTextNotice);
                         this.topPadding += 20;
                     }
                     break;
@@ -555,14 +452,17 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                         this.marginWidth
                     );
 
+                    this.topPadding += 5;
                     let linesGroup: fabric.Group;
-                    [linesGroup, this.topPadding] = drawLineTracks(
-                        startQueryPixels,
-                        endQueryPixels,
-                        startSubjPixels,
-                        endSubjPixels,
-                        this.topPadding,
-                        1
+                    linesGroup = drawLineTracks(
+                        {
+                            startQueryPixels: this.startQueryPixels,
+                            endQueryPixels: this.endQueryPixels,
+                            startSubjPixels: this.startSubjPixels,
+                            endSubjPixels: this.endSubjPixels
+                        },
+                        { strokeWidth: 1 },
+                        this.topPadding
                     );
                     this.canvas.add(linesGroup);
 
@@ -614,12 +514,9 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                             defaultGradient
                         );
                     }
+                    this.topPadding += 10;
                     let queryDomain, subjDomain: fabric.Rect;
-                    [
-                        queryDomain,
-                        subjDomain,
-                        this.topPadding
-                    ] = drawDomainTracks(
+                    [queryDomain, subjDomain] = drawDomainTracks(
                         startQueryHspPixels,
                         endQueryHspPixels,
                         startSubjHspPixels,
@@ -631,114 +528,50 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.canvas.add(subjDomain);
 
                     // E-value text tracks
-                    const textObj = { ...textDefaults };
-                    textObj.fontSize = this.fontSize;
-                    textObj.top = this.topPadding - 15;
-                    textObj.textAlign = "center";
-
-                    textObj.left = this.startEvalPixels;
-                    let evalText: fabric.Text;
-                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-                        evalText = new fabric.Text(
-                            numberToString(hsp.hsp_bit_score!),
-                            textObj
-                        );
-                    } else {
-                        evalText = new fabric.Text(
-                            numberToString(hsp.hsp_expect!),
-                            textObj
-                        );
-                    }
-                    evalText.width = this.contentScoringWidth;
-                    this.canvas.add(evalText);
+                    let scoreText: fabric.Text;
+                    scoreText = drawScoreText(
+                        this.startEvalPixels,
+                        hsp,
+                        {
+                            fontSize: this.fontSize,
+                            colorScheme: this.colorScheme
+                        },
+                        this.topPadding
+                    );
+                    scoreText.width = this.contentScoringWidth;
+                    this.canvas.add(scoreText);
 
                     // Query tooltip
-                    const floatTextObj = { ...textDefaults };
-                    floatTextObj.fontSize = this.fontSize + 1;
-                    floatTextObj.textAlign = "left";
-                    floatTextObj.originX = "top";
-                    floatTextObj.originY = "top";
-                    floatTextObj.top = 5;
-                    let queryTooltipText: fabric.Text;
-                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-                        queryTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_query_from}\nEnd: ${
-                                hsp.hsp_query_to
-                            }\nBit score: ${numberToString(
-                                hsp.hsp_bit_score!
-                            )}`,
-                            floatTextObj
-                        );
-                    } else {
-                        queryTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_query_from}\nEnd: ${
-                                hsp.hsp_query_to
-                            }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
-                            floatTextObj
-                        );
-                    }
-                    const rectObj = { ...rectDefaults };
-                    rectObj.fill = "white";
-                    rectObj.stroke = "lightseagreen";
-                    rectObj.rx = 5;
-                    rectObj.ry = 5;
-                    rectObj.originX = "top";
-                    rectObj.originY = "top";
-                    rectObj.width = 140;
-                    rectObj.height = 60;
-                    rectObj.opacity = 0.95;
-
-                    const queryTooltipBox: fabric.Rect = new fabric.Rect(
-                        rectObj
-                    );
-                    const queryTooltipGroup: fabric.Group = new fabric.Group(
-                        [queryTooltipBox, queryTooltipText],
+                    let queryTooltipGroup: fabric.Group;
+                    queryTooltipGroup = drawDomainTooltips(
+                        startQueryHspPixels,
+                        endQueryHspPixels,
+                        hsp.hsp_query_from,
+                        hsp.hsp_query_to,
+                        hsp,
                         {
-                            selectable: false,
-                            evented: false,
-                            objectCaching: false,
-                            visible: false,
-                            top: this.topPadding - 10,
-                            left: startQueryHspPixels + endQueryHspPixels / 2
-                        }
+                            fontSize: this.fontSize,
+                            colorScheme: this.colorScheme
+                        },
+                        this.topPadding
                     );
                     this.canvas.add(queryTooltipGroup);
                     mouseOverDomain(queryDomain, queryTooltipGroup, this);
                     mouseOutDomain(queryDomain, queryTooltipGroup, this);
 
                     // Subject tooltip
-                    let subjTooltipText: fabric.Text;
-                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-                        subjTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
-                                hsp.hsp_hit_to
-                            }\nBit score: ${numberToString(
-                                hsp.hsp_bit_score!
-                            )}`,
-                            floatTextObj
-                        );
-                    } else {
-                        subjTooltipText = new fabric.Text(
-                            `Start: ${hsp.hsp_hit_from}\nEnd: ${
-                                hsp.hsp_hit_to
-                            }\nE-value: ${numberToString(hsp.hsp_expect!)}`,
-                            floatTextObj
-                        );
-                    }
-
-                    const subjTooltipBox: fabric.Rect = new fabric.Rect(
-                        rectObj
-                    );
-                    const subjTooltipGroup: fabric.Group = new fabric.Group(
-                        [subjTooltipBox, subjTooltipText],
+                    let subjTooltipGroup: fabric.Group;
+                    subjTooltipGroup = drawDomainTooltips(
+                        startSubjHspPixels,
+                        endSubjHspPixels,
+                        hsp.hsp_hit_from,
+                        hsp.hsp_hit_to,
+                        hsp,
                         {
-                            selectable: false,
-                            evented: false,
-                            objectCaching: false,
-                            visible: false,
-                            top: this.topPadding - 10,
-                            left: startSubjHspPixels + endSubjHspPixels / 2
-                        }
+                            fontSize: this.fontSize,
+                            colorScheme: this.colorScheme
+                        },
+                        this.topPadding
                     );
                     this.canvas.add(subjTooltipGroup);
                     mouseOverDomain(subjDomain, subjTooltipGroup, this);
@@ -749,124 +582,100 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     }
 
     private drawColorScaleGroup() {
+        // Scale Type
+        let scaleTypeText: fabric.Text;
+        scaleTypeText = drawScaleTypeText(
+            {
+                fontSize: this.fontSize,
+                scaleLabelWidth: this.scaleLabelWidth
+            },
+            this.topPadding
+        );
+        this.canvas.add(scaleTypeText);
+
         // Scale Type selection
-        const textSelObj = { ...textDefaults };
-        textSelObj.fontSize = this.fontSize + 1;
-        textSelObj.fontWeight = "bold";
-        textSelObj.top = this.topPadding;
-        textSelObj.left = this.scaleLabelWidth;
-
-        var fixedText = new fabric.Text("Scale Type:", textSelObj);
-        this.canvas.add(fixedText);
-
-        const textCheckDynObj = { ...textDefaults };
-        textCheckDynObj.fontSize = this.fontSize + 12;
-        textCheckDynObj.fill = "grey";
-        textCheckDynObj.evented = true;
-        textCheckDynObj.top = this.topPadding - 8;
-        textCheckDynObj.left = this.scaleLabelWidth;
-        const textCheckFixObj = { ...textCheckDynObj };
-        const textCheckNcbiObj = { ...textCheckDynObj };
-
-        let checkSym: string;
-        this.colorScheme === ColorSchemeEnum.dynamic
-            ? (checkSym = "☒")
-            : (checkSym = "☐");
-        if (this.colorScheme === ColorSchemeEnum.dynamic)
-            textCheckDynObj.fill = "black";
-        textCheckDynObj.left! += 80;
-        var dynamicText = new fabric.Text(checkSym, textCheckDynObj);
-        mouseOverCheckbox(dynamicText, textCheckDynObj, this);
-        mouseOutCheckbox(
+        let textCheckDynObj: TextType;
+        let dynamicBoxText: fabric.Text;
+        let dynamicText: fabric.Text;
+        let textCheckFixObj: TextType;
+        let fixedBoxText: fabric.Text;
+        let fixedText: fabric.Text;
+        let textCheckNcbiObj: TextType;
+        let ncbiblastBoxText: fabric.Text;
+        let ncbiblastText: fabric.Text;
+        [
+            dynamicBoxText,
             dynamicText,
+            textCheckDynObj,
+            fixedBoxText,
+            fixedText,
+            textCheckFixObj,
+            ncbiblastBoxText,
+            ncbiblastText,
+            textCheckNcbiObj
+        ] = drawCheckBoxText(
+            {
+                colorScheme: this.colorScheme,
+                fontSize: this.fontSize,
+                scaleLabelWidth: this.scaleLabelWidth
+            },
+            this.topPadding
+        );
+        this.canvas.add(dynamicBoxText);
+        this.canvas.add(dynamicText);
+        mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
+        mouseOutCheckbox(
+            dynamicBoxText,
             textCheckDynObj,
             ColorSchemeEnum.dynamic,
             this
         );
-        mouseDownCheckbox(dynamicText, ColorSchemeEnum.dynamic, this);
-        this.canvas.add(dynamicText);
-        textSelObj.fontWeight = "normal";
-        textSelObj.left! += 100;
-        this.canvas.add(dynamicText);
-        var dynamicText = new fabric.Text(
-            "Dynamic (E-value: min to max)",
-            textSelObj
-        );
-        this.canvas.add(dynamicText);
+        mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
 
-        this.colorScheme === ColorSchemeEnum.fixed
-            ? (checkSym = "☒")
-            : (checkSym = "☐");
-        if (this.colorScheme === ColorSchemeEnum.fixed)
-            textCheckFixObj.fill = "black";
-        textCheckFixObj.left! += 290;
-        var fixedText = new fabric.Text(checkSym, textCheckFixObj);
-        mouseOverCheckbox(fixedText, textCheckFixObj, this);
+        this.canvas.add(fixedBoxText);
+        this.canvas.add(fixedText);
+        mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
         mouseOutCheckbox(
-            fixedText,
+            fixedBoxText,
             textCheckFixObj,
             ColorSchemeEnum.fixed,
             this
         );
-        mouseDownCheckbox(fixedText, ColorSchemeEnum.fixed, this);
-        this.canvas.add(fixedText);
-        textSelObj.left! += 210;
-        var fixedText = new fabric.Text(
-            "Fixed (E-value: 0.0 to 100.0)",
-            textSelObj
-        );
-        this.canvas.add(fixedText);
+        mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
 
-        this.colorScheme === ColorSchemeEnum.ncbiblast
-            ? (checkSym = "☒")
-            : (checkSym = "☐");
-        if (this.colorScheme === ColorSchemeEnum.ncbiblast)
-            textCheckNcbiObj.fill = "black";
-        textCheckNcbiObj.left! += 480;
-        var ncbiblastText = new fabric.Text(checkSym, textCheckNcbiObj);
-        mouseOverCheckbox(ncbiblastText, textCheckNcbiObj, this);
+        this.canvas.add(ncbiblastBoxText);
+        this.canvas.add(ncbiblastText);
+        mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
         mouseOutCheckbox(
-            ncbiblastText,
+            ncbiblastBoxText,
             textCheckNcbiObj,
             ColorSchemeEnum.ncbiblast,
             this
         );
-        mouseDownCheckbox(ncbiblastText, ColorSchemeEnum.ncbiblast, this);
-        this.canvas.add(ncbiblastText);
-        textSelObj.left! += 190;
-        var ncbiblastText = new fabric.Text(
-            "NCBI BLAST+ (Bit score: <40 to ≥200)",
-            textSelObj
-        );
-        this.canvas.add(ncbiblastText);
+        mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
 
         // E-value/Bit Score Text
         this.topPadding += 25;
-        const textObj = { ...textDefaults };
-        textObj.fontSize = this.fontSize + 1;
-        textObj.top = this.topPadding;
-        let scaleTypeLabel: string;
-        this.colorScheme === ColorSchemeEnum.ncbiblast
-            ? (scaleTypeLabel = "Bit score")
-            : (scaleTypeLabel = "E-value");
-        this.colorScheme === ColorSchemeEnum.ncbiblast
-            ? (textObj.left = this.scaleLabelWidth - 56)
-            : (textObj.left = this.scaleLabelWidth - 50);
-        var evalueText = new fabric.Text(`${scaleTypeLabel}`, textObj);
-        this.canvas.add(evalueText);
+        let scaleScoreText: fabric.Text;
+        scaleScoreText = drawScaleScoreText(
+            {
+                fontSize: this.fontSize,
+                scaleLabelWidth: this.scaleLabelWidth
+            },
+            this.topPadding
+        );
+        this.canvas.add(scaleScoreText);
 
         // E-value Color Gradient
-        const rectObj = { ...rectDefaults };
-        rectObj.top = this.topPadding;
-        rectObj.left = this.scaleLabelWidth;
-        rectObj.width = this.scaleWidth;
-        rectObj.height = 15;
-        var colorScale = new fabric.Rect(rectObj);
-        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-            colorNcbiBlastGradient(colorScale, 0, this.scaleWidth);
-        } else {
-            colorDefaultGradient(colorScale, 0, this.scaleWidth);
-        }
+        let colorScale: fabric.Rect;
+        colorScale = drawScaleColorGradient(
+            {
+                scaleWidth: this.scaleWidth,
+                scaleLabelWidth: this.scaleLabelWidth,
+                colorScheme: this.colorScheme
+            },
+            this.topPadding
+        );
 
         this.canvas.add(colorScale);
 
@@ -877,167 +686,99 @@ export class CanvasRenderer extends BasicCanvasRenderer {
                     this.scaleWidth -
                     this.scaleLabelWidth) /
                 5;
+            this.topPadding += 15;
             let axisGroup: fabric.Group;
-            [axisGroup, this.topPadding] = drawLineAxis6Buckets(
+            axisGroup = drawLineAxis6Buckets(
                 this.scaleLabelWidth,
                 this.scaleLabelWidth + oneFifthGradPixels,
                 this.scaleLabelWidth + oneFifthGradPixels * 2,
                 this.scaleLabelWidth + oneFifthGradPixels * 3,
                 this.scaleLabelWidth + oneFifthGradPixels * 4,
                 this.scaleLabelWidth + this.scaleWidth,
-                this.topPadding,
-                1
+                { strokeWidth: 1 },
+                this.topPadding
             );
             this.canvas.add(axisGroup);
 
             // Bits scale tick mark labels
             this.topPadding += 5;
-            textObj.top = this.topPadding;
-            textObj.fontSize = this.fontSize;
-            // 20% Tick Label
-            let label = `<${this.gradientSteps[1]}`;
-            textObj.left =
-                this.scaleLabelWidth +
-                oneFifthGradPixels -
-                label.length * 3 -
-                72;
-            const o20LabelText = new fabric.Text(label, textObj);
-            // 40% Tick Label
-            label = `${this.gradientSteps[1]} - ${this.gradientSteps[2]}`;
-            textObj.left =
-                this.scaleLabelWidth +
-                oneFifthGradPixels * 2 -
-                label.length * 3 -
-                72;
-            const o40LabelText = new fabric.Text(label, textObj);
-            // 60% Tick Label
-            label = `${this.gradientSteps[2]} - ${this.gradientSteps[3]}`;
-            textObj.left =
-                this.scaleLabelWidth +
-                oneFifthGradPixels * 3 -
-                label.length * 3 -
-                72;
-            const o60LabelText = new fabric.Text(label, textObj);
-            // 60% Tick Label
-            label = `${this.gradientSteps[3]} - ${this.gradientSteps[4]}`;
-            textObj.left =
-                this.scaleLabelWidth +
-                oneFifthGradPixels * 4 -
-                label.length * 3 -
-                72;
-            const o80LabelText = new fabric.Text(label, textObj);
-            // End Tick Label
-            label = `≥${this.gradientSteps[4]}`;
-            textObj.left =
-                this.scaleLabelWidth + this.scaleWidth - label.length * 3 - 72;
-            const endLabelText = new fabric.Text(label, textObj);
-
-            const textGroup = new fabric.Group(
-                [
-                    o20LabelText,
-                    o40LabelText,
-                    o60LabelText,
-                    o80LabelText,
-                    endLabelText
-                ],
-                objectDefaults
+            let tickLabels5Group: fabric.Group;
+            tickLabels5Group = drawScaleTick5LabelsGroup(
+                this.gradientSteps,
+                oneFifthGradPixels,
+                {
+                    fontSize: this.fontSize,
+                    scaleWidth: this.scaleWidth,
+                    scaleLabelWidth: this.scaleLabelWidth
+                },
+                this.topPadding
             );
-            this.canvas.add(textGroup);
+            this.canvas.add(tickLabels5Group);
         } else {
             const oneForthGradPixels =
                 (this.scaleLabelWidth +
                     this.scaleWidth -
                     this.scaleLabelWidth) /
                 4;
+            this.topPadding += 15;
             let axisGroup: fabric.Group;
-            [axisGroup, this.topPadding] = drawLineAxis5Buckets(
+            axisGroup = drawLineAxis5Buckets(
                 this.scaleLabelWidth,
                 this.scaleLabelWidth + oneForthGradPixels,
                 this.scaleLabelWidth + oneForthGradPixels * 2,
                 this.scaleLabelWidth + oneForthGradPixels * 3,
                 this.scaleLabelWidth + this.scaleWidth,
-                this.topPadding,
-                1
+                { strokeWidth: 1 },
+                this.topPadding
             );
             this.canvas.add(axisGroup);
 
             // E-value scale tick mark labels
             this.topPadding += 5;
-            textObj.top = this.topPadding;
-            textObj.fontSize = this.fontSize;
-            // Start Tick Label
-            textObj.left =
-                this.scaleLabelWidth -
-                numberToString(this.gradientSteps[0]).length * 3;
-            const startLabelText = new fabric.Text(
-                numberToString(this.gradientSteps[0]),
-                textObj
+            let tickLabels4Group: fabric.Group;
+            tickLabels4Group = drawScaleTick4LabelsGroup(
+                this.gradientSteps,
+                oneForthGradPixels,
+                {
+                    fontSize: this.fontSize,
+                    scaleWidth: this.scaleWidth,
+                    scaleLabelWidth: this.scaleLabelWidth
+                },
+                this.topPadding
             );
-            // 25% Tick Label
-            textObj.left =
-                this.scaleLabelWidth +
-                oneForthGradPixels -
-                numberToString(this.gradientSteps[1]).length * 3;
-            const o25LabelText = new fabric.Text(
-                numberToString(this.gradientSteps[1]),
-                textObj
-            );
-            // 50% Tick Label
-            textObj.left =
-                this.scaleLabelWidth +
-                oneForthGradPixels * 2 -
-                numberToString(this.gradientSteps[2]).length * 3;
-            const o50LabelText = new fabric.Text(
-                numberToString(this.gradientSteps[2]),
-                textObj
-            );
-            // 75% Tick Label
-            textObj.left =
-                this.scaleLabelWidth +
-                oneForthGradPixels * 3 -
-                numberToString(this.gradientSteps[3]).length * 3;
-            const o75LabelText = new fabric.Text(
-                numberToString(this.gradientSteps[3]),
-                textObj
-            );
-            // End Tick Label
-            textObj.left =
-                this.scaleLabelWidth +
-                this.scaleWidth -
-                numberToString(this.gradientSteps[4]).length * 3;
-            const endLabelText = new fabric.Text(
-                numberToString(this.gradientSteps[4]),
-                textObj
-            );
-
-            const textGroup = new fabric.Group(
-                [
-                    startLabelText,
-                    o25LabelText,
-                    o50LabelText,
-                    o75LabelText,
-                    endLabelText
-                ],
-                objectDefaults
-            );
-            this.canvas.add(textGroup);
+            this.canvas.add(tickLabels4Group);
         }
     }
 
-    private drawFooterText() {
-        const textObj = { ...textDefaults };
-        textObj.fontSize = this.fontSize;
-        textObj.evented = true;
-        textObj.top = this.topPadding;
-        textObj.left = 225;
-        const copyright =
-            `European Bioinformatics Institute 2006-2020. ` +
-            `EBI is an Outstation of the European Molecular Biology Laboratory.`;
-        const copyrightText = new fabric.Text(`${copyright}`, textObj);
+    private drawFooterGroup() {
+        this.topPadding += 30;
+        let copyrightText: fabric.Text;
+        let textFooterObj: TextType;
+        [copyrightText, textFooterObj] = drawFooterText(
+            {
+                fontSize: this.fontSize
+            },
+            this.topPadding
+        );
         this.canvas.add(copyrightText);
-        mouseOverText(copyrightText, textObj, this);
+        mouseOverText(copyrightText, textFooterObj, this);
         mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
-        mouseOutText(copyrightText, textObj, this);
+        mouseOutText(copyrightText, textFooterObj, this);
+    }
+
+    private wrapCanvas() {
+        this.topPadding += 20;
+        if (this.canvasHeight < this.topPadding) {
+            this.canvasHeight = this.topPadding;
+        }
+        if (this.canvasWrapperStroke) {
+            // final canvas wrapper stroke
+            const canvasWrapper = drawCanvasWrapperStroke({
+                canvasWidth: this.canvasWidth,
+                canvasHeight: this.canvasHeight
+            });
+            this.canvas.add(canvasWrapper);
+        }
     }
 }
 

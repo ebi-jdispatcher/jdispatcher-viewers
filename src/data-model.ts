@@ -45,7 +45,7 @@ interface DB {
     created?: string;
 }
 
-interface Hit {
+export interface Hit {
     hit_acc: string;
     hit_db: string;
     hit_def: string;
@@ -64,7 +64,7 @@ interface Hit {
     hit_url: string;
 }
 
-interface Hsp {
+export interface Hsp {
     hsp_align_len?: number;
     hsp_bit_score?: number;
     hsp_expect?: number;

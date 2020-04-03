@@ -25,6 +25,7 @@ export interface RenderOptions {
     fontSize?: number;
     fontFamily?: string;
     canvasWrapperStroke?: boolean;
+    strokeWidth?: number;
 }
 
 // jobId validation
@@ -105,4 +106,16 @@ export const objectDefaults: ObjectType = {
 
 export const textDefaults: TextType = { ...objectDefaults };
 export const rectDefaults: RectType = { ...objectDefaults };
-export const LineDefaults: LineType = { ...objectDefaults };
+export const lineDefaults: LineType = { ...objectDefaults };
+
+export interface CoordsValues {
+    queryLen?: number;
+    subjLen?: number;
+    subjHspLen?: number;
+    startQueryPixels?: number;
+    endQueryPixels?: number;
+    startEvalPixels?: number;
+    endEvalPixels?: number;
+    startSubjPixels?: number;
+    endSubjPixels?: number;
+}
