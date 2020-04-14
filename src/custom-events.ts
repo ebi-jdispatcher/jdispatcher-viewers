@@ -1,11 +1,12 @@
 import { fabric } from "fabric";
 import { TextType, ColorSchemeEnum } from "./custom-types";
 import { VisualOutput } from "./visual-output-app";
+import { FunctionalPredictions } from "./functional-predictions-app";
 
 export function mouseOverText(
     fabricObj: fabric.Object,
     textObj: TextType,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
@@ -20,7 +21,7 @@ export function mouseOverText(
 export function mouseDownText(
     fabricObj: fabric.Object,
     href: string,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
@@ -33,7 +34,7 @@ export function mouseDownText(
 export function mouseOutText(
     fabricObj: fabric.Object,
     textObj: TextType,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
@@ -47,7 +48,7 @@ export function mouseOutText(
 export function mouseOverDomain(
     fabricObj: fabric.Object,
     fabricGroupObj: fabric.Object,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
@@ -62,7 +63,7 @@ export function mouseOverDomain(
 export function mouseOutDomain(
     fabricObj: fabric.Object,
     fabricGroupObj: fabric.Object,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
@@ -75,7 +76,7 @@ export function mouseOutDomain(
 export function mouseOverCheckbox(
     fabricObj: fabric.Object,
     textObj: TextType,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
@@ -90,7 +91,7 @@ export function mouseOverCheckbox(
 export function mouseDownCheckbox(
     fabricObj: fabric.Object,
     value: ColorSchemeEnum,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
@@ -106,7 +107,7 @@ export function mouseOutCheckbox(
     fabricObj: fabric.Object,
     textObj: TextType,
     value: ColorSchemeEnum,
-    _this: VisualOutput
+    _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
