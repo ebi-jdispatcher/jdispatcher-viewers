@@ -1,4 +1,4 @@
-import { CanvasRenderer } from "./app";
+import { VisualOutput } from "./visual-output-app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 import { validateJobId } from "./other-utilities";
 
@@ -149,7 +149,7 @@ class FabricjsRenderer {
 
     private renderCanvas() {
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
-        const fabricjs = new CanvasRenderer("canvas", this.canvasInstance[0], {
+        const fabricjs = new VisualOutput("canvas", this.canvasInstance[0], {
             colorScheme: ColorSchemeEnum.dynamic,
             numberHsps: 10,
             logSkippedHsps: true,

@@ -1,6 +1,6 @@
 import { LitElement, html, property, customElement } from "lit-element";
 import { RenderOptions, ColorSchemeEnum } from "./custom-types";
-import { CanvasRenderer } from "./app";
+import { VisualOutput } from "./visual-output-app";
 
 @customElement("jd-visual-output")
 export class CanvasRendererComponent extends LitElement {
@@ -35,7 +35,7 @@ export class CanvasRendererComponent extends LitElement {
             document.body.appendChild(newDiv);
         }
         // New JD Viewers Fabricjs Canvas
-        new CanvasRenderer("canvas", this.data, renderOptions).render();
+        new VisualOutput("canvas", this.data, renderOptions).render();
         return html`
             ${this.canvasDivTemplate}
         `;

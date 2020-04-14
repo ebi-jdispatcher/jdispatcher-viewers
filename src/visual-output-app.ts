@@ -142,7 +142,7 @@ export class BasicCanvasRenderer {
     }
 }
 
-export class CanvasRenderer extends BasicCanvasRenderer {
+export class VisualOutput extends BasicCanvasRenderer {
     private topPadding: number = 0;
     private queryLen: number = 0;
     private subjLen: number = 0;
@@ -764,4 +764,4 @@ export class CanvasRenderer extends BasicCanvasRenderer {
     }
 }
 
-(window as any).CanvasRenderer = CanvasRenderer;
+(window as any).VisualOutput = VisualOutput;
