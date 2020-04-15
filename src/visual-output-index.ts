@@ -64,7 +64,7 @@ class JobIdInputForm {
 
     constructor() {
         this.templateElement = document.getElementById(
-            "input-jobid"
+            "visual-output-input-jobid"
         )! as HTMLTemplateElement;
         this.hostElement = document.getElementById(
             "visual-output-app"
