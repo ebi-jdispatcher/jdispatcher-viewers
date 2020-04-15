@@ -52,9 +52,6 @@ import {
     drawCanvasWrapperStroke
 } from "./drawing-utilities";
 
-// web-component support
-import "./visual-output-webcomponent.ts";
-
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
     protected canvasWidth: number;
@@ -763,5 +760,3 @@ export class VisualOutput extends BasicCanvasRenderer {
         }
     }
 }
-
-(window as any).VisualOutput = VisualOutput;
