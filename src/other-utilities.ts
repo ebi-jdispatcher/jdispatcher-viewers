@@ -1,4 +1,5 @@
-import { SSSResultModel } from "./data-model";
+import { xml2json } from "xml-js";
+import { SSSResultModel, IPRMCResultModel } from "./data-model";
 import { JobIdValitable } from "./custom-types";
 
 function countDecimals(n: number) {
@@ -67,3 +68,32 @@ export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false
     }
     return isValid;
 }
+
+// InterPro Match Complete XML data (via Dbfetch)
+export function getIPRMCDbfetchURL(accessions: string) {
+    return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
+}
+
+export async function getXMLDataFromURL(
+    dataLoc: string
+): Promise<string> {
+    const request = new Request(dataLoc);
+    try {
+        return fetch(request).then(response => {
+            if (!response.ok) {
+                throw new Error(`Could not retrieve data from ${dataLoc}`);
+            }
+            try {
+                return response.text();
+            } catch (error) {
+                throw new Error(`Could not decode JSON data from ${dataLoc}`);
+            }
+        });
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+export function parseXMLData(data: string): IPRMCResultModel {
+    return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
+};
