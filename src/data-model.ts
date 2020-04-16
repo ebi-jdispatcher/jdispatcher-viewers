@@ -89,3 +89,119 @@ export interface Hsp {
     hsp_sw_score?: number;
     hsp_zscore?: number;
 }
+
+export interface IPRMCResultModel {
+    _declaration: Declaration;
+    _doctype: string;
+    interpromatch: IPRMC;
+}
+
+export interface IPRMC {
+    release: Release;
+    protein: Protein[];
+}
+
+export interface Protein {
+    _attributes: ProteinAttributes;
+    match: Match[];
+}
+
+export interface ProteinAttributes {
+    id: string;
+    name: string;
+    length: string;
+    crc64: string;
+}
+
+export interface Match {
+    _attributes: MatchAttributes;
+    ipr?: Ipr;
+    lcn: Lcn;
+}
+
+export interface MatchAttributes {
+    id: string;
+    name: string;
+    dbname: IprDbname;
+    status: IprStatus;
+    model: string;
+    evd: IprEvd;
+}
+
+export enum IprDbname {
+    Cathgene3D = "CATHGENE3D",
+    Cdd = "CDD",
+    Panther = "PANTHER",
+    Pfam = "PFAM",
+    Pirsf = "PIRSF",
+    Prints = "PRINTS",
+    Profile = "PROFILE",
+    Smart = "SMART",
+    Ssf = "SSF",
+    Unclassified = "Unclassified",
+}
+
+export enum IprEvd {
+    FPrintScan = "FPrintScan",
+    HMMPfam = "HMMPfam",
+    PrfScan = "PrfScan",
+    RpsBlast = "RPS-BLAST",
+    SmartScan = "Smart scan",
+}
+
+export enum IprStatus {
+    T = "T",
+}
+
+export interface Ipr {
+    _attributes: IprAttributes;
+}
+
+export interface IprAttributes {
+    id: string;
+    name: string;
+    type: IprType;
+    parent_id?: string;
+}
+
+export enum IprType {
+    Domain = "Domain",
+    Family = "Family",
+    HomologousSuperfamily = "Homologous_superfamily",
+    Repeat = "Repeat",
+}
+
+export interface Lcn {
+    _attributes: LcnAttributes;
+}
+
+export interface LcnAttributes {
+    start: string;
+    end: string;
+    fragments?: string;
+    score: string;
+}
+
+export interface Declaration {
+    _attributes: DeclarationAttributes;
+}
+
+export interface DeclarationAttributes {
+    version: string;
+    encoding: string;
+}
+
+export interface Release {
+    dbinfo: Dbinfo[];
+}
+
+export interface Dbinfo {
+    _attributes: DbinfoAttributes;
+}
+
+export interface DbinfoAttributes {
+    dbname: string;
+    version: string;
+    entry_count: string;
+    file_date: string;
+}
