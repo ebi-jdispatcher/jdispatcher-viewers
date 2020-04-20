@@ -10,5 +10,4 @@ import "./visual-output-webcomponent.ts";
 import "./functional-predictions-webcomponent.ts";
 
 // demo index page with JobId input form
-import "./visual-output-index.ts";
-import "./functional-predictions-index.ts";
+import "./index.ts";

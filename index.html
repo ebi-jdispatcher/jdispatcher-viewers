@@ -9,19 +9,21 @@
         <script type="module" src="dist/jd_viewers_bundle.js"></script>
     </head>
     <body>
-        <div id="visual-output-app">
-            <template id="visual-output-input-jobid">
+        <div id="jd-viewers-app">
+            <template id="input-jobid">
                 <form>
                     <div class="form-control">
                         <label for="jobid">JobId:</label>
                         <input type="text" size="60" id="jobid" required="true"
                         value="mock_jobid-I20200317-103136-0485-5599422-np2" />
-                        <button type="submit">Generate Visual-Output</button>
+                        </br>
+                        <button type="submit" name="visual-output">Generate Visual Output</button>
+                        <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
                     </div>
                 </form>    
             </template>
             </br>
-            <template id="output-vis-canvas">
+            <template id="jd-viewers-output">
                 <div id="canvas-wrapper">
                     <canvas id="canvas"/>
                 </div>

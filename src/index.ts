@@ -1,15 +1,27 @@
 import { VisualOutput } from "./visual-output-app";
+import { FunctionalPredictions } from "./functional-predictions-app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 import { validateJobId } from "./other-utilities";
 
-type Listener = (items: string[]) => void;
+interface InstanceObjType {
+    data: string;
+    submitter: string;
+}
+
+type Listener = (items: InstanceObjType) => void;
+
+interface SubmitEvent {
+    explicitOriginalTarget: HTMLElement;
+    submitter: HTMLButtonElement;
+}
 
 // Canvas State Management
 class CanvasState {
-    private canvasInstances: string[] = [];
+    private canvasInstance: InstanceObjType;
     private static instance: CanvasState;
     private listener: Listener = () => {};
     private jobIds: string[] = [];
+    private submitterName: string = "";
 
     private constructor() {}
 
@@ -26,12 +38,19 @@ class CanvasState {
         this.listener = listenerFn;
     }
 
-    addCanvas(jobId: string, data: string) {
-        if (this.jobIds.length === 0 || !this.jobIds.includes(jobId)) {
-            this.canvasInstances = [];
+    addCanvas(jobId: string, data: string, submitter: string) {
+        if (
+            this.jobIds.length === 0 ||
+            !this.jobIds.includes(jobId) ||
+            submitter !== this.submitterName
+        ) {
+            this.submitterName = submitter;
             this.jobIds.push(jobId);
-            this.canvasInstances.push(data);
-            this.listener(this.canvasInstances.slice());
+            this.canvasInstance = {
+                data: data,
+                submitter: submitter,
+            };
+            this.listener(this.canvasInstance);
         }
     }
 }
@@ -49,7 +68,7 @@ function autobind(
         get() {
             const boundFn = originalMethod.bind(this);
             return boundFn;
-        }
+        },
     };
     return adjDescriptor;
 }
@@ -64,10 +83,10 @@ class JobIdInputForm {
 
     constructor() {
         this.templateElement = document.getElementById(
-            "visual-output-input-jobid"
+            "input-jobid"
         )! as HTMLTemplateElement;
         this.hostElement = document.getElementById(
-            "visual-output-app"
+            "jd-viewers-app"
         )! as HTMLDivElement;
         if (this.templateElement !== null) {
             const importedHTMLcontent = document.importNode(
@@ -96,18 +115,25 @@ class JobIdInputForm {
     @autobind
     private submitHandler(event: Event) {
         event.preventDefault();
+        const submittedEvent = (event as unknown) as SubmitEvent;
         const jobId = this.jobIdElement.value.trim();
         let formValidatable = { ...jobIdDefaults };
         formValidatable.value = jobId;
+        console.log(submittedEvent.submitter.name.trim());
 
         if (validateJobId(formValidatable)) {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
                 canvasInstance.addCanvas(
                     jobId,
-                    "./src/testdata/ncbiblast.json"
+                    "./src/testdata/ncbiblast.json",
+                    submittedEvent.submitter.name.trim()
                 );
             } else {
-                canvasInstance.addCanvas(jobId, jobId);
+                canvasInstance.addCanvas(
+                    jobId,
+                    jobId,
+                    submittedEvent.submitter.name.trim()
+                );
                 return;
             }
         } else {
@@ -122,16 +148,19 @@ class FabricjsRenderer {
     private templateElement: HTMLTemplateElement;
     private hostElement: HTMLDivElement;
     private elementCanvas: HTMLDivElement;
-    private canvasInstance: string[];
+    private canvasInstance: InstanceObjType;
+    private fabricjs:
+        | VisualOutput
+        | FunctionalPredictions
+        | undefined = undefined;
 
     constructor() {
         this.templateElement = document.getElementById(
-            "output-vis-canvas"
+            "jd-viewers-output"
         )! as HTMLTemplateElement;
         this.hostElement = document.getElementById(
-            "visual-output-app"
+            "jd-viewers-app"
         )! as HTMLDivElement;
-
         if (this.templateElement !== null) {
             const importedHTMLcontent = document.importNode(
                 this.templateElement.content,
@@ -139,9 +168,11 @@ class FabricjsRenderer {
             );
             this.elementCanvas = importedHTMLcontent.firstElementChild as HTMLDivElement;
 
-            this.canvasInstance = [];
-            canvasInstance.addListener((canvasInstance: string[]) => {
+            canvasInstance.addListener((canvasInstance: InstanceObjType) => {
                 this.canvasInstance = canvasInstance;
+                if (this.fabricjs !== undefined) {
+                    this.fabricjs.canvas.clear();
+                }
                 this.renderCanvas();
             });
         }
@@ -149,12 +180,31 @@ class FabricjsRenderer {
 
     private renderCanvas() {
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
-        const fabricjs = new VisualOutput("canvas", this.canvasInstance[0], {
-            colorScheme: ColorSchemeEnum.dynamic,
-            numberHsps: 10,
-            logSkippedHsps: true,
-            canvasWrapperStroke: true
-        }).render();
+        if (this.canvasInstance.submitter === "visual-output") {
+            this.fabricjs = new VisualOutput(
+                "canvas",
+                this.canvasInstance.data,
+                {
+                    colorScheme: ColorSchemeEnum.dynamic,
+                    numberHsps: 10,
+                    logSkippedHsps: true,
+                    canvasWrapperStroke: true,
+                }
+            );
+            this.fabricjs.render();
+        } else if (this.canvasInstance.submitter === "functional-predictions") {
+            this.fabricjs = new FunctionalPredictions(
+                "canvas",
+                this.canvasInstance.data,
+                {
+                    colorScheme: ColorSchemeEnum.dynamic,
+                    numberHsps: 10,
+                    logSkippedHsps: true,
+                    canvasWrapperStroke: true,
+                }
+            );
+            this.fabricjs.render();
+        }
     }
 }
 
