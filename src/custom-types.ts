@@ -5,6 +5,34 @@ export enum ColorSchemeEnum {
     blasterjs = "blasterjs" // e-value (fixed scale)
 }
 
+export enum ProteinFeaturesEnum {
+    PANTHER = "PANTHER",
+    PFAM = "PFAM",
+    PIRSF = "PIRSF",
+    PIR = "PIR",
+    PRINTS = "PRINTS",
+    PRODOM = "PRODOM",
+    PROSITE = "PROSITE",
+    PROFILE = "PROFILE",
+    SMART = "SMART",
+    TIGERFAMS = "TIGERFAMs",
+    GENE3D = "GENE3D",
+    CATHGENE3D = "CATHGENE3D",
+    SSF = "SSF",
+    SUPERFAMILY = "SUPERFAMILY",
+    HAMAP = "HAMAP",
+    SIGNALP = "SIGNALP",
+    TMHMM = "TMHMM",
+    MOBIDBLT = "MOBIDBLT",
+    UNIPROT = "UNIPROT",
+    SWISSPROT = "SWISSPROT",
+    TREMBL = "TREMBL",
+    GO = "GO",
+    SFLD = "SFLD",
+    MEROPS = "MEROPS",
+    UNCLASSIFIED = "UNCLASSIFIED",
+}
+
 /* Global Options for Rendering the Fabric.js canvas
  * Width and Height in Pixels (px)
  */
