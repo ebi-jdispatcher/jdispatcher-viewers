@@ -62,15 +62,15 @@ export function getRgbColorFixed(
             "Color Scheme and Gradient Steps should have matching lengths!"
         );
     }
-    if (score + 0.0 === 0.0 || score < gradientSteps[0]) {
+    if (score + 0.0 === 0.0 || score < gradientSteps[1]) {
         return `rgb(${colorScheme[colorSchemeSteps[0]].join(",")})`;
-    } else if (score >= gradientSteps[0] && score < gradientSteps[1]) {
-        return `rgb(${colorScheme[colorSchemeSteps[1]].join(",")})`;
     } else if (score >= gradientSteps[1] && score < gradientSteps[2]) {
-        return `rgb(${colorScheme[colorSchemeSteps[2]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[1]].join(",")})`;
     } else if (score >= gradientSteps[2] && score < gradientSteps[3]) {
+        return `rgb(${colorScheme[colorSchemeSteps[2]].join(",")})`;
+    } else if (score >= gradientSteps[3] && score < gradientSteps[4]) {
         return `rgb(${colorScheme[colorSchemeSteps[3]].join(",")})`;
-    } else if (score >= gradientSteps[3]) {
+    } else if (score >= gradientSteps[4]) {
         return `rgb(${colorScheme[colorSchemeSteps[4]].join(",")})`;
     } else {
         return `rgb(192,192,192)`;
