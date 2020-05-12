@@ -2,7 +2,7 @@ export enum ColorSchemeEnum {
     fixed = "fixed", // e-value (fixed scale)
     dynamic = "dynamic", // e-value (dynamic scale)
     ncbiblast = "ncbiblast", // bit score (fixed scale)
-    blasterjs = "blasterjs" // e-value (fixed scale)
+    blasterjs = "blasterjs", // e-value (fixed scale)
 }
 
 export enum ProteinFeaturesEnum {
@@ -37,7 +37,7 @@ export enum ProteinFeaturesEnum {
  * Width and Height in Pixels (px)
  */
 export interface RenderOptions {
-    jobId?: string,
+    jobId?: string;
     canvasWidth?: number;
     canvasHeight?: number;
     contentWidth?: number; // Vizualisation
@@ -70,7 +70,7 @@ export const jobIdDefaults: JobIdValitable = {
     required: true,
     minLength: 35,
     maxLength: 60,
-    pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)$/
+    pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)$/,
 };
 
 export interface TextType {
@@ -129,7 +129,7 @@ export interface ColorType {
 export const objectDefaults: ObjectType = {
     selectable: false,
     evented: false,
-    objectCaching: false
+    objectCaching: false,
 };
 
 export const textDefaults: TextType = { ...objectDefaults };
