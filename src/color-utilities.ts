@@ -1,4 +1,4 @@
-import { ColorType, ColorSchemeEnum } from "./custom-types";
+import { ColorType, ColorSchemeEnum, ProteinFeaturesEnum } from "./custom-types";
 
 export function getRgbColorGradient(
     score: number,
@@ -237,3 +237,26 @@ export function HSVtoRGB(h: number, s: number, v: number) {
 //     }
 //     return [h, s, v];
 // }
+
+export function colorByProteinFeatureName(domainName: ProteinFeaturesEnum): string {
+    let color: string;
+    if (domainName == "GENE3D" || domainName == "CATHGENE3D")
+        color = "rgb(119,2,221)";
+    else if (domainName == "PANTHER") color = "rgb(153,102,51)";
+    else if (domainName == "PFAM") color = "rgb(102,51,255)";
+    else if (domainName == "PIRSF" || domainName == "PIR")
+        color = "rgb(217,119,249)";
+    else if (domainName == "PRINTS") color = "rgb(51,204,51)";
+    else if (domainName == "PRODOM") color = "rgb(102,153,255)";
+    else if (domainName == "PROFILE") color = "rgb(255,153,51)";
+    else if (domainName == "PROSITE") color = "rgb(255,204,51)";
+    else if (domainName == "SMART") color = "rgb(206,0,49)";
+    else if (domainName == "SUPERFAMILY" || domainName == "SSF")
+        color = "rgb(0,0,0)";
+    else if (domainName == "TIGERFAMs") color = "rgb(46,140,12)";
+    else if (domainName == "HAMAP") color = "rgb(102,255,255)";
+    else if (domainName == "SIGNALP") color = "rgb(217,119,249)";
+    else if (domainName == "TMHMM") color = "rgb(41,140,12)";
+    else color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
+    return color;
+}
