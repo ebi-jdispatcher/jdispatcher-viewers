@@ -96,4 +96,45 @@ export async function getXMLDataFromURL(
 
 export function parseXMLData(data: string): IPRMCResultModel {
     return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
-};
+}
+
+export function domainNameToEnum(
+    domainName: string
+): DomainDatabaseEnum {
+    domainName = domainName.toUpperCase();
+    let domainNameEnum = DomainDatabaseEnum.UNCLASSIFIED;
+    if (domainName === "IPR" || domainName === "INTERPRO") {
+        domainNameEnum = DomainDatabaseEnum.INTERPRO;
+    } else if (
+        domainName === "CATHGENE3D" ||
+        domainName === "CATH-GENE3D" ||
+        domainName === "GENE3D"
+    ) {
+        domainNameEnum = DomainDatabaseEnum.CATHGENE3D;
+    } else if (domainName === "CDD") {
+        domainNameEnum = DomainDatabaseEnum.CDD;
+    } else if (domainName === "PANTHER") {
+        domainNameEnum = DomainDatabaseEnum.PANTHER;
+    } else if (domainName === "HAMAP") {
+        domainNameEnum = DomainDatabaseEnum.HAMAP;
+    } else if (domainName === "PFAM") {
+        domainNameEnum = DomainDatabaseEnum.PFAM;
+    } else if (domainName === "PIRSF") {
+        domainNameEnum = DomainDatabaseEnum.PIRSF;
+    } else if (domainName === "PRINTS") {
+        domainNameEnum = DomainDatabaseEnum.PRINTS;
+    } else if (domainName === "PROSITE PROFILES") {
+        domainNameEnum = DomainDatabaseEnum.PROSITE_PROFILES;
+    } else if (domainName === "PROSITE PATTERNS") {
+        domainNameEnum = DomainDatabaseEnum.PROSITE_PATTERNS;
+    } else if (domainName === "SFLD") {
+        domainNameEnum = DomainDatabaseEnum.SFLD;
+    } else if (domainName === "SMART") {
+        domainNameEnum = DomainDatabaseEnum.SMART;
+    } else if (domainName === "SUPERFAMILY" || domainName === "SSF") {
+        domainNameEnum = DomainDatabaseEnum.SUPERFAMILY;
+    } else if (domainName === "TIGERFAMS") {
+        domainNameEnum = DomainDatabaseEnum.TIGERFAMS;
+    }
+    return domainNameEnum;
+}
