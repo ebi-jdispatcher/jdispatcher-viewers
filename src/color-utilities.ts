@@ -90,7 +90,7 @@ export function getGradientSteps(
             Math.pow(10, -1),
             Math.pow(10, 0),
             Math.pow(10, 1),
-            Math.pow(10, 2)
+            Math.pow(10, 2),
         ];
     } else if (colorScheme === ColorSchemeEnum.dynamic) {
         if (maxScore < 1e-304) {
@@ -100,7 +100,7 @@ export function getGradientSteps(
                 Math.pow(10, eScale),
                 Math.pow(10, eScale / 2),
                 Math.pow(10, eScale / 4),
-                Math.pow(10, eScale / 8)
+                Math.pow(10, eScale / 8),
             ];
         } else if (minScore < 1) {
             const maxLog10 = Math.log10(maxScore);
@@ -121,7 +121,7 @@ export function getGradientSteps(
                     Math.pow(10, secondNotZeroEvalue),
                     Math.pow(10, thirdNotZeroEvalue),
                     Math.pow(10, fourthNotZeroEvalue),
-                    maxScore
+                    maxScore,
                 ];
             } else {
                 const evalueDiff =
@@ -132,7 +132,7 @@ export function getGradientSteps(
                         1,
                         (2 + maxScore) / 3,
                         (2 + 2 * maxScore) / 3,
-                        maxScore
+                        maxScore,
                     ];
                 } else if (Math.abs(evalueDiff) <= 4) {
                     gradientSteps = [
@@ -140,7 +140,7 @@ export function getGradientSteps(
                         Math.pow(10, evalueDiff / 2),
                         1,
                         (maxScore + 1) / 2,
-                        maxScore
+                        maxScore,
                     ];
                 } else {
                     gradientSteps = [
@@ -148,7 +148,7 @@ export function getGradientSteps(
                         Math.pow(10, evalueDiff / 2),
                         Math.pow(10, evalueDiff / 4),
                         1,
-                        maxScore
+                        maxScore,
                     ];
                 }
             }
@@ -158,7 +158,7 @@ export function getGradientSteps(
                 (3 * minScore + maxScore) / 4,
                 (minScore + maxScore) / 2,
                 (minScore + 3 * maxScore) / 4,
-                maxScore
+                maxScore,
             ];
         }
     } else if (colorScheme === ColorSchemeEnum.ncbiblast) {

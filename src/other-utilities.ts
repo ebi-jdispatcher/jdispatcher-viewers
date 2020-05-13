@@ -25,7 +25,7 @@ export async function getDataFromURLorFile(
 ): Promise<SSSResultModel | IPRMCResultModel> {
     const request = new Request(dataLoc);
     try {
-        return fetch(request).then(response => {
+        return fetch(request).then((response) => {
             if (!response.ok) {
                 throw new Error(`Could not retrieve data from ${dataLoc}`);
             }
@@ -45,7 +45,10 @@ export function getServiceURLfromJobId(jobId: string) {
     return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
 }
 
-export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false) {
+export function validateJobId(
+    jobIdObj: JobIdValitable,
+    verbose: boolean = false
+) {
     let isValid = true;
     if (jobIdObj.required) {
         isValid = isValid && jobIdObj.value.trim().length !== 0;
@@ -59,7 +62,7 @@ export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false
     if (jobIdObj.pattern) {
         isValid = isValid && jobIdObj.pattern.test(jobIdObj.value.trim());
     }
-    if (verbose){
+    if (verbose) {
         if (isValid) {
             console.log(`JobId "${jobIdObj.value}" is valid!`);
         } else {
@@ -74,12 +77,10 @@ export function getIPRMCDbfetchURL(accessions: string) {
     return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
 }
 
-export async function getXMLDataFromURL(
-    dataLoc: string
-): Promise<string> {
+export async function getXMLDataFromURL(dataLoc: string): Promise<string> {
     const request = new Request(dataLoc);
     try {
-        return fetch(request).then(response => {
+        return fetch(request).then((response) => {
             if (!response.ok) {
                 throw new Error(`Could not retrieve data from ${dataLoc}`);
             }

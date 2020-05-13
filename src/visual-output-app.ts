@@ -5,18 +5,18 @@ import { getQuerySubjPixelCoords, getHspPixelCoords } from "./coords-utilities";
 import {
     getRgbColorGradient,
     getRgbColorFixed,
-    getGradientSteps
+    getGradientSteps,
 } from "./color-utilities";
 import {
     getDataFromURLorFile,
     validateJobId,
-    getServiceURLfromJobId
+    getServiceURLfromJobId,
 } from "./other-utilities";
 import {
     RenderOptions,
     ColorSchemeEnum,
     jobIdDefaults,
-    TextType
+    TextType,
 } from "./custom-types";
 import {
     mouseDownText,
@@ -26,7 +26,7 @@ import {
     mouseOutDomain,
     mouseOverCheckbox,
     mouseDownCheckbox,
-    mouseOutCheckbox
+    mouseOutCheckbox,
 } from "./custom-events";
 import {
     drawHeaderTextGroup,
@@ -49,7 +49,7 @@ import {
     drawScaleTick5LabelsGroup,
     drawScaleTick4LabelsGroup,
     drawFooterText,
-    drawCanvasWrapperStroke
+    drawCanvasWrapperStroke,
 } from "./drawing-utilities";
 
 export class BasicCanvasRenderer {
@@ -125,7 +125,7 @@ export class BasicCanvasRenderer {
         this.canvas = new fabric.Canvas(this.element, {
             defaultCursor: "default",
             moveCursor: "default",
-            hoverCursor: "default"
+            hoverCursor: "default",
         });
     }
 
@@ -195,13 +195,13 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
 
     private loadData() {
-        const json = getDataFromURLorFile(this.data).then(data => data);
-        json.then(data => {
+        const json = getDataFromURLorFile(this.data).then((data) => data);
+        json.then((data) => {
             if (typeof this.dataObj === "undefined") {
                 this.dataObj = data as SSSResultModel;
                 this.render();
             }
-        }).catch(error => console.log(error));
+        }).catch((error) => console.log(error));
     }
 
     private loadInitalProperties() {
@@ -216,7 +216,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.startQueryPixels,
             this.endQueryPixels,
             this.startSubjPixels,
-            this.endSubjPixels
+            this.endSubjPixels,
         ] = getQuerySubjPixelCoords(
             this.queryLen,
             this.subjLen,
@@ -236,7 +236,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.dataObj,
             {
                 fontSize: this.fontSize,
-                canvasWidth: this.canvasWidth
+                canvasWidth: this.canvasWidth,
             },
             this.topPadding
         );
@@ -269,13 +269,13 @@ export class VisualOutput extends BasicCanvasRenderer {
                     subjLen: this.subjLen,
                     startQueryPixels: this.startQueryPixels,
                     startEvalPixels: this.startEvalPixels,
-                    startSubjPixels: this.startSubjPixels
+                    startSubjPixels: this.startSubjPixels,
                 },
                 {
                     contentWidth: this.contentWidth,
                     contentScoringWidth: this.contentScoringWidth,
                     fontSize: this.fontSize,
-                    colorScheme: this.colorScheme
+                    colorScheme: this.colorScheme,
                 },
                 this.topPadding
             );
@@ -288,7 +288,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     startQueryPixels: this.startQueryPixels,
                     endQueryPixels: this.endQueryPixels,
                     startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels
+                    endSubjPixels: this.endSubjPixels,
                 },
                 { strokeWidth: 2 },
                 this.topPadding
@@ -303,10 +303,10 @@ export class VisualOutput extends BasicCanvasRenderer {
                     startQueryPixels: this.startQueryPixels,
                     endQueryPixels: this.endQueryPixels,
                     startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels
+                    endSubjPixels: this.endSubjPixels,
                 },
                 {
-                    fontSize: this.fontSize
+                    fontSize: this.fontSize,
                 },
                 this.topPadding
             );
@@ -325,7 +325,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             const noHitsTextGroup = drawNoHitsFoundText(
                 {
                     fontSize: this.fontSize,
-                    contentWidth: this.contentWidth
+                    contentWidth: this.contentWidth,
                 },
                 this.topPadding
             );
@@ -413,7 +413,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                             this.numberHsps,
                             {
                                 fontSize: this.fontSize,
-                                contentWidth: this.contentWidth
+                                contentWidth: this.contentWidth,
                             },
                             this.topPadding
                         );
@@ -432,7 +432,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         startQueryPixels,
                         endQueryPixels,
                         startSubjPixels,
-                        endSubjPixels
+                        endSubjPixels,
                     ] = getQuerySubjPixelCoords(
                         queryLen,
                         subjLen,
@@ -449,7 +449,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                             startQueryPixels: startQueryPixels,
                             endQueryPixels: endQueryPixels,
                             startSubjPixels: startSubjPixels,
-                            endSubjPixels: endSubjPixels
+                            endSubjPixels: endSubjPixels,
                         },
                         { strokeWidth: 1 },
                         this.topPadding
@@ -467,7 +467,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     const hspSubjEnd: number = hsp.hsp_hit_to;
                     [
                         startQueryHspPixels,
-                        endQueryHspPixels
+                        endQueryHspPixels,
                     ] = getHspPixelCoords(
                         queryLen,
                         subjLen,
@@ -523,7 +523,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         hsp,
                         {
                             fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
+                            colorScheme: this.colorScheme,
                         },
                         this.topPadding
                     );
@@ -539,7 +539,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         hsp,
                         {
                             fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
+                            colorScheme: this.colorScheme,
                         },
                         this.topPadding
                     );
@@ -556,7 +556,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         hsp,
                         {
                             fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
+                            colorScheme: this.colorScheme,
                         },
                         this.topPadding
                     );
@@ -573,7 +573,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         const scaleTypeText = drawScaleTypeText(
             {
                 fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth
+                scaleLabelWidth: this.scaleLabelWidth,
             },
             this.topPadding
         );
@@ -596,12 +596,12 @@ export class VisualOutput extends BasicCanvasRenderer {
             textCheckFixObj,
             ncbiblastBoxText,
             ncbiblastText,
-            textCheckNcbiObj
+            textCheckNcbiObj,
         ] = drawCheckBoxText(
             {
                 colorScheme: this.colorScheme,
                 fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth
+                scaleLabelWidth: this.scaleLabelWidth,
             },
             this.topPadding
         );
@@ -644,7 +644,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             {
                 fontSize: this.fontSize,
                 scaleLabelWidth: this.scaleLabelWidth,
-                colorScheme: this.colorScheme
+                colorScheme: this.colorScheme,
             },
             this.topPadding
         );
@@ -655,7 +655,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             {
                 scaleWidth: this.scaleWidth,
                 scaleLabelWidth: this.scaleLabelWidth,
-                colorScheme: this.colorScheme
+                colorScheme: this.colorScheme,
             },
             this.topPadding
         );
@@ -690,7 +690,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 {
                     fontSize: this.fontSize,
                     scaleWidth: this.scaleWidth,
-                    scaleLabelWidth: this.scaleLabelWidth
+                    scaleLabelWidth: this.scaleLabelWidth,
                 },
                 this.topPadding
             );
@@ -721,7 +721,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 {
                     fontSize: this.fontSize,
                     scaleWidth: this.scaleWidth,
-                    scaleLabelWidth: this.scaleLabelWidth
+                    scaleLabelWidth: this.scaleLabelWidth,
                 },
                 this.topPadding
             );
@@ -735,7 +735,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         let textFooterObj: TextType;
         [copyrightText, textFooterObj] = drawFooterText(
             {
-                fontSize: this.fontSize
+                fontSize: this.fontSize,
             },
             this.topPadding
         );
@@ -754,7 +754,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             // final canvas wrapper stroke
             const canvasWrapper = drawCanvasWrapperStroke({
                 canvasWidth: this.canvasWidth,
-                canvasHeight: this.canvasHeight
+                canvasHeight: this.canvasHeight,
             });
             this.canvas.add(canvasWrapper);
         }

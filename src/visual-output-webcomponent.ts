@@ -18,7 +18,7 @@ export class CanvasRendererComponent extends LitElement {
             colorScheme: this.colorScheme as ColorSchemeEnum,
             numberHsps: this.numberHsps,
             logSkippedHsps: this.logSkippedHsps,
-            canvasWrapperStroke: this.canvasWrapperStroke
+            canvasWrapperStroke: this.canvasWrapperStroke,
         };
 
         // Checks to find if canvas element exist (with id="canvas")
@@ -36,9 +36,7 @@ export class CanvasRendererComponent extends LitElement {
         }
         // New JD Viewers Fabricjs Canvas
         new VisualOutput("canvas", this.data, renderOptions).render();
-        return html`
-            ${this.canvasDivTemplate}
-        `;
+        return html` ${this.canvasDivTemplate} `;
     }
     get canvasDivTemplate() {
         return html``;

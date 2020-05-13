@@ -119,7 +119,6 @@ class JobIdInputForm {
         const jobId = this.jobIdElement.value.trim();
         let formValidatable = { ...jobIdDefaults };
         formValidatable.value = jobId;
-        console.log(submittedEvent.submitter.name.trim());
 
         if (validateJobId(formValidatable)) {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {

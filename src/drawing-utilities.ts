@@ -17,7 +17,6 @@ import {
 } from "./custom-types";
 import { colorByDatabaseName } from "./color-utilities";
 
-
 export function drawHeaderTextGroup(
     dataObj: SSSResultModel,
     renderOptions: RenderOptions,
@@ -73,7 +72,7 @@ export function drawHeaderTextGroup(
             sequenceText,
             lengthText,
             startText,
-            endText
+            endText,
         ],
         objectDefaults
     );
@@ -159,7 +158,7 @@ export function drawLineTracks(
         coordValues.startQueryPixels!,
         topPadding,
         coordValues.endQueryPixels!,
-        topPadding
+        topPadding,
     ];
     lineObj.left = coordValues.startQueryPixels;
     const queryLine = new fabric.Line(coordsQuery, lineObj);
@@ -168,7 +167,7 @@ export function drawLineTracks(
         coordValues.startQueryPixels!,
         topPadding - 3,
         coordValues.startQueryPixels!,
-        topPadding + 3
+        topPadding + 3,
     ];
     lineObj.top = topPadding - 2;
     const queryStartCap = new fabric.Line(coordsQueryStartCap, lineObj);
@@ -177,7 +176,7 @@ export function drawLineTracks(
         coordValues.endQueryPixels!,
         topPadding - 3,
         coordValues.endQueryPixels!,
-        topPadding + 3
+        topPadding + 3,
     ];
     lineObj.left = coordValues.endQueryPixels;
     const queryEndCap = new fabric.Line(coordsQueryEndCap, lineObj);
@@ -187,7 +186,7 @@ export function drawLineTracks(
         coordValues.startSubjPixels!,
         topPadding,
         coordValues.endSubjPixels!,
-        topPadding
+        topPadding,
     ];
     lineObj.top = topPadding;
     lineObj.left = coordValues.startSubjPixels;
@@ -197,7 +196,7 @@ export function drawLineTracks(
         coordValues.startSubjPixels!,
         topPadding - 3,
         coordValues.startSubjPixels!,
-        topPadding + 3
+        topPadding + 3,
     ];
     lineObj.top = topPadding - 2;
     const subjStartCap = new fabric.Line(coordsSubjStartCap, lineObj);
@@ -206,7 +205,7 @@ export function drawLineTracks(
         coordValues.endSubjPixels!,
         topPadding - 3,
         coordValues.endSubjPixels!,
-        topPadding + 3
+        topPadding + 3,
     ];
     lineObj.left = coordValues.endSubjPixels;
     const subjEndCap = new fabric.Line(coordsSubjEndCap, lineObj);
@@ -219,7 +218,7 @@ export function drawLineTracks(
             queryStartCap,
             queryEndCap,
             subjStartCap,
-            subjEndCap
+            subjEndCap,
         ],
         objectDefaults
     );
@@ -429,7 +428,7 @@ export function drawDomainTooltips(
             objectCaching: false,
             visible: false,
             top: topPadding - 10,
-            left: startHspPixels + endHspPixels / 2
+            left: startHspPixels + endHspPixels / 2,
         }
     );
     return tooltipGroup;
@@ -526,7 +525,7 @@ export function drawCheckBoxText(
         textCheckFixObj,
         ncbiblastCheckboxText,
         ncbiblastText,
-        textCheckNcbiObj
+        textCheckNcbiObj,
     ];
 }
 
@@ -584,7 +583,7 @@ export function drawLineAxis5Buckets(
         startGradPixels,
         topPadding,
         endGradPixels,
-        topPadding
+        topPadding,
     ];
     lineObj.left = startGradPixels;
     const axisLine = new fabric.Line(coordsAxis, lineObj);
@@ -594,7 +593,7 @@ export function drawLineAxis5Buckets(
         startGradPixels,
         topPadding,
         startGradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     const axisStartTick = new fabric.Line(coordsAxisStartTick, lineObj);
 
@@ -603,7 +602,7 @@ export function drawLineAxis5Buckets(
         o25GradPixels,
         topPadding,
         o25GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o25GradPixels;
     const axis25Tick = new fabric.Line(coordsAxis25Tick, lineObj);
@@ -613,7 +612,7 @@ export function drawLineAxis5Buckets(
         o50GradPixels,
         topPadding,
         o50GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o50GradPixels;
     const axis50Tick = new fabric.Line(coordsAxis50Tick, lineObj);
@@ -623,7 +622,7 @@ export function drawLineAxis5Buckets(
         o75GradPixels,
         topPadding,
         o75GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o75GradPixels;
     const axis75Tick = new fabric.Line(coordsAxis75Tick, lineObj);
@@ -633,7 +632,7 @@ export function drawLineAxis5Buckets(
         endGradPixels,
         topPadding,
         endGradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = endGradPixels;
     const axisEndTick = new fabric.Line(coordsAxisEndTick, lineObj);
@@ -646,7 +645,7 @@ export function drawLineAxis5Buckets(
             axis25Tick,
             axis50Tick,
             axis75Tick,
-            axisEndTick
+            axisEndTick,
         ],
         objectDefaults
     );
@@ -672,7 +671,7 @@ export function drawLineAxis6Buckets(
         startGradPixels,
         topPadding,
         endGradPixels,
-        topPadding
+        topPadding,
     ];
     lineObj.left = startGradPixels;
     const axisLine = new fabric.Line(coordsAxis, lineObj);
@@ -682,7 +681,7 @@ export function drawLineAxis6Buckets(
         startGradPixels,
         topPadding,
         startGradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     const axisStartTick = new fabric.Line(coordsAxisStartTick, lineObj);
 
@@ -691,7 +690,7 @@ export function drawLineAxis6Buckets(
         o20GradPixels,
         topPadding,
         o20GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o20GradPixels;
     const axis20Tick = new fabric.Line(coordsAxis20Tick, lineObj);
@@ -701,7 +700,7 @@ export function drawLineAxis6Buckets(
         o40GradPixels,
         topPadding,
         o40GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o40GradPixels;
     const axis40Tick = new fabric.Line(coordsAxis40Tick, lineObj);
@@ -711,7 +710,7 @@ export function drawLineAxis6Buckets(
         o60GradPixels,
         topPadding,
         o60GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o60GradPixels;
     const axis60Tick = new fabric.Line(coordsAxis60Tick, lineObj);
@@ -721,7 +720,7 @@ export function drawLineAxis6Buckets(
         o80GradPixels,
         topPadding,
         o80GradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = o80GradPixels;
     const axis80Tick = new fabric.Line(coordsAxis80Tick, lineObj);
@@ -731,7 +730,7 @@ export function drawLineAxis6Buckets(
         endGradPixels,
         topPadding,
         endGradPixels,
-        topPadding + 4
+        topPadding + 4,
     ];
     lineObj.left = endGradPixels;
     const axisEndTick = new fabric.Line(coordsAxisEndTick, lineObj);
@@ -745,7 +744,7 @@ export function drawLineAxis6Buckets(
             axis40Tick,
             axis60Tick,
             axis80Tick,
-            axisEndTick
+            axisEndTick,
         ],
         objectDefaults
     );
@@ -866,7 +865,7 @@ export function drawScaleTick4LabelsGroup(
             o25LabelText,
             o50LabelText,
             o75LabelText,
-            endLabelText
+            endLabelText,
         ],
         objectDefaults
     );
@@ -900,7 +899,7 @@ export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {
         height: renderOptions.canvasHeight! - 1,
         strokeWidth: 1,
         stroke: "lightseagreen",
-        fill: "transparent"
+        fill: "transparent",
     });
     return canvasWrapper;
 }
