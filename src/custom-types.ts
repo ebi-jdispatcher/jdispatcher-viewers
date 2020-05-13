@@ -102,7 +102,7 @@ interface LineType {
     [key: string]: any;
 }
 
-interface RectType {
+export interface RectType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
