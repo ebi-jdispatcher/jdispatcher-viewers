@@ -85,7 +85,7 @@ export function mouseOverCheckbox(
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
-            e.target.set("hoverCursor", "default");
+            e.target.set("hoverCursor", "pointer");
             e.target.setOptions(textObj);
             e.target.setOptions({ fill: "black" });
             _this.canvas.renderAll();
