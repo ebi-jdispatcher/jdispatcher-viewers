@@ -3,7 +3,7 @@ import {
     TextType,
     RectType,
     ColorSchemeEnum,
-    ProteinFeaturesEnum,
+    DomainDatabaseEnum,
 } from "./custom-types";
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
@@ -130,20 +130,30 @@ export function mouseOutCheckbox(
 export function mouseOverDomainCheckbox(
     fabricObj: fabric.Object,
     rectObj: RectType,
-    currentProteinFeature: ProteinFeaturesEnum,
+    currentDomainDatabase: DomainDatabaseEnum,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
             e.target.set("hoverCursor", "pointer");
             e.target.setOptions(rectObj);
-            if (
-                _this.currentProteinFeature !== undefined &&
-                _this.currentProteinFeature === currentProteinFeature
+            let currentDomainDatabaseDisabled = false;
+            if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
+                currentDomainDatabaseDisabled = true;
+            }
+            if (currentDomainDatabaseDisabled) {
+                e.target.setOptions({ fill: "white", stroke: "grey" });
+                e.target.set("hoverCursor", "default");
+            } else if (
+                !_this.domainDatabaseList.includes(
+                    currentDomainDatabase.toString()
+                )
             ) {
-                e.target.setOptions({ fill: "white", stroke: "black" });
+                e.target.setOptions({ stroke: "black" });
+                e.target.set("hoverCursor", "pointer");
             } else {
-                e.target.setOptions({ fill: "white", stroke: "black" });
+                e.target.setOptions({ opacity: 0.5, stroke: "grey" });
+                e.target.set("hoverCursor", "pointer");
             }
             _this.canvas.renderAll();
         }
@@ -152,29 +162,27 @@ export function mouseOverDomainCheckbox(
 
 export function mouseDownDomainCheckbox(
     fabricObj: fabric.Object,
-    currentProteinFeature: ProteinFeaturesEnum,
+    currentDomainDatabase: DomainDatabaseEnum,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
             if (
-                !_this.proteinFeaturesList.includes(
-                    currentProteinFeature.toString()
+                !_this.domainDatabaseList.includes(
+                    currentDomainDatabase.toString()
                 )
             ) {
-                _this.proteinFeaturesList.push(
-                    currentProteinFeature.toString()
-                );
-                _this.currentProteinFeature = currentProteinFeature;
+                _this.domainDatabaseList.push(currentDomainDatabase.toString());
+                _this.currentDomainDatabase = currentDomainDatabase;
                 _this.render();
             } else {
-                const indx = _this.proteinFeaturesList.indexOf(
-                    currentProteinFeature.toString()
+                const indx = _this.domainDatabaseList.indexOf(
+                    currentDomainDatabase.toString()
                 );
                 if (indx > -1) {
-                    _this.proteinFeaturesList.splice(indx, 1);
+                    _this.domainDatabaseList.splice(indx, 1);
                 }
-                _this.currentProteinFeature = undefined;
+                _this.currentDomainDatabase = undefined;
                 _this.render();
             }
         }
@@ -184,19 +192,26 @@ export function mouseDownDomainCheckbox(
 export function mouseOutDomainCheckbox(
     fabricObj: fabric.Object,
     rectObj: RectType,
-    currentProteinFeature: ProteinFeaturesEnum,
+    currentDomainDatabase: DomainDatabaseEnum,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
+            let currentDomainDatabaseDisabled = false;
+            if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
+                currentDomainDatabaseDisabled = true;
+            }
             if (
-                !_this.proteinFeaturesList.includes(
-                    currentProteinFeature.toString()
+                !_this.domainDatabaseList.includes(
+                    currentDomainDatabase.toString()
                 )
             ) {
                 e.target.setOptions({ stroke: "grey", fill: "white" });
+            } else if (currentDomainDatabaseDisabled) {
+                e.target.setOptions({ stroke: "grey", fill: "white" });
             } else {
                 e.target.setOptions(rectObj);
+                e.target.setOptions({ opacity: 1.0, stroke: "black" });
             }
             _this.canvas.renderAll();
         }
