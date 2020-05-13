@@ -1,4 +1,4 @@
-import { ColorType, ColorSchemeEnum, ProteinFeaturesEnum } from "./custom-types";
+import { ColorType, ColorSchemeEnum, DomainDatabaseEnum } from "./custom-types";
 
 export function getRgbColorGradient(
     score: number,
@@ -238,7 +238,7 @@ export function HSVtoRGB(h: number, s: number, v: number) {
 //     return [h, s, v];
 // }
 
-export function colorByProteinFeatureName(domainName: ProteinFeaturesEnum): string {
+export function colorByDatabaseName(domainName: DomainDatabaseEnum): string {
     let color: string;
     if (domainName == "GENE3D" || domainName == "CATHGENE3D")
         color = "rgb(119,2,221)";

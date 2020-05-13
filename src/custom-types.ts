@@ -5,31 +5,35 @@ export enum ColorSchemeEnum {
     blasterjs = "blasterjs", // e-value (fixed scale)
 }
 
-export enum ProteinFeaturesEnum {
+export enum DomainDatabaseEnum {
+    // IPR = "InterPro",
+    INTERPRO = "InterPro",
     PANTHER = "PANTHER",
-    PFAM = "PFAM",
+    PFAM = "Pfam",
     PIRSF = "PIRSF",
-    PIR = "PIR",
     PRINTS = "PRINTS",
     PRODOM = "PRODOM",
-    PROSITE = "PROSITE",
-    PROFILE = "PROFILE",
+    // PROFILE = "PROSITE profiles",
+    // PROSITE = "PROSITE patterns",
+    PROSITE_PROFILES = "PROSITE profiles",
+    PROSITE_PATTERNS = "PROSITE patterns",
     SMART = "SMART",
     TIGERFAMS = "TIGERFAMs",
-    GENE3D = "GENE3D",
-    CATHGENE3D = "CATHGENE3D",
-    SSF = "SSF",
+    // GENE3D = "CATH-Gene3D",
+    CATHGENE3D = "CATH-Gene3D",
+    // SSF = "SUPERFAMILY",
     SUPERFAMILY = "SUPERFAMILY",
     HAMAP = "HAMAP",
     SIGNALP = "SIGNALP",
     TMHMM = "TMHMM",
     MOBIDBLT = "MOBIDBLT",
-    UNIPROT = "UNIPROT",
+    UNIPROT = "UniProt",
     SWISSPROT = "SWISSPROT",
     TREMBL = "TREMBL",
     GO = "GO",
     SFLD = "SFLD",
     MEROPS = "MEROPS",
+    CDD = "CDD",
     UNCLASSIFIED = "UNCLASSIFIED",
 }
 
@@ -54,6 +58,9 @@ export interface RenderOptions {
     fontFamily?: string;
     canvasWrapperStroke?: boolean;
     strokeWidth?: number;
+    currentDomainDatabase?: DomainDatabaseEnum | undefined;
+    currentColor?: string;
+    currentDisabled?: boolean;
 }
 
 // jobId validation
