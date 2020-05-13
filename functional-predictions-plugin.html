@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>jdistpatcher-viewers</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+        <script type="text/javascript" src="dist/jd_viewers_bundle.js" defer></script>
+    </head>
+    <body>
+        <div id="canvas-wrapper">
+            <canvas id="canvas" />
+        </div>
+    </body>
+    <script>
+        function getDataURL(jobId) {
+            const toolName = jobId.split("-")[0];
+            return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get Sequence Similirity Search JSON URL
+            const jobId = "ncbiblast-I20200513-163804-0218-11274806-np2";
+            const data = getDataURL(jobId);
+
+            // Render Options
+            const options = {
+                colorScheme: "dynamic",
+                numberHsps: 10,
+                logSkippedHsps: true,
+                canvasWrapperStroke: true
+            };
+            // Call render method to display the viz
+            new FunctionalPredictions("canvas", data, options).render();
+        });
+    </script>
+</html>
