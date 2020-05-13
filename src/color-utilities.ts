@@ -238,25 +238,39 @@ export function HSVtoRGB(h: number, s: number, v: number) {
 //     return [h, s, v];
 // }
 
+// Using custom coloring scheme
 export function colorByDatabaseName(domainName: DomainDatabaseEnum): string {
     let color: string;
-    if (domainName == "GENE3D" || domainName == "CATHGENE3D")
-        color = "rgb(119,2,221)";
-    else if (domainName == "PANTHER") color = "rgb(153,102,51)";
-    else if (domainName == "PFAM") color = "rgb(102,51,255)";
-    else if (domainName == "PIRSF" || domainName == "PIR")
-        color = "rgb(217,119,249)";
-    else if (domainName == "PRINTS") color = "rgb(51,204,51)";
-    else if (domainName == "PRODOM") color = "rgb(102,153,255)";
-    else if (domainName == "PROFILE") color = "rgb(255,153,51)";
-    else if (domainName == "PROSITE") color = "rgb(255,204,51)";
-    else if (domainName == "SMART") color = "rgb(206,0,49)";
-    else if (domainName == "SUPERFAMILY" || domainName == "SSF")
-        color = "rgb(0,0,0)";
-    else if (domainName == "TIGERFAMs") color = "rgb(46,140,12)";
-    else if (domainName == "HAMAP") color = "rgb(102,255,255)";
-    else if (domainName == "SIGNALP") color = "rgb(217,119,249)";
-    else if (domainName == "TMHMM") color = "rgb(41,140,12)";
+    if (domainName == "InterPro") color = "rgb(211,47,47)";
+    else if (domainName == "Pfam") color = "rgb(171,71,188)";
+    else if (domainName == "HAMAP") color = "rgb(106,27,154)";
+    else if (domainName == "PANTHER") color = "rgb(57,73,171)";
+    else if (domainName == "SUPERFAMILY") color = "rgb(33,150,243)";
+    else if (domainName == "SMART") color = "rgb(0,188,212)";
+    else if (domainName == "PROSITE profiles") color = "rgb(0,150,136)";
+    else if (domainName == "SFLD") color = "rgb(76,175,80)";
+    else if (domainName == "CDD") color = "rgb(205,220,57)";
+    else if (domainName == "PRINTS") color = "rgb(255,235,59)";
+    else if (domainName == "TIGERFAMs") color = "rgb(255,193,7)";
+    else if (domainName == "CATH-Gene3D") color = "rgb(255,112,67)";
+    else if (domainName == "PIRSF") color = "rgb(121,85,72)";
+    else if (domainName == "PROSITE patterns") color = "rgb(55,71,79)";
     else color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
     return color;
 }
+// Using coloring scheme from https://www.ebi.ac.uk/interpro/entry/InterPro/#table
+// if (domainName == "InterPro") color = "rgb(45,174,193)";
+// else if (domainName == "Pfam") color = "rgb(98,135,177)";
+// else if (domainName == "HAMAP") color = "rgb(44,214,214)";
+// else if (domainName == "PANTHER") color = "rgb(191,172,146)";
+// else if (domainName == "SUPERFAMILY") color = "rgb(104,104,104)";
+// else if (domainName == "SMART") color = "rgb(255,141,141)";
+// else if (domainName == "PROSITE profiles") color = "rgb(246,159,116)";
+// else if (domainName == "SFLD") color = "rgb(0,177,211)";
+// else if (domainName == "CDD") color = "rgb(173,220,88)";
+// else if (domainName == "PRINTS") color = "rgb(84,199,95)";
+// else if (domainName == "TIGERFAMs") color = "rgb(86,185,166)";
+// else if (domainName == "CATH-Gene3D") color = "rgb(168,140,195)";
+// else if (domainName == "PIRSF") color = "rgb(251,189,221)";
+// else if (domainName == "PROSITE patterns") color = "rgb(243,199,102)";
+// else if (domainName == "PRODOM") color = "rgb(102,153,255)";
