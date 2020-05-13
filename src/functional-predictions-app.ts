@@ -1,47 +1,37 @@
 import { fabric } from "fabric";
-import { SSSResultModel } from "./data-model";
-import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
-import { getQuerySubjPixelCoords, getHspPixelCoords } from "./coords-utilities";
-import {
-    getRgbColorGradient,
-    getRgbColorFixed,
-    getGradientSteps
-} from "./color-utilities";
+import { SSSResultModel, IPRMCResultModel, Protein } from "./data-model";
+import { getQuerySubjPixelCoords } from "./coords-utilities";
+import { getGradientSteps } from "./color-utilities";
 import {
     getDataFromURLorFile,
     validateJobId,
-    getServiceURLfromJobId
+    getServiceURLfromJobId,
+    domainDatabaseNameToEnum,
 } from "./other-utilities";
 import {
     RenderOptions,
     ColorSchemeEnum,
+    DomainDatabaseEnum,
     jobIdDefaults,
-    TextType
+    TextType,
+    RectType,
 } from "./custom-types";
 import {
     mouseDownText,
     mouseOverText,
     mouseOutText,
-    mouseOverDomain,
-    mouseOutDomain,
     mouseOverCheckbox,
     mouseDownCheckbox,
-    mouseOutCheckbox
+    mouseOutCheckbox,
+    mouseOverDomainCheckbox,
+    mouseDownDomainCheckbox,
+    mouseOutDomainCheckbox,
 } from "./custom-events";
 import {
     drawHeaderTextGroup,
     drawHeaderLinkText,
-    drawContentHeaderTextGroup,
-    drawLineTracks,
-    drawContentSequenceInfoText,
-    drawHspNoticeText,
-    drawScoreText,
-    drawContentFooterTextGroup,
     drawNoHitsFoundText,
-    drawDomainTracks,
-    drawDomainTooltips,
     drawScaleTypeText,
-    drawCheckBoxText,
     drawScaleScoreText,
     drawScaleColorGradient,
     drawLineAxis5Buckets,
@@ -49,8 +39,70 @@ import {
     drawScaleTick5LabelsGroup,
     drawScaleTick4LabelsGroup,
     drawFooterText,
-    drawCanvasWrapperStroke
+    drawCanvasWrapperStroke,
+    drawCheckBoxText,
+    drawContentTitleText,
+    drawContentSupressText,
+    drawProteinFeaturesText,
+    drawDomainCheckbox,
 } from "./drawing-utilities";
+
+const defaultDomainDatabaseList = [
+    DomainDatabaseEnum.INTERPRO,
+    DomainDatabaseEnum.CATHGENE3D,
+    DomainDatabaseEnum.CDD,
+    DomainDatabaseEnum.PANTHER,
+    DomainDatabaseEnum.HAMAP,
+    DomainDatabaseEnum.PFAM,
+    DomainDatabaseEnum.PIRSF,
+    DomainDatabaseEnum.PRINTS,
+    DomainDatabaseEnum.PROSITE_PROFILES,
+    DomainDatabaseEnum.PROSITE_PATTERNS,
+    DomainDatabaseEnum.SFLD,
+    DomainDatabaseEnum.SMART,
+    DomainDatabaseEnum.SUPERFAMILY,
+    DomainDatabaseEnum.TIGERFAMS,
+];
+
+function createDomainCheckbox(
+    _this: FunctionalPredictions,
+    currentDomainDatabase: DomainDatabaseEnum,
+    domainDatabases: DomainDatabaseEnum[],
+    topPadding: number,
+    leftPadding: number,
+    renderOptions: RenderOptions
+) {
+    if (_this.domainDatabaseList.includes(currentDomainDatabase.toString())) {
+        _this.currentDomainDatabase = currentDomainDatabase;
+    } else {
+        _this.currentDomainDatabase = undefined;
+    }
+
+    _this.currentDomainDatabaseDisabled = false;
+    if (!domainDatabases.includes(currentDomainDatabase)) {
+        _this.currentDomainDatabaseDisabled = true;
+    }
+
+    let rectObj: RectType;
+    let textObj: TextType;
+    let rect: fabric.Rect;
+    let text: fabric.Text;
+    [rect, text, rectObj, textObj] = drawDomainCheckbox(
+        {
+            currentDomainDatabase: _this.currentDomainDatabase,
+            currentDisabled: _this.currentDomainDatabaseDisabled,
+            fontSize: renderOptions.fontSize,
+        },
+        topPadding,
+        leftPadding,
+        currentDomainDatabase
+    );
+    _this.canvas.add(rect);
+    _this.canvas.add(text);
+    mouseOverDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
+    mouseOutDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
+    mouseDownDomainCheckbox(rect, currentDomainDatabase, _this);
+}
 
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
@@ -59,6 +111,8 @@ export class BasicCanvasRenderer {
     protected contentWidth: number;
     protected contentScoringWidth: number;
     protected contentLabelWidth: number;
+    protected contentLabelLeftWidth: number;
+    protected contentLabelRightWidth: number;
     protected scaleWidth: number;
     protected scaleLabelWidth: number;
     protected marginWidth: number;
@@ -89,6 +143,13 @@ export class BasicCanvasRenderer {
         renderOptions.contentLabelWidth != undefined
             ? (this.contentLabelWidth = renderOptions.contentLabelWidth)
             : (this.contentLabelWidth = (26.5 * this.canvasWidth) / 100);
+        renderOptions.contentLabelLeftWidth != undefined
+            ? (this.contentLabelLeftWidth = renderOptions.contentLabelLeftWidth)
+            : (this.contentLabelLeftWidth = (8.25 * this.canvasWidth) / 100);
+        renderOptions.contentLabelRightWidth != undefined
+            ? (this.contentLabelRightWidth =
+                  renderOptions.contentLabelRightWidth)
+            : (this.contentLabelRightWidth = (18.25 * this.canvasWidth) / 100);
         renderOptions.scaleWidth != undefined
             ? (this.scaleWidth = renderOptions.scaleWidth)
             : (this.scaleWidth = (75.0 * this.canvasWidth) / 100);
@@ -125,7 +186,7 @@ export class BasicCanvasRenderer {
         this.canvas = new fabric.Canvas(this.element, {
             defaultCursor: "default",
             moveCursor: "default",
-            hoverCursor: "default"
+            hoverCursor: "default",
         });
     }
 
@@ -139,7 +200,7 @@ export class BasicCanvasRenderer {
     }
 }
 
-export class VisualOutput extends BasicCanvasRenderer {
+export class FunctionalPredictions extends BasicCanvasRenderer {
     private topPadding: number = 0;
     private queryLen: number = 0;
     private subjLen: number = 0;
@@ -149,12 +210,17 @@ export class VisualOutput extends BasicCanvasRenderer {
     private startSubjPixels: number;
     private endSubjPixels: number;
     private gradientSteps: number[] = [];
-    private dataObj: SSSResultModel;
+    private sssDataObj: SSSResultModel;
+    private iprmcDataObj: IPRMCResultModel;
+    public currentDomainDatabase: DomainDatabaseEnum | undefined;
+    public uniqueDomainDatabases: DomainDatabaseEnum[] = [];
+    public currentDomainDatabaseDisabled: boolean = false;
 
     constructor(
         element: string | HTMLCanvasElement,
         private data: string,
-        renderOptions: RenderOptions
+        renderOptions: RenderOptions,
+        public domainDatabaseList: string[] = defaultDomainDatabaseList
     ) {
         super(element, renderOptions);
         this.validateInput();
@@ -162,15 +228,25 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
     public render() {
         this.loadData();
-        if (typeof this.dataObj !== "undefined") {
+        this.loadIPRMCdata();
+        if (
+            typeof this.sssDataObj !== "undefined" &&
+            typeof this.iprmcDataObj !== "undefined"
+        ) {
             this.loadInitalProperties();
             this.loadInitialCoords();
             // clear the canvas
             this.canvas.clear();
             // canvas header
             this.drawHeaderGroup();
+
             // canvas content
+            // TODO?
+            "Query Sequence View - Switch to Subject Sequence View";
+            "Subject Sequence View - Switch to Query Sequence View";
+            // this.dataObj.hits = [];
             this.drawContentGroup();
+
             // canvas footer
             this.drawFooterGroup();
             // finishing off
@@ -195,18 +271,18 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
 
     private loadData() {
-        const json = getDataFromURLorFile(this.data).then(data => data);
-        json.then(data => {
-            if (typeof this.dataObj === "undefined") {
-                this.dataObj = data as SSSResultModel;
+        const json = getDataFromURLorFile(this.data).then((data) => data);
+        json.then((data) => {
+            if (typeof this.sssDataObj === "undefined") {
+                this.sssDataObj = data as SSSResultModel;
                 this.render();
             }
-        }).catch(error => console.log(error));
+        }).catch((error) => console.log(error));
     }
 
     private loadInitalProperties() {
-        this.queryLen = this.dataObj.query_len;
-        for (const hit of this.dataObj.hits) {
+        this.queryLen = this.sssDataObj.query_len;
+        for (const hit of this.sssDataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
         }
     }
@@ -216,7 +292,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.startQueryPixels,
             this.endQueryPixels,
             this.startSubjPixels,
-            this.endSubjPixels
+            this.endSubjPixels,
         ] = getQuerySubjPixelCoords(
             this.queryLen,
             this.subjLen,
@@ -229,14 +305,63 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
     }
 
+    private loadIPRMCdata() {
+        let accessions: string = "";
+        for (const hit of this.sssDataObj.hits) {
+            if (accessions === "") accessions += `${hit.hit_acc}`;
+            else accessions += `,${hit.hit_acc}`;
+        }
+        //    const xmlURL = getIPRMCDbfetchURL(accessions);
+        //    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
+        //    xml.then((data) => {
+        //        if (typeof this.iprmcDataObj === "undefined") {
+        //            this.iprmcDataObj = parseXMLData(data);
+        //            this.render();
+        //        }
+        //    }).catch((error) => console.log(error));
+        // Temporarily to avoid hitting Dbfetch
+        const json = getDataFromURLorFile("./src/testdata/iprmc.json").then(
+            (data) => data
+        );
+        json.then((data) => {
+            if (typeof this.iprmcDataObj === "undefined") {
+                this.iprmcDataObj = data as IPRMCResultModel;
+                this.render();
+            }
+        }).catch((error) => console.log(error));
+
+        // disable domain checkboxes that have not predictions
+        if (this.iprmcDataObj != undefined) {
+            const domainPredictions: DomainDatabaseEnum[] = [];
+            for (const protein of this.iprmcDataObj["interpromatch"][
+                "protein"
+            ]) {
+                for (const match of protein["match"]) {
+                    if (match.ipr != undefined) {
+                        domainPredictions.push(DomainDatabaseEnum.INTERPRO);
+                    } else {
+                        domainPredictions.push(
+                            domainDatabaseNameToEnum(
+                                match._attributes["dbname"].toString()
+                            )
+                        );
+                    }
+                }
+            }
+            this.uniqueDomainDatabases = domainPredictions.filter(
+                (v, i, x) => x.indexOf(v) === i
+            );
+        }
+    }
+
     private drawHeaderGroup() {
         // canvas header
         this.topPadding = 2;
         const textHeaderGroup = drawHeaderTextGroup(
-            this.dataObj,
+            this.sssDataObj,
             {
                 fontSize: this.fontSize,
-                canvasWidth: this.canvasWidth
+                canvasWidth: this.canvasWidth,
             },
             this.topPadding
         );
@@ -247,70 +372,165 @@ export class VisualOutput extends BasicCanvasRenderer {
         let textHeaderLink: fabric.Text;
         let textSeqObj: TextType;
         [textHeaderLink, textSeqObj] = drawHeaderLinkText(
-            this.dataObj,
+            this.sssDataObj,
             { fontSize: this.fontSize },
             this.topPadding
         );
         this.canvas.add(textHeaderLink);
-        if (this.dataObj.query_url != null) {
+        if (this.sssDataObj.query_url != null) {
             mouseOverText(textHeaderLink, textSeqObj, this);
-            mouseDownText(textHeaderLink, this.dataObj.query_url, this);
+            mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
             mouseOutText(textHeaderLink, textSeqObj, this);
         }
     }
 
+    private drawPredictionsGroup() {
+        // Protein Features - Database Selection
+        const pfLabelText = drawProteinFeaturesText(
+            {
+                fontSize: this.fontSize,
+                scaleLabelWidth: this.scaleLabelWidth - 50,
+            },
+            this.topPadding
+        );
+        this.canvas.add(pfLabelText);
+
+        // display the domain checkboxes
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.INTERPRO,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 130,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PFAM,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 220,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.HAMAP,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 300,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PANTHER,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 400,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.SUPERFAMILY,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 510,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.SMART,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 640,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PROSITE_PROFILES,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 730,
+            { fontSize: this.fontSize }
+        );
+        this.topPadding += 30;
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.SFLD,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 130,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.CDD,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 220,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PRINTS,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 300,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.TIGERFAMS,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 400,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.CATHGENE3D,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 510,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PIRSF,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 640,
+            { fontSize: this.fontSize }
+        );
+        createDomainCheckbox(
+            this,
+            DomainDatabaseEnum.PROSITE_PATTERNS,
+            this.uniqueDomainDatabases,
+            this.topPadding,
+            this.contentLabelLeftWidth + 730,
+            { fontSize: this.fontSize }
+        );
+    }
+
     private drawContentGroup() {
-        if (this.dataObj.hits.length > 0) {
-            // content header
-            this.topPadding += 25;
-            const textContentHeaderGroup = drawContentHeaderTextGroup(
-                {
-                    queryLen: this.queryLen,
-                    subjLen: this.subjLen,
-                    startQueryPixels: this.startQueryPixels,
-                    startEvalPixels: this.startEvalPixels,
-                    startSubjPixels: this.startSubjPixels
-                },
-                {
-                    contentWidth: this.contentWidth,
-                    contentScoringWidth: this.contentScoringWidth,
-                    fontSize: this.fontSize,
-                    colorScheme: this.colorScheme
-                },
-                this.topPadding
-            );
-            this.canvas.add(textContentHeaderGroup);
+        // canvas content title
+        this.topPadding += 25;
+        let titleText: fabric.Text;
+        let textTitleObj: TextType;
+        [titleText, textTitleObj] = drawContentTitleText(
+            {
+                fontSize: this.fontSize + 1,
+            },
+            this.topPadding
+        );
+        this.canvas.add(titleText);
 
-            // content header line tracks
-            this.topPadding += 20;
-            const lineTrackGroup = drawLineTracks(
-                {
-                    startQueryPixels: this.startQueryPixels,
-                    endQueryPixels: this.endQueryPixels,
-                    startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels
-                },
-                { strokeWidth: 2 },
-                this.topPadding
-            );
-            this.canvas.add(lineTrackGroup);
+        // canvas dynamic content
+        if (this.sssDataObj.hits.length > 0) {
+            // domain selection
+            this.topPadding += 35;
+            this.drawPredictionsGroup();
 
-            this.topPadding += 5;
-            const textContentFooterGroup = drawContentFooterTextGroup(
-                {
-                    queryLen: this.queryLen,
-                    subjLen: this.subjLen,
-                    startQueryPixels: this.startQueryPixels,
-                    endQueryPixels: this.endQueryPixels,
-                    startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels
-                },
-                {
-                    fontSize: this.fontSize
-                },
-                this.topPadding
-            );
-            this.canvas.add(textContentFooterGroup);
+            // query sequence
 
             // dynamic content
             this.topPadding += 25;
@@ -320,26 +540,41 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.topPadding += 20;
             this.drawColorScaleGroup();
         } else {
-            // text content: "No hits found!"
+            // text content: "No predictions found!"
             this.topPadding += 20;
             const noHitsTextGroup = drawNoHitsFoundText(
                 {
                     fontSize: this.fontSize,
-                    contentWidth: this.contentWidth
+                    contentWidth: this.contentWidth,
                 },
                 this.topPadding
             );
             this.canvas.add(noHitsTextGroup);
         }
+
+        // canvas content suppressed output
+        this.topPadding += 30;
+        let supressText: fabric.Text;
+        let textSupressObj: TextType;
+        [supressText, textSupressObj] = drawContentSupressText(
+            {
+                fontSize: this.fontSize,
+                contentWidth: this.contentWidth,
+            },
+            this.topPadding
+        );
+        this.canvas.add(supressText);
     }
 
     private drawDynamicContentGroup() {
+        // draw a new track group per hit
+        // only display 30? hits
         // draw a new track per hsp for each hit
         // only display 10 hsps per hit
-        const queryLen: number = this.dataObj.query_len;
+        const queryLen: number = this.sssDataObj.query_len;
         let subjLen: number = 0;
         let maxIDLen: number = 0;
-        for (const hit of this.dataObj.hits) {
+        for (const hit of this.sssDataObj.hits) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
@@ -347,7 +582,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         let minScore: number = Number.MAX_VALUE;
         let maxScore: number = 0;
         let minNotZeroScore: number = Number.MAX_VALUE;
-        for (const hit of this.dataObj.hits) {
+        for (const hit of this.sssDataObj.hits) {
             for (const hsp of hit.hit_hsps) {
                 if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                     if (hsp.hsp_bit_score! < minScore)
@@ -386,186 +621,6 @@ export class VisualOutput extends BasicCanvasRenderer {
                 this.colorScheme
             );
         }
-
-        for (const hit of this.dataObj.hits) {
-            let numberHsps: number = 0;
-            const totalNumberHsps: number = hit.hit_hsps.length;
-            // Hit ID + Hit Description text tracks
-            let textObj: TextType;
-            let spaceText, hitText: fabric.Text;
-            [spaceText, hitText, textObj] = drawContentSequenceInfoText(
-                maxIDLen,
-                hit,
-                { fontSize: this.fontSize },
-                this.topPadding
-            );
-            this.canvas.add(spaceText);
-            this.canvas.add(hitText);
-            mouseOverText(hitText, textObj, this);
-            mouseDownText(hitText, hit.hit_url, this);
-            mouseOutText(hitText, textObj, this);
-            for (const hsp of hit.hit_hsps) {
-                numberHsps++;
-                if (numberHsps > this.numberHsps) {
-                    if (this.logSkippedHsps === true) {
-                        const hspTextNotice = drawHspNoticeText(
-                            totalNumberHsps,
-                            this.numberHsps,
-                            {
-                                fontSize: this.fontSize,
-                                contentWidth: this.contentWidth
-                            },
-                            this.topPadding
-                        );
-                        this.canvas.add(hspTextNotice);
-                        this.topPadding += 20;
-                    }
-                    break;
-                } else {
-                    // line Tracks
-                    const subjHspLen: number = hit.hit_len;
-                    let startQueryPixels: number;
-                    let endQueryPixels: number;
-                    let startSubjPixels: number;
-                    let endSubjPixels: number;
-                    [
-                        startQueryPixels,
-                        endQueryPixels,
-                        startSubjPixels,
-                        endSubjPixels
-                    ] = getQuerySubjPixelCoords(
-                        queryLen,
-                        subjLen,
-                        subjHspLen,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.contentLabelWidth,
-                        this.marginWidth
-                    );
-
-                    this.topPadding += 5;
-                    const linesGroup = drawLineTracks(
-                        {
-                            startQueryPixels: startQueryPixels,
-                            endQueryPixels: endQueryPixels,
-                            startSubjPixels: startSubjPixels,
-                            endSubjPixels: endSubjPixels
-                        },
-                        { strokeWidth: 1 },
-                        this.topPadding
-                    );
-                    this.canvas.add(linesGroup);
-
-                    // domain tracks
-                    let startQueryHspPixels: number;
-                    let endQueryHspPixels: number;
-                    let startSubjHspPixels: number;
-                    let endSubjHspPixels: number;
-                    const hspQueryStart: number = hsp.hsp_query_from;
-                    const hspQueryEnd: number = hsp.hsp_query_to;
-                    const hspSubjStart: number = hsp.hsp_hit_from;
-                    const hspSubjEnd: number = hsp.hsp_hit_to;
-                    [
-                        startQueryHspPixels,
-                        endQueryHspPixels
-                    ] = getHspPixelCoords(
-                        queryLen,
-                        subjLen,
-                        queryLen,
-                        startQueryPixels,
-                        hspQueryStart,
-                        hspQueryEnd,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.marginWidth
-                    );
-                    [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
-                        queryLen,
-                        subjLen,
-                        subjHspLen,
-                        startSubjPixels,
-                        hspSubjStart,
-                        hspSubjEnd,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.marginWidth
-                    );
-                    let color: string;
-                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-                        color = getRgbColorFixed(
-                            hsp.hsp_bit_score!,
-                            this.gradientSteps,
-                            ncbiBlastGradient
-                        );
-                    } else {
-                        color = getRgbColorGradient(
-                            hsp.hsp_expect!,
-                            this.gradientSteps,
-                            defaultGradient
-                        );
-                    }
-                    this.topPadding += 10;
-                    let queryDomain, subjDomain: fabric.Rect;
-                    [queryDomain, subjDomain] = drawDomainTracks(
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                        startSubjHspPixels,
-                        endSubjHspPixels,
-                        this.topPadding,
-                        color
-                    );
-                    this.canvas.add(queryDomain);
-                    this.canvas.add(subjDomain);
-
-                    // E-value text tracks
-                    const scoreText = drawScoreText(
-                        this.startEvalPixels,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
-                        },
-                        this.topPadding
-                    );
-                    scoreText.width = this.contentScoringWidth;
-                    this.canvas.add(scoreText);
-
-                    // Query tooltip
-                    const queryTooltipGroup = drawDomainTooltips(
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                        hsp.hsp_query_from,
-                        hsp.hsp_query_to,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
-                        },
-                        this.topPadding
-                    );
-                    this.canvas.add(queryTooltipGroup);
-                    mouseOverDomain(queryDomain, queryTooltipGroup, this);
-                    mouseOutDomain(queryDomain, queryTooltipGroup, this);
-
-                    // Subject tooltip
-                    const subjTooltipGroup = drawDomainTooltips(
-                        startSubjHspPixels,
-                        endSubjHspPixels,
-                        hsp.hsp_hit_from,
-                        hsp.hsp_hit_to,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme
-                        },
-                        this.topPadding
-                    );
-                    this.canvas.add(subjTooltipGroup);
-                    mouseOverDomain(subjDomain, subjTooltipGroup, this);
-                    mouseOutDomain(subjDomain, subjTooltipGroup, this);
-                }
-            }
-        }
     }
 
     private drawColorScaleGroup() {
@@ -573,7 +628,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         const scaleTypeText = drawScaleTypeText(
             {
                 fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth
+                scaleLabelWidth: this.scaleLabelWidth,
             },
             this.topPadding
         );
@@ -596,12 +651,12 @@ export class VisualOutput extends BasicCanvasRenderer {
             textCheckFixObj,
             ncbiblastBoxText,
             ncbiblastText,
-            textCheckNcbiObj
+            textCheckNcbiObj,
         ] = drawCheckBoxText(
             {
                 colorScheme: this.colorScheme,
                 fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth
+                scaleLabelWidth: this.scaleLabelWidth,
             },
             this.topPadding
         );
@@ -644,7 +699,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             {
                 fontSize: this.fontSize,
                 scaleLabelWidth: this.scaleLabelWidth,
-                colorScheme: this.colorScheme
+                colorScheme: this.colorScheme,
             },
             this.topPadding
         );
@@ -655,7 +710,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             {
                 scaleWidth: this.scaleWidth,
                 scaleLabelWidth: this.scaleLabelWidth,
-                colorScheme: this.colorScheme
+                colorScheme: this.colorScheme,
             },
             this.topPadding
         );
@@ -690,7 +745,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 {
                     fontSize: this.fontSize,
                     scaleWidth: this.scaleWidth,
-                    scaleLabelWidth: this.scaleLabelWidth
+                    scaleLabelWidth: this.scaleLabelWidth,
                 },
                 this.topPadding
             );
@@ -721,7 +776,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 {
                     fontSize: this.fontSize,
                     scaleWidth: this.scaleWidth,
-                    scaleLabelWidth: this.scaleLabelWidth
+                    scaleLabelWidth: this.scaleLabelWidth,
                 },
                 this.topPadding
             );
@@ -735,7 +790,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         let textFooterObj: TextType;
         [copyrightText, textFooterObj] = drawFooterText(
             {
-                fontSize: this.fontSize
+                fontSize: this.fontSize,
             },
             this.topPadding
         );
@@ -754,7 +809,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             // final canvas wrapper stroke
             const canvasWrapper = drawCanvasWrapperStroke({
                 canvasWidth: this.canvasWidth,
-                canvasHeight: this.canvasHeight
+                canvasHeight: this.canvasHeight,
             });
             this.canvas.add(canvasWrapper);
         }

@@ -11,8 +11,12 @@ import {
     RenderOptions,
     CoordsValues,
     ColorSchemeEnum,
-    TextType
+    TextType,
+    RectType,
+    DomainDatabaseEnum,
 } from "./custom-types";
+import { colorByDatabaseName } from "./color-utilities";
+
 
 export function drawHeaderTextGroup(
     dataObj: SSSResultModel,
@@ -899,4 +903,83 @@ export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {
         fill: "transparent"
     });
     return canvasWrapper;
+}
+
+export function drawContentTitleText(
+    renderOptions: RenderOptions,
+    topPadding: number
+): [fabric.Text, TextType] {
+    const textObj = { ...textDefaults };
+    textObj.fontWeight = "bold";
+    textObj.fontSize = renderOptions.fontSize! + 2;
+    textObj.top = topPadding;
+    textObj.left = 375;
+    const title = "Fast Family and Domain Prediction";
+    const titleText = new fabric.Text(`${title}`, textObj);
+    return [titleText, textObj];
+}
+
+export function drawContentSupressText(
+    renderOptions: RenderOptions,
+    topPadding: number
+): [fabric.Text, TextType] {
+    const textObj = { ...textDefaults };
+    textObj.fontSize = renderOptions.fontSize!;
+    textObj.top = topPadding;
+    textObj.left = renderOptions.contentWidth! / 2;
+    textObj.fill = "red";
+    const title =
+        "This is a partial representation of the result, only the first hits are displayed";
+    const titleText = new fabric.Text(`${title}`, textObj);
+    return [titleText, textObj];
+}
+
+export function drawProteinFeaturesText(
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Text {
+    const textSelObj = { ...textDefaults };
+    textSelObj.fontSize = renderOptions.fontSize! + 1;
+    textSelObj.fontWeight = "bold";
+    textSelObj.top = topPadding;
+    textSelObj.left = renderOptions.scaleLabelWidth! - 75;
+    const scaleTypeText = new fabric.Text("Select your database:", textSelObj);
+    return scaleTypeText;
+}
+
+export function drawDomainCheckbox(
+    renderOptions: RenderOptions,
+    topPadding: number,
+    leftPadding: number,
+    currentDomainDatabase: DomainDatabaseEnum
+): [fabric.Rect, fabric.Text, RectType, TextType] {
+    const rectObj = { ...rectDefaults };
+    rectObj.top = topPadding;
+    rectObj.left = leftPadding;
+    rectObj.height = 15;
+    rectObj.width = 15;
+    rectObj.evented = true;
+    const textObj = { ...textDefaults };
+    textObj.fontSize = renderOptions.fontSize! + 1;
+    textObj.top = topPadding;
+    textObj.left = leftPadding + 20;
+
+    if (renderOptions.currentDisabled) {
+        textObj.fill = "grey";
+        rectObj.fill = "white";
+        rectObj.stroke = "grey";
+    } else if (renderOptions.currentDomainDatabase !== undefined) {
+        rectObj.fill = colorByDatabaseName(renderOptions.currentDomainDatabase);
+        rectObj.stroke = "black";
+    } else {
+        rectObj.fill = "white";
+        rectObj.stroke = "grey";
+    }
+
+    const proteinFeatureRect = new fabric.Rect(rectObj);
+    const proteinFeatureText = new fabric.Text(
+        currentDomainDatabase.toString(),
+        textObj
+    );
+    return [proteinFeatureRect, proteinFeatureText, rectObj, rectObj];
 }

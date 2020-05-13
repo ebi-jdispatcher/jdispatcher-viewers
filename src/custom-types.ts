@@ -47,6 +47,8 @@ export interface RenderOptions {
     contentWidth?: number; // Vizualisation
     contentScoringWidth?: number; // Scoring information
     contentLabelWidth?: number; // Sequence information
+    contentLabelLeftWidth?: number; // Sequence/Domain information
+    contentLabelRightWidth?: number; // Sequence/Domain information
     scaleWidth?: number; // Color Scale
     scaleLabelWidth?: number; // Color score information
     marginWidth?: number; // Space around different objects

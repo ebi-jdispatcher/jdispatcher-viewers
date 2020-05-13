@@ -1,6 +1,6 @@
 import { xml2json } from "xml-js";
 import { SSSResultModel, IPRMCResultModel } from "./data-model";
-import { JobIdValitable } from "./custom-types";
+import { JobIdValitable, DomainDatabaseEnum } from "./custom-types";
 
 function countDecimals(n: number) {
     if (Math.floor(n) === n) return 0;
@@ -22,7 +22,7 @@ export function numberToString(n: number) {
 
 export async function getDataFromURLorFile(
     dataLoc: string
-): Promise<SSSResultModel> {
+): Promise<SSSResultModel | IPRMCResultModel> {
     const request = new Request(dataLoc);
     try {
         return fetch(request).then(response => {
@@ -98,7 +98,7 @@ export function parseXMLData(data: string): IPRMCResultModel {
     return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
 }
 
-export function domainNameToEnum(
+export function domainDatabaseNameToEnum(
     domainName: string
 ): DomainDatabaseEnum {
     domainName = domainName.toUpperCase();
