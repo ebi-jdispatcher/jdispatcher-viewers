@@ -61,6 +61,7 @@ export interface RenderOptions {
     fontFamily?: string;
     canvasWrapperStroke?: boolean;
     strokeWidth?: number;
+    strokeDashArray?: [number, number];
     currentDomainDatabase?: DomainDatabaseEnum | undefined;
     currentColor?: string;
     currentDisabled?: boolean;
@@ -150,6 +151,14 @@ export interface CoordsValues {
     queryLen?: number;
     subjLen?: number;
     subjHspLen?: number;
+    start?: number;
+    end?: number;
+    queryStart?: number;
+    queryEnd?: number;
+    subjStart?: number;
+    subjEnd?: number;
+    startPixels?: number;
+    endPixels?: number;
     startQueryPixels?: number;
     endQueryPixels?: number;
     startEvalPixels?: number;

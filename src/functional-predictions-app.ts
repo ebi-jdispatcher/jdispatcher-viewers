@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { SSSResultModel, IPRMCResultModel, Protein } from "./data-model";
-import { getQuerySubjPixelCoords } from "./coords-utilities";
+import { getQuerySubjPixelCoords, getPixelCoords } from "./coords-utilities";
 import { getGradientSteps } from "./color-utilities";
 import {
     getDataFromURLorFile,
@@ -45,6 +45,10 @@ import {
     drawContentSupressText,
     drawProteinFeaturesText,
     drawDomainCheckbox,
+    drawLineTracks,
+    drawContentFooterTextGroup,
+    drawContentSequenceInfoText,
+    drawDomainLineTracks,
 } from "./drawing-utilities";
 
 const defaultDomainDatabaseList = [
@@ -135,7 +139,7 @@ export class BasicCanvasRenderer {
             : (this.canvasHeight = 110);
         renderOptions.contentWidth != undefined
             ? (this.contentWidth = renderOptions.contentWidth)
-            : (this.contentWidth = (65.5 * this.canvasWidth) / 100);
+            : (this.contentWidth = (72.5 * this.canvasWidth) / 100);
         renderOptions.contentScoringWidth != undefined
             ? (this.contentScoringWidth = renderOptions.contentScoringWidth)
             : (this.contentScoringWidth = (7.0 * this.canvasWidth) / 100);
@@ -200,6 +204,10 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private topPadding: number = 0;
     private queryLen: number = 0;
     private subjLen: number = 0;
+    private queryStart: number = 0;
+    private queryEnd: number = 0;
+    private startPixels: number;
+    private endPixels: number;
     private startQueryPixels: number;
     private endQueryPixels: number;
     private startEvalPixels: number;
@@ -277,6 +285,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     }
 
     private loadInitalProperties() {
+        this.queryStart = 1;
+        this.queryEnd = this.sssDataObj.query_len;
         this.queryLen = this.sssDataObj.query_len;
         for (const hit of this.sssDataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
@@ -284,6 +294,11 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     }
 
     private loadInitialCoords() {
+        [this.startPixels, this.endPixels] = getPixelCoords(
+            this.contentWidth,
+            this.contentLabelWidth,
+            this.marginWidth
+        );
         [
             this.startQueryPixels,
             this.endQueryPixels,
@@ -326,7 +341,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             }
         }).catch((error) => console.log(error));
 
-        // disable domain checkboxes that have not predictions
+        // disable domain checkboxes that have no predictions
         if (this.iprmcDataObj != undefined) {
             const domainPredictions: DomainDatabaseEnum[] = [];
             for (const protein of this.iprmcDataObj["interpromatch"][
@@ -378,6 +393,80 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
             mouseOutText(textHeaderLink, textSeqObj, this);
         }
+    }
+
+    private drawContentGroup() {
+        // canvas content title
+        this.topPadding += 25;
+        let titleText: fabric.Text;
+        let textTitleObj: TextType;
+        [titleText, textTitleObj] = drawContentTitleText(
+            {
+                fontSize: this.fontSize + 1,
+            },
+            this.topPadding
+        );
+        this.canvas.add(titleText);
+
+        // canvas dynamic content
+        if (this.sssDataObj.hits.length > 0) {
+            // domain selection
+            this.topPadding += 35;
+            this.drawPredictionsGroup();
+
+            // query/subj sequence
+            this.topPadding += 25;
+            this.drawContentHeader();
+
+            // dynamic content
+            this.topPadding += 25;
+            this.drawDynamicContentGroup();
+
+            // color scale
+            this.topPadding += 35;
+            this.drawColorScaleGroup();
+        } else {
+            // text content: "No predictions found!"
+            this.topPadding += 20;
+            const noHitsTextGroup = drawNoHitsFoundText(
+                {
+                    fontSize: this.fontSize,
+                    contentWidth: this.contentWidth,
+                },
+                this.topPadding
+            );
+            this.canvas.add(noHitsTextGroup);
+        }
+    }
+
+    private drawContentHeader() {
+        // query sequence tracks
+        this.topPadding += 20;
+        // content header line tracks
+        const lineTrackGroup = drawLineTracks(
+            {
+                startPixels: this.startPixels,
+                endPixels: this.endPixels,
+            },
+            { strokeWidth: 2 },
+            this.topPadding
+        );
+        this.canvas.add(lineTrackGroup);
+        // content header line track legends
+        this.topPadding += 5;
+        const textContentFooterGroup = drawContentFooterTextGroup(
+            {
+                start: this.queryStart,
+                end: this.queryEnd,
+                startPixels: this.startPixels,
+                endPixels: this.endPixels,
+            },
+            {
+                fontSize: this.fontSize,
+            },
+            this.topPadding
+        );
+        this.canvas.add(textContentFooterGroup);
     }
 
     private drawPredictionsGroup() {
@@ -507,66 +596,10 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         );
     }
 
-    private drawContentGroup() {
-        // canvas content title
-        this.topPadding += 25;
-        let titleText: fabric.Text;
-        let textTitleObj: TextType;
-        [titleText, textTitleObj] = drawContentTitleText(
-            {
-                fontSize: this.fontSize + 1,
-            },
-            this.topPadding
-        );
-        this.canvas.add(titleText);
-
-        // canvas dynamic content
-        if (this.sssDataObj.hits.length > 0) {
-            // domain selection
-            this.topPadding += 35;
-            this.drawPredictionsGroup();
-
-            // query sequence
-
-            // dynamic content
-            this.topPadding += 25;
-            this.drawDynamicContentGroup();
-
-            // color scale
-            this.topPadding += 20;
-            this.drawColorScaleGroup();
-        } else {
-            // text content: "No predictions found!"
-            this.topPadding += 20;
-            const noHitsTextGroup = drawNoHitsFoundText(
-                {
-                    fontSize: this.fontSize,
-                    contentWidth: this.contentWidth,
-                },
-                this.topPadding
-            );
-            this.canvas.add(noHitsTextGroup);
-        }
-
-        // canvas content suppressed output
-        this.topPadding += 30;
-        let supressText: fabric.Text;
-        let textSupressObj: TextType;
-        [supressText, textSupressObj] = drawContentSupressText(
-            {
-                fontSize: this.fontSize,
-                contentWidth: this.contentWidth,
-            },
-            this.topPadding
-        );
-        this.canvas.add(supressText);
-    }
-
     private drawDynamicContentGroup() {
         // draw a new track group per hit
-        // only display 30? hits
-        // draw a new track per hsp for each hit
-        // only display 10 hsps per hit
+        // only display 30 hits by default
+        // draw only one HSP per hit
         const queryLen: number = this.sssDataObj.query_len;
         let subjLen: number = 0;
         let maxIDLen: number = 0;
@@ -616,6 +649,85 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 minNotZeroScore,
                 this.colorScheme
             );
+        }
+        let tmpNumberHits = 0;
+        for (const hit of this.sssDataObj.hits) {
+            tmpNumberHits++;
+            if (tmpNumberHits <= this.numberHits) {
+                // Hit ID + Hit Description text tracks
+                let textObj: TextType;
+                let spaceText, hitText: fabric.Text;
+                [spaceText, hitText, textObj] = drawContentSequenceInfoText(
+                    maxIDLen,
+                    hit,
+                    { fontSize: this.fontSize },
+                    this.topPadding
+                );
+                this.canvas.add(spaceText);
+                this.canvas.add(hitText);
+                mouseOverText(hitText, textObj, this);
+                mouseDownText(hitText, hit.hit_url, this);
+                mouseOutText(hitText, textObj, this);
+
+                // subject line tracks
+                const lineTrackGroup = drawLineTracks(
+                    {
+                        startPixels: this.startPixels,
+                        endPixels: this.endPixels,
+                    },
+                    { strokeWidth: 1},
+                    this.topPadding
+                );
+                this.canvas.add(lineTrackGroup);
+                
+                // subject line tracks - legends
+                this.topPadding += 5;
+                const textContentFooterGroup = drawContentFooterTextGroup(
+                    {
+                        start: this.queryStart,
+                        end: hit.hit_len,
+                        startPixels: this.startPixels,
+                        endPixels: this.endPixels,
+                    },
+                    {
+                        fontSize: this.fontSize,
+                    },
+                    this.topPadding
+                );
+                this.canvas.add(textContentFooterGroup);
+
+                // domain predictions
+                this.topPadding +=10;
+                for (const dp of this.uniqueDomainDatabases) {
+                    this.topPadding += 10;
+                    let dashedLineTrackGroup = drawDomainLineTracks(
+                        {
+                            startPixels: this.startPixels,
+                            endPixels: this.endPixels,
+                        },
+                        { strokeWidth: 1, strokeDashArray: [1, 5] },
+                        this.topPadding
+                    );
+                    this.canvas.add(dashedLineTrackGroup);
+                }
+
+                // final padding
+                this.topPadding += 20;
+            } else {
+                // canvas content suppressed output
+                let supressText: fabric.Text;
+                let textSupressObj: TextType;
+                [supressText, textSupressObj] = drawContentSupressText(
+                    {
+                        fontSize: this.fontSize,
+                        contentWidth: this.contentWidth,
+                    },
+                    this.topPadding,
+                    this.numberHits
+                );
+                this.canvas.add(supressText);
+                break;
+            }
         }
     }
 

@@ -32,11 +32,11 @@ import {
     drawHeaderTextGroup,
     drawHeaderLinkText,
     drawContentHeaderTextGroup,
-    drawLineTracks,
+    drawLineTracksQuerySubject,
     drawContentSequenceInfoText,
     drawHspNoticeText,
     drawScoreText,
-    drawContentFooterTextGroup,
+    drawContentQuerySubjFooterTextGroup,
     drawNoHitsFoundText,
     drawDomainTracks,
     drawDomainTooltips,
@@ -283,7 +283,7 @@ export class VisualOutput extends BasicCanvasRenderer {
 
             // content header line tracks
             this.topPadding += 20;
-            const lineTrackGroup = drawLineTracks(
+            const lineTrackGroup = drawLineTracksQuerySubject(
                 {
                     startQueryPixels: this.startQueryPixels,
                     endQueryPixels: this.endQueryPixels,
@@ -296,7 +296,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.canvas.add(lineTrackGroup);
 
             this.topPadding += 5;
-            const textContentFooterGroup = drawContentFooterTextGroup(
+            const textContentFooterGroup = drawContentQuerySubjFooterTextGroup(
                 {
                     queryLen: this.queryLen,
                     subjLen: this.subjLen,
@@ -444,7 +444,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     );
 
                     this.topPadding += 5;
-                    const linesGroup = drawLineTracks(
+                    const linesGroup = drawLineTracksQuerySubject(
                         {
                             startQueryPixels: startQueryPixels,
                             endQueryPixels: endQueryPixels,

@@ -25,6 +25,16 @@ export function getTotalPixels(
     return totalPixels;
 }
 
+export function getPixelCoords(
+    contentWidth: number,
+    contentLabelWidth: number,
+    marginWidth: number
+) {
+    const startPixels = contentLabelWidth + marginWidth;
+    const endPixels = contentLabelWidth + contentWidth - marginWidth;
+    return [startPixels, endPixels];
+}
+
 export function getQuerySubjPixelCoords(
     queryLen: number,
     subjLen: number,

@@ -144,7 +144,7 @@ export function drawContentHeaderTextGroup(
     return textGroup;
 }
 
-export function drawLineTracks(
+export function drawLineTracksQuerySubject(
     coordValues: CoordsValues,
     renderOptions: RenderOptions,
     topPadding: number
@@ -225,7 +225,94 @@ export function drawLineTracks(
     return lineGroup;
 }
 
+export function drawLineTracks(
+    coordValues: CoordsValues,
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Group {
+    const lineObj = { ...lineDefaults };
+    lineObj.top = topPadding;
+    lineObj.stroke = "black";
+    lineObj.strokeWidth = renderOptions.strokeWidth;
+    //  Query/Subject
+    const coordsQuery: [number, number, number, number] = [
+        coordValues.startPixels!,
+        topPadding,
+        coordValues.endPixels!,
+        topPadding,
+    ];
+    lineObj.left = coordValues.startPixels;
+    const Line = new fabric.Line(coordsQuery, lineObj);
+
+    const coordsStartCap: [number, number, number, number] = [
+        coordValues.startPixels!,
+        topPadding - 3,
+        coordValues.startPixels!,
+        topPadding + 3,
+    ];
+    lineObj.top = topPadding - 2;
+    const startCap = new fabric.Line(coordsStartCap, lineObj);
+
+    const coordsEndCap: [number, number, number, number] = [
+        coordValues.endPixels!,
+        topPadding - 3,
+        coordValues.endPixels!,
+        topPadding + 3,
+    ];
+    lineObj.left = coordValues.endPixels;
+    const endCap = new fabric.Line(coordsEndCap, lineObj);
+
+    // Group
+    const lineGroup = new fabric.Group(
+        [Line, startCap, endCap],
+        objectDefaults
+    );
+    return lineGroup;
+}
+
+export function drawDomainLineTracks(
+    coordValues: CoordsValues,
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Line {
+    const lineObj = { ...lineDefaults };
+    lineObj.top = topPadding;
+    lineObj.stroke = "black";
+    lineObj.strokeWidth = renderOptions.strokeWidth;
+    lineObj.strokeDashArray = renderOptions.strokeDashArray;
+    //  Query/Subject
+    const coordsQuery: [number, number, number, number] = [
+        coordValues.startPixels!,
+        topPadding,
+        coordValues.endPixels!,
+        topPadding,
+    ];
+    lineObj.left = coordValues.startPixels;
+    return new fabric.Line(coordsQuery, lineObj);
+}
+
 export function drawContentFooterTextGroup(
+    coordValues: CoordsValues,
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Group {
+    const textObj = { ...textDefaults };
+    textObj.fontSize = renderOptions.fontSize;
+    textObj.top = topPadding;
+    // Start Query/Subject
+    textObj.left = coordValues.startPixels! - 2.5;
+    const startText = new fabric.Text(`${coordValues.start}`, textObj);
+    // End Query/Subject
+    let positionFactor: number = getTextLegendPaddingFactor(
+        `${coordValues.end}`
+    );
+    textObj.left = coordValues.endPixels! - positionFactor;
+    const endText = new fabric.Text(`${coordValues.end}`, textObj);
+    const textGroup = new fabric.Group([startText, endText], objectDefaults);
+    return textGroup;
+}
+
+export function drawContentQuerySubjFooterTextGroup(
     coordValues: CoordsValues,
     renderOptions: RenderOptions,
     topPadding: number
@@ -929,7 +1016,7 @@ export function drawContentSupressText(
     textObj.left = renderOptions.contentWidth! / 2;
     textObj.fill = "red";
     const title =
-        "This is a partial representation of the result, only the first hits are displayed";
+        `This is a partial representation of the result, only the first ${numberHits} hits are displayed`;
     const titleText = new fabric.Text(`${title}`, textObj);
     return [titleText, textObj];
 }
