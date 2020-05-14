@@ -1,5 +1,9 @@
 import { fabric } from "fabric";
-import { SSSResultModel, IPRMCResultModel, Protein } from "./data-model";
+import {
+    SSSResultModel,
+    IPRMCResultModel,
+    IPRMCResultModelFlat,
+} from "./data-model";
 import { getQuerySubjPixelCoords, getPixelCoords } from "./coords-utilities";
 import { getGradientSteps } from "./color-utilities";
 import {
@@ -7,6 +11,7 @@ import {
     validateJobId,
     getServiceURLfromJobId,
     getUniqueIPRMCDomainDatabases,
+    getFlattenIPRMCDataModel,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -216,6 +221,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private gradientSteps: number[] = [];
     private sssDataObj: SSSResultModel;
     private iprmcDataObj: IPRMCResultModel;
+    private iprmcDataFlatObj: IPRMCResultModelFlat = {};
     public currentDomainDatabase: DomainDatabaseEnum | undefined;
     public uniqueDomainDatabases: DomainDatabaseEnum[] = [];
     public currentDomainDatabaseDisabled: boolean = false;
@@ -342,9 +348,14 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         }).catch((error) => console.log(error));
 
         // disable domain checkboxes that have no predictions
+        // and get 'workable' IPRMC data structure
         if (this.iprmcDataObj != undefined) {
             this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
                 this.iprmcDataObj
+            );
+            this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
+                this.iprmcDataObj,
+                this.numberHits
             );
         }
     }

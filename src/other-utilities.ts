@@ -1,5 +1,11 @@
 import { xml2json } from "xml-js";
-import { SSSResultModel, IPRMCResultModel } from "./data-model";
+import {
+    SSSResultModel,
+    IPRMCResultModel,
+    IPRMCResultModelFlat,
+    IprMatchesFlat,
+    IprMatchFlat,
+} from "./data-model";
 import { JobIdValitable, DomainDatabaseEnum } from "./custom-types";
 
 function countDecimals(n: number) {
@@ -156,4 +162,72 @@ export function getUniqueIPRMCDomainDatabases(dataObj: IPRMCResultModel) {
         }
     }
     return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
+}
+
+export function getFlattenIPRMCDataModel(
+    dataObj: IPRMCResultModel,
+    numberHits: number
+): IPRMCResultModelFlat {
+    let tmpNumberHits = 0;
+    let iprmcDataFlatObj: IPRMCResultModelFlat = {};
+    for (const protein of dataObj["interpromatch"]["protein"]) {
+        tmpNumberHits++;
+        if (tmpNumberHits <= numberHits) {
+            let matchObjs: IprMatchesFlat = {};
+            for (const match of protein["match"]) {
+                let matchObj: IprMatchFlat = {};
+                if (match.ipr != undefined) {
+                    if (!(match.ipr._attributes.id in matchObjs)) {
+                        matchObjs[match.ipr._attributes.id] = [];
+                    }
+                    matchObj = {
+                        id: match.ipr._attributes.id,
+                        name: match.ipr._attributes.name,
+                        dbname: "InterPro",
+                        type: match.ipr._attributes.type,
+                        altid: match._attributes.id,
+                        altname: match._attributes.name,
+                        altdbname: match._attributes.dbname,
+                        status: match._attributes.status,
+                        model: match._attributes.model,
+                        evd: match._attributes.evd,
+                        start: match.lcn._attributes.start,
+                        end: match.lcn._attributes.end,
+                        fragments: match.lcn._attributes.fragments,
+                        score: match.lcn._attributes.fragments,
+                    };
+                    matchObjs[match.ipr._attributes.id].push(matchObj);
+                } else {
+                    if (!(match._attributes.id in matchObjs)) {
+                        matchObjs[match._attributes.id] = [];
+                    }
+                    matchObj = {
+                        id: match._attributes.id,
+                        name: match._attributes.name,
+                        dbname: match._attributes.dbname,
+                        status: match._attributes.status,
+                        model: match._attributes.model,
+                        evd: match._attributes.evd,
+                        type: "Unclassified",
+                        start: match.lcn._attributes.start,
+                        end: match.lcn._attributes.end,
+                        fragments: match.lcn._attributes.fragments,
+                        score: match.lcn._attributes.fragments,
+                    };
+                    matchObjs[match._attributes.id].push(matchObj);
+                }
+            }
+            iprmcDataFlatObj[protein._attributes.id] = {
+                id: protein._attributes.id,
+                name: protein._attributes.name,
+                length: protein._attributes.length,
+                match: matchObjs,
+            };
+        } else {
+            console.log(
+                `Skipping protein as number of hits has reached ${numberHits}`
+            );
+        }
+    }
+    return iprmcDataFlatObj;
 }

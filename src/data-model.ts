@@ -234,3 +234,22 @@ export interface DbinfoAttributes {
     entry_count: string;
     file_date: string;
 }
+
+export interface IPRMCResultModelFlat {
+    [key: string]: IPRMCFlat;
+}
+
+interface IPRMCFlat {
+    id: string;
+    name: string;
+    length: string;
+    match: IprMatchesFlat;
+}
+
+export interface IprMatchesFlat {
+    [key: string]: IprMatchFlat[];
+}
+
+export interface IprMatchFlat {
+    [key: string]: string | undefined;
+}
