@@ -139,3 +139,21 @@ export function domainDatabaseNameToEnum(
     }
     return domainNameEnum;
 }
+
+export function getUniqueIPRMCDomainDatabases(dataObj: IPRMCResultModel) {
+    const domainPredictions: DomainDatabaseEnum[] = [];
+    for (const protein of dataObj["interpromatch"]["protein"]) {
+        for (const match of protein["match"]) {
+            if (match.ipr != undefined) {
+                domainPredictions.push(DomainDatabaseEnum.INTERPRO);
+            } else {
+                domainPredictions.push(
+                    domainDatabaseNameToEnum(
+                        match._attributes["dbname"].toString()
+                    )
+                );
+            }
+        }
+    }
+    return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
+}

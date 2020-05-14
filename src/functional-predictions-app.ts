@@ -6,7 +6,7 @@ import {
     getDataFromURLorFile,
     validateJobId,
     getServiceURLfromJobId,
-    domainDatabaseNameToEnum,
+    getUniqueIPRMCDomainDatabases,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -343,24 +343,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
         // disable domain checkboxes that have no predictions
         if (this.iprmcDataObj != undefined) {
-            const domainPredictions: DomainDatabaseEnum[] = [];
-            for (const protein of this.iprmcDataObj["interpromatch"][
-                "protein"
-            ]) {
-                for (const match of protein["match"]) {
-                    if (match.ipr != undefined) {
-                        domainPredictions.push(DomainDatabaseEnum.INTERPRO);
-                    } else {
-                        domainPredictions.push(
-                            domainDatabaseNameToEnum(
-                                match._attributes["dbname"].toString()
-                            )
-                        );
-                    }
-                }
-            }
-            this.uniqueDomainDatabases = domainPredictions.filter(
-                (v, i, x) => x.indexOf(v) === i
+            this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
+                this.iprmcDataObj
             );
         }
     }
@@ -675,11 +659,11 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                         startPixels: this.startPixels,
                         endPixels: this.endPixels,
                     },
-                    { strokeWidth: 1},
+                    { strokeWidth: 1 },
                     this.topPadding
                 );
                 this.canvas.add(lineTrackGroup);
-                
+
                 // subject line tracks - legends
                 this.topPadding += 5;
                 const textContentFooterGroup = drawContentFooterTextGroup(
@@ -697,7 +681,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 this.canvas.add(textContentFooterGroup);
 
                 // domain predictions
-                this.topPadding +=10;
+                this.topPadding += 10;
                 for (const dp of this.uniqueDomainDatabases) {
                     this.topPadding += 10;
                     let dashedLineTrackGroup = drawDomainLineTracks(
