@@ -53,6 +53,7 @@ export interface RenderOptions {
     scaleLabelWidth?: number; // Color score information
     marginWidth?: number; // Space around different objects
     colorScheme?: ColorSchemeEnum;
+    numberHits?: number; // Number of Hits to be displayed
     numberHsps?: number; // Number of HSPs to be displayed
     logSkippedHsps?: boolean; // Display notice about skipped HSPs
     fontWeigth?: string;

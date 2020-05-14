@@ -117,8 +117,7 @@ export class BasicCanvasRenderer {
     protected scaleLabelWidth: number;
     protected marginWidth: number;
     public colorScheme: ColorSchemeEnum;
-    protected numberHsps: number;
-    protected logSkippedHsps: boolean;
+    protected numberHits: number;
     protected fontSize: number;
     protected fontWeigth: string;
     protected fontFamily: string;
@@ -162,12 +161,9 @@ export class BasicCanvasRenderer {
         renderOptions.colorScheme != undefined
             ? (this.colorScheme = renderOptions.colorScheme)
             : (this.colorScheme = ColorSchemeEnum.dynamic);
-        renderOptions.numberHsps != undefined
-            ? (this.numberHsps = renderOptions.numberHsps)
-            : (this.numberHsps = 10);
-        renderOptions.logSkippedHsps != undefined
-            ? (this.logSkippedHsps = renderOptions.logSkippedHsps)
-            : (this.logSkippedHsps = true);
+        renderOptions.numberHits != undefined
+            ? (this.numberHits = renderOptions.numberHits)
+            : (this.numberHits = 30);
         renderOptions.fontSize != undefined
             ? (this.fontSize = renderOptions.fontSize)
             : (this.fontSize = 12);

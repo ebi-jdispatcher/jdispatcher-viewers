@@ -6,8 +6,7 @@ import { FunctionalPredictions } from "./functional-predictions-app";
 export class CanvasRendererComponent extends LitElement {
     @property({ type: String }) data = "";
     @property({ type: String }) colorScheme = "dynamic";
-    @property({ type: Number }) numberHsps = 10;
-    @property({ type: Boolean }) logSkippedHsps = true;
+    @property({ type: Number }) numberHits = 30;
     @property({ type: Boolean }) canvasWrapperStroke = true;
 
     constructor() {
@@ -16,8 +15,7 @@ export class CanvasRendererComponent extends LitElement {
     render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
-            numberHsps: this.numberHsps,
-            logSkippedHsps: this.logSkippedHsps,
+            numberHits: this.numberHits,
             canvasWrapperStroke: this.canvasWrapperStroke,
         };
 

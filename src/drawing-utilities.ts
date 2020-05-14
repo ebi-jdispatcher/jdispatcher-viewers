@@ -920,7 +920,8 @@ export function drawContentTitleText(
 
 export function drawContentSupressText(
     renderOptions: RenderOptions,
-    topPadding: number
+    topPadding: number,
+    numberHits: number
 ): [fabric.Text, TextType] {
     const textObj = { ...textDefaults };
     textObj.fontSize = renderOptions.fontSize!;
