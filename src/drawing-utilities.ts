@@ -1070,3 +1070,23 @@ export function drawDomainCheckbox(
     );
     return [proteinFeatureRect, proteinFeatureText, rectObj, rectObj];
 }
+
+export function drawHitTransparentBox(
+    startPixels: number,
+    endPixels: number,
+    topPadding: number,
+    fill: string,
+    height: number
+): fabric.Rect {
+    const rectObj = { ...rectDefaults };
+    rectObj.fill = fill;
+    rectObj.opacity = 0.5;
+    rectObj.rx = 5;
+    rectObj.ry = 5;
+    //  Hit
+    rectObj.top = topPadding + 15;
+    rectObj.left = startPixels;
+    rectObj.width = endPixels;
+    rectObj.height = height;
+    return new fabric.Rect(rectObj);
+}
