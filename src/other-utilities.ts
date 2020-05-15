@@ -230,11 +230,12 @@ export function getFlattenIPRMCDataModel(
                 match: matchObjs,
                 matches: matches.sort(),
             };
-        } else {
-            console.log(
-                `Skipping protein as number of hits has reached ${numberHits}`
-            );
-        }
+        } 
+        // else {
+        //     console.log(
+        //         `Skipping protein as number of hits has reached ${numberHits}`
+        //     );
+        // }
     }
     return iprmcDataFlatObj;
 }

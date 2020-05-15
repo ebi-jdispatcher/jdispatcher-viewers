@@ -747,9 +747,11 @@ export class VisualOutput extends BasicCanvasRenderer {
 
     private wrapCanvas() {
         this.topPadding += 20;
-        if (this.canvasHeight < this.topPadding) {
-            this.canvasHeight = this.topPadding;
-        }
+        // topPadding always overrides the canvasHeight?
+        // if (this.canvasHeight < this.topPadding) {
+        //     this.canvasHeight = this.topPadding;
+        // }
+        this.canvasHeight = this.topPadding;
         if (this.canvasWrapperStroke) {
             // final canvas wrapper stroke
             const canvasWrapper = drawCanvasWrapperStroke({

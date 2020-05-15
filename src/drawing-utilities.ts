@@ -404,7 +404,7 @@ export function drawHspNoticeText(
     textObj.fill = "red";
     const hspTextNotice = new fabric.Text(
         `This hit contains ${totalNumberHsps} alignments, ` +
-            `but only the first ${numberHsps} are displayed`,
+            `but only the first ${numberHsps} are displayed!`,
         textObj
     );
     return hspTextNotice;
@@ -1016,7 +1016,8 @@ export function drawContentSupressText(
     textObj.left = renderOptions.contentWidth! / 2;
     textObj.fill = "red";
     const title =
-        `This is a partial representation of the result, only the first ${numberHits} hits are displayed`;
+        `This is a partial representation of the result, ` + 
+            `only the first ${numberHits} hits are displayed!`;
     const titleText = new fabric.Text(`${title}`, textObj);
     return [titleText, textObj];
 }
