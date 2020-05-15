@@ -23,12 +23,11 @@ import {
     getServiceURLfromJobId,
     getUniqueIPRMCDomainDatabases,
     getFlattenIPRMCDataModel,
-    domainDatabaseNameToEnum,
+    domainDatabaseNameToString,
 } from "./other-utilities";
 import {
     RenderOptions,
     ColorSchemeEnum,
-    DomainDatabaseEnum,
     jobIdDefaults,
     TextType,
     RectType,
@@ -70,31 +69,31 @@ import {
 } from "./drawing-utilities";
 
 const defaultDomainDatabaseList = [
-    DomainDatabaseEnum.INTERPRO,
-    DomainDatabaseEnum.CATHGENE3D,
-    DomainDatabaseEnum.CDD,
-    DomainDatabaseEnum.PANTHER,
-    DomainDatabaseEnum.HAMAP,
-    DomainDatabaseEnum.PFAM,
-    DomainDatabaseEnum.PIRSF,
-    DomainDatabaseEnum.PRINTS,
-    DomainDatabaseEnum.PROSITE_PROFILES,
-    DomainDatabaseEnum.PROSITE_PATTERNS,
-    DomainDatabaseEnum.SFLD,
-    DomainDatabaseEnum.SMART,
-    DomainDatabaseEnum.SUPERFAMILY,
-    DomainDatabaseEnum.TIGERFAMS,
+    "PRODOM",
+    "CATH-Gene3D",
+    "CDD",
+    "PANTHER",
+    "HAMAP",
+    "Pfam",
+    "PIRSF",
+    "PRINTS",
+    "PROSITE profiles",
+    "PROSITE patterns",
+    "SFLD",
+    "SMART",
+    "SUPERFAMILY",
+    "TIGERFAMs",
 ];
 
 function createDomainCheckbox(
     _this: FunctionalPredictions,
-    currentDomainDatabase: DomainDatabaseEnum,
-    domainDatabases: DomainDatabaseEnum[],
+    currentDomainDatabase: string,
+    domainDatabases: string[],
     topPadding: number,
     leftPadding: number,
     renderOptions: RenderOptions
 ) {
-    if (_this.domainDatabaseList.includes(currentDomainDatabase.toString())) {
+    if (_this.domainDatabaseList.includes(currentDomainDatabase)) {
         _this.currentDomainDatabase = currentDomainDatabase;
     } else {
         _this.currentDomainDatabase = undefined;
@@ -235,8 +234,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private sssDataObj: SSSResultModel;
     private iprmcDataObj: IPRMCResultModel;
     private iprmcDataFlatObj: IPRMCResultModelFlat = {};
-    public currentDomainDatabase: DomainDatabaseEnum | undefined;
-    public uniqueDomainDatabases: DomainDatabaseEnum[] = [];
+    public currentDomainDatabase: string | undefined;
+    public uniqueDomainDatabases: string[] = [];
     public currentDomainDatabaseDisabled: boolean = false;
 
     constructor(
@@ -371,7 +370,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 for (const db of this.domainDatabaseList) {
                     if (
                         !this.uniqueDomainDatabases.includes(
-                            domainDatabaseNameToEnum(db)
+                            domainDatabaseNameToString(db)
                         )
                     ) {
                         const indx = this.domainDatabaseList.indexOf(db);
@@ -506,115 +505,115 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // display the domain checkboxes
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.INTERPRO,
+            "Pfam",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 130,
+            this.contentLabelLeftWidth + 190,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PFAM,
+            "SUPERFAMILY",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 220,
+            this.contentLabelLeftWidth + 260,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.HAMAP,
+            "SMART",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 300,
+            this.contentLabelLeftWidth + 390,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PANTHER,
+            "HAMAP",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 400,
+            this.contentLabelLeftWidth + 480,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.SUPERFAMILY,
+            "PANTHER",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 510,
+            this.contentLabelLeftWidth + 570,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.SMART,
+            "PRODOM",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 640,
+            this.contentLabelLeftWidth + 680,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PROSITE_PROFILES,
+            "PROSITE profiles",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 730,
+            this.contentLabelLeftWidth + 770,
             { fontSize: this.fontSize }
         );
         this.topPadding += 30;
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.SFLD,
+            "CDD",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 130,
+            this.contentLabelLeftWidth + 190,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.CDD,
+            "CATH-Gene3D",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 220,
+            this.contentLabelLeftWidth + 260,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PRINTS,
+            "PIRSF",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 300,
+            this.contentLabelLeftWidth + 390,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.TIGERFAMS,
+            "PRINTS",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 400,
+            this.contentLabelLeftWidth + 480,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.CATHGENE3D,
+            "TIGERFAMs",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 510,
+            this.contentLabelLeftWidth + 570,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PIRSF,
+            "SFLD",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 640,
+            this.contentLabelLeftWidth + 680,
             { fontSize: this.fontSize }
         );
         createDomainCheckbox(
             this,
-            DomainDatabaseEnum.PROSITE_PATTERNS,
+            "PROSITE patterns",
             this.uniqueDomainDatabases,
             this.topPadding,
-            this.contentLabelLeftWidth + 730,
+            this.contentLabelLeftWidth + 770,
             { fontSize: this.fontSize }
         );
     }
@@ -753,53 +752,31 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
 
                 // unique domain predictions && selected domain Databases
-                let selectedDomainDatabases: DomainDatabaseEnum[] = [];
+                let selectedDomainDatabases: string[] = [];
                 for (const did of this.iprmcDataFlatObj[hit.hit_acc][
                     "matches"
                 ]) {
-                    if (did.startsWith("IPR")) {
-                        if (
-                            this.domainDatabaseList.includes(
-                                DomainDatabaseEnum.INTERPRO.toString()
-                            )
-                        )
-                            selectedDomainDatabases.push(
-                                DomainDatabaseEnum.INTERPRO
-                            );
-                    } else {
-                        if (
-                            this.domainDatabaseList.includes(
-                                this.iprmcDataFlatObj[hit.hit_acc]["match"][
-                                    did
-                                ][0]["dbname"] as string
-                            )
-                        )
-                            selectedDomainDatabases.push(
-                                domainDatabaseNameToEnum(
-                                    this.iprmcDataFlatObj[hit.hit_acc]["match"][
-                                        did
-                                    ][0]["dbname"] as string
-                                )
-                            );
+                    const domain = domainDatabaseNameToString(
+                        this.iprmcDataFlatObj[hit.hit_acc]["match"][did][0][
+                            "dbname"
+                        ] as string
+                    );
+                    if (this.domainDatabaseList.includes(domain)) {
+                        selectedDomainDatabases.push(domain);
                     }
                 }
-                let adjustedTopPadding = this.topPadding;
                 let boxHeight = selectedDomainDatabases.length * 15 + 15;
-                if (selectedDomainDatabases.length === 0 ) {
-                    boxHeight = 15;
-                    adjustedTopPadding -= 25;
-                    console.log(selectedDomainDatabases.length)
-                }
-                
+                if (selectedDomainDatabases.length === 0) boxHeight = 0;
+
                 const hitTransparentBox = drawHitTransparentBox(
                     startDomainPixels,
                     endDomainPixels,
-                    adjustedTopPadding,
+                    this.topPadding,
                     boxColor,
                     boxHeight
                 );
                 this.canvas.add(hitTransparentBox);
-                
+
                 // domain dashed-line tracks
                 this.topPadding += 15;
                 for (const _ of selectedDomainDatabases) {

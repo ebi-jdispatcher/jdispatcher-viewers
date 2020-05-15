@@ -6,7 +6,7 @@ import {
     IprMatchesFlat,
     IprMatchFlat,
 } from "./data-model";
-import { JobIdValitable, DomainDatabaseEnum } from "./custom-types";
+import { JobIdValitable } from "./custom-types";
 
 function countDecimals(n: number) {
     if (Math.floor(n) === n) return 0;
@@ -105,58 +105,61 @@ export function parseXMLData(data: string): IPRMCResultModel {
     return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
 }
 
-export function domainDatabaseNameToEnum(
-    domainName: string
-): DomainDatabaseEnum {
+export function domainDatabaseNameToString(domainName: string): string {
     domainName = domainName.toUpperCase();
-    let domainNameEnum = DomainDatabaseEnum.UNCLASSIFIED;
+    let domainNameEnum = "Unclassified";
     if (domainName === "IPR" || domainName === "INTERPRO") {
-        domainNameEnum = DomainDatabaseEnum.INTERPRO;
+        domainNameEnum = "InterPro";
     } else if (
         domainName === "CATHGENE3D" ||
         domainName === "CATH-GENE3D" ||
         domainName === "GENE3D"
     ) {
-        domainNameEnum = DomainDatabaseEnum.CATHGENE3D;
+        domainNameEnum = "CATH-Gene3D";
     } else if (domainName === "CDD") {
-        domainNameEnum = DomainDatabaseEnum.CDD;
+        domainNameEnum = "CDD";
     } else if (domainName === "PANTHER") {
-        domainNameEnum = DomainDatabaseEnum.PANTHER;
+        domainNameEnum = "PANTHER";
     } else if (domainName === "HAMAP") {
-        domainNameEnum = DomainDatabaseEnum.HAMAP;
+        domainNameEnum = "HAMAP";
     } else if (domainName === "PFAM") {
-        domainNameEnum = DomainDatabaseEnum.PFAM;
+        domainNameEnum = "Pfam";
     } else if (domainName === "PIRSF") {
-        domainNameEnum = DomainDatabaseEnum.PIRSF;
+        domainNameEnum = "PIRSF";
     } else if (domainName === "PRINTS") {
-        domainNameEnum = DomainDatabaseEnum.PRINTS;
-    } else if (domainName === "PROSITE PROFILES") {
-        domainNameEnum = DomainDatabaseEnum.PROSITE_PROFILES;
-    } else if (domainName === "PROSITE PATTERNS") {
-        domainNameEnum = DomainDatabaseEnum.PROSITE_PATTERNS;
+        domainNameEnum = "PRINTS";
+    } else if (
+        domainName === "PROSITE PROFILES" ||
+        domainName === "PROSITE_PROFILES" ||
+        domainName === "PROFILE"
+    ) {
+        domainNameEnum = "PROSITE profiles";
+    } else if (
+        domainName === "PROSITE PATTERNS" ||
+        domainName === "PROSITE_PATTERNS" ||
+        domainName === "PROSITE"
+    ) {
+        domainNameEnum = "PROSITE patterns";
     } else if (domainName === "SFLD") {
-        domainNameEnum = DomainDatabaseEnum.SFLD;
+        domainNameEnum = "SFLD";
     } else if (domainName === "SMART") {
-        domainNameEnum = DomainDatabaseEnum.SMART;
+        domainNameEnum = "SMART";
     } else if (domainName === "SUPERFAMILY" || domainName === "SSF") {
-        domainNameEnum = DomainDatabaseEnum.SUPERFAMILY;
+        domainNameEnum = "SUPERFAMILY";
     } else if (domainName === "TIGERFAMS") {
-        domainNameEnum = DomainDatabaseEnum.TIGERFAMS;
+        domainNameEnum = "TIGERFAMs";
+    } else if (domainName === "PRODOM") {
+        domainNameEnum = "PRODOM";
     }
     return domainNameEnum;
 }
 
 export function getUniqueIPRMCDomainDatabases(dataObj: IPRMCResultModel) {
-    const domainPredictions: DomainDatabaseEnum[] = [];
+    const domainPredictions: string[] = [];
     for (const protein of dataObj["interpromatch"]["protein"]) {
         for (const match of protein["match"]) {
-            if (match.ipr != undefined) {
-                domainPredictions.push(DomainDatabaseEnum.INTERPRO);
-            } 
             domainPredictions.push(
-                domainDatabaseNameToEnum(
-                    match._attributes["dbname"].toString()
-                )
+                domainDatabaseNameToString(match._attributes["dbname"])
             );
         }
     }
@@ -186,11 +189,13 @@ export function getFlattenIPRMCDataModel(
                     matchObj = {
                         id: match.ipr._attributes.id,
                         name: match.ipr._attributes.name,
-                        dbname: "InterPro",
+                        dbname: domainDatabaseNameToString(
+                            match._attributes.dbname
+                        ),
                         type: match.ipr._attributes.type,
                         altid: match._attributes.id,
                         altname: match._attributes.name,
-                        altdbname: match._attributes.dbname,
+                        altdbname: "InterPro",
                         status: match._attributes.status,
                         model: match._attributes.model,
                         evd: match._attributes.evd,
@@ -210,7 +215,9 @@ export function getFlattenIPRMCDataModel(
                     matchObj = {
                         id: match._attributes.id,
                         name: match._attributes.name,
-                        dbname: match._attributes.dbname,
+                        dbname: domainDatabaseNameToString(
+                            match._attributes.dbname
+                        ),
                         status: match._attributes.status,
                         model: match._attributes.model,
                         evd: match._attributes.evd,
@@ -230,7 +237,7 @@ export function getFlattenIPRMCDataModel(
                 match: matchObjs,
                 matches: matches.sort(),
             };
-        } 
+        }
         // else {
         //     console.log(
         //         `Skipping protein as number of hits has reached ${numberHits}`

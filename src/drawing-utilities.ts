@@ -13,7 +13,6 @@ import {
     ColorSchemeEnum,
     TextType,
     RectType,
-    DomainDatabaseEnum,
 } from "./custom-types";
 import { colorByDatabaseName } from "./color-utilities";
 
@@ -1030,7 +1029,7 @@ export function drawProteinFeaturesText(
     textSelObj.fontSize = renderOptions.fontSize! + 1;
     textSelObj.fontWeight = "bold";
     textSelObj.top = topPadding;
-    textSelObj.left = renderOptions.scaleLabelWidth! - 75;
+    textSelObj.left = renderOptions.scaleLabelWidth! - 10;
     const scaleTypeText = new fabric.Text("Select your database:", textSelObj);
     return scaleTypeText;
 }
@@ -1039,7 +1038,7 @@ export function drawDomainCheckbox(
     renderOptions: RenderOptions,
     topPadding: number,
     leftPadding: number,
-    currentDomainDatabase: DomainDatabaseEnum
+    currentDomainDatabase: string
 ): [fabric.Rect, fabric.Text, RectType, TextType] {
     const rectObj = { ...rectDefaults };
     rectObj.top = topPadding;
@@ -1065,10 +1064,7 @@ export function drawDomainCheckbox(
     }
 
     const proteinFeatureRect = new fabric.Rect(rectObj);
-    const proteinFeatureText = new fabric.Text(
-        currentDomainDatabase.toString(),
-        textObj
-    );
+    const proteinFeatureText = new fabric.Text(currentDomainDatabase, textObj);
     return [proteinFeatureRect, proteinFeatureText, rectObj, rectObj];
 }
 

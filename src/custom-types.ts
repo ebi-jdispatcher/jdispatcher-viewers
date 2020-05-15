@@ -5,38 +5,6 @@ export enum ColorSchemeEnum {
     blasterjs = "blasterjs", // e-value (fixed scale)
 }
 
-export enum DomainDatabaseEnum {
-    // IPR = "InterPro",
-    INTERPRO = "InterPro",
-    PANTHER = "PANTHER",
-    PFAM = "Pfam",
-    PIRSF = "PIRSF",
-    PRINTS = "PRINTS",
-    PRODOM = "PRODOM",
-    // PROFILE = "PROSITE profiles",
-    // PROSITE = "PROSITE patterns",
-    PROSITE_PROFILES = "PROSITE profiles",
-    PROSITE_PATTERNS = "PROSITE patterns",
-    SMART = "SMART",
-    TIGERFAMS = "TIGERFAMs",
-    // GENE3D = "CATH-Gene3D",
-    CATHGENE3D = "CATH-Gene3D",
-    // SSF = "SUPERFAMILY",
-    SUPERFAMILY = "SUPERFAMILY",
-    HAMAP = "HAMAP",
-    SIGNALP = "SIGNALP",
-    TMHMM = "TMHMM",
-    MOBIDBLT = "MOBIDBLT",
-    UNIPROT = "UniProt",
-    SWISSPROT = "SWISSPROT",
-    TREMBL = "TREMBL",
-    GO = "GO",
-    SFLD = "SFLD",
-    MEROPS = "MEROPS",
-    CDD = "CDD",
-    UNCLASSIFIED = "UNCLASSIFIED",
-}
-
 /* Global Options for Rendering the Fabric.js canvas
  * Width and Height in Pixels (px)
  */
@@ -62,7 +30,7 @@ export interface RenderOptions {
     canvasWrapperStroke?: boolean;
     strokeWidth?: number;
     strokeDashArray?: [number, number];
-    currentDomainDatabase?: DomainDatabaseEnum | undefined;
+    currentDomainDatabase?: string | undefined;
     currentColor?: string;
     currentDisabled?: boolean;
 }

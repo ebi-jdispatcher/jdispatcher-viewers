@@ -3,7 +3,6 @@ import {
     TextType,
     RectType,
     ColorSchemeEnum,
-    DomainDatabaseEnum,
 } from "./custom-types";
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
@@ -130,7 +129,7 @@ export function mouseOutCheckbox(
 export function mouseOverDomainCheckbox(
     fabricObj: fabric.Object,
     rectObj: RectType,
-    currentDomainDatabase: DomainDatabaseEnum,
+    currentDomainDatabase: string,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
@@ -146,7 +145,7 @@ export function mouseOverDomainCheckbox(
                 e.target.set("hoverCursor", "default");
             } else if (
                 !_this.domainDatabaseList.includes(
-                    currentDomainDatabase.toString()
+                    currentDomainDatabase
                 )
             ) {
                 e.target.setOptions({ stroke: "black" });
@@ -162,22 +161,22 @@ export function mouseOverDomainCheckbox(
 
 export function mouseDownDomainCheckbox(
     fabricObj: fabric.Object,
-    currentDomainDatabase: DomainDatabaseEnum,
+    currentDomainDatabase: string,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
             if (
                 !_this.domainDatabaseList.includes(
-                    currentDomainDatabase.toString()
+                    currentDomainDatabase
                 )
             ) {
-                _this.domainDatabaseList.push(currentDomainDatabase.toString());
+                _this.domainDatabaseList.push(currentDomainDatabase);
                 _this.currentDomainDatabase = currentDomainDatabase;
                 _this.render();
             } else {
                 const indx = _this.domainDatabaseList.indexOf(
-                    currentDomainDatabase.toString()
+                    currentDomainDatabase
                 );
                 if (indx > -1) {
                     _this.domainDatabaseList.splice(indx, 1);
@@ -192,7 +191,7 @@ export function mouseDownDomainCheckbox(
 export function mouseOutDomainCheckbox(
     fabricObj: fabric.Object,
     rectObj: RectType,
-    currentDomainDatabase: DomainDatabaseEnum,
+    currentDomainDatabase: string,
     _this: FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
@@ -203,7 +202,7 @@ export function mouseOutDomainCheckbox(
             }
             if (
                 !_this.domainDatabaseList.includes(
-                    currentDomainDatabase.toString()
+                    currentDomainDatabase
                 )
             ) {
                 e.target.setOptions({ stroke: "grey", fill: "white" });

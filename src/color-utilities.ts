@@ -1,4 +1,4 @@
-import { ColorType, ColorSchemeEnum, DomainDatabaseEnum } from "./custom-types";
+import { ColorType, ColorSchemeEnum } from "./custom-types";
 
 export function getRgbColorGradient(
     score: number,
@@ -239,21 +239,22 @@ export function HSVtoRGB(h: number, s: number, v: number) {
 // }
 
 // Using custom coloring scheme
-export function colorByDatabaseName(domainName: DomainDatabaseEnum): string {
+export function colorByDatabaseName(domainName: string): string {
     let color: string;
-    if (domainName == "InterPro") color = "rgb(211,47,47)";
-    else if (domainName == "Pfam") color = "rgb(171,71,188)";
-    else if (domainName == "HAMAP") color = "rgb(106,27,154)";
-    else if (domainName == "PANTHER") color = "rgb(57,73,171)";
-    else if (domainName == "SUPERFAMILY") color = "rgb(33,150,243)";
-    else if (domainName == "SMART") color = "rgb(0,188,212)";
+    // if (domainName == "InterPro") color = "rgb(211,47,47)";
+    if (domainName == "Pfam") color = "rgb(211,47,47)";
+    else if (domainName == "SUPERFAMILY") color = "rgb(171,71,188)";
+    else if (domainName == "SMART") color = "rgb(106,27,154)";
+    else if (domainName == "HAMAP") color = "rgb(57,73,171)";
+    else if (domainName == "PANTHER") color = "rgb(33,150,243)";
+    else if (domainName == "PRODOM") color = "rgb(0,188,212)";
     else if (domainName == "PROSITE profiles") color = "rgb(0,150,136)";
-    else if (domainName == "SFLD") color = "rgb(76,175,80)";
-    else if (domainName == "CDD") color = "rgb(205,220,57)";
-    else if (domainName == "PRINTS") color = "rgb(255,235,59)";
-    else if (domainName == "TIGERFAMs") color = "rgb(255,193,7)";
-    else if (domainName == "CATH-Gene3D") color = "rgb(255,112,67)";
-    else if (domainName == "PIRSF") color = "rgb(121,85,72)";
+    else if (domainName == "CDD") color = "rgb(76,175,80)";
+    else if (domainName == "CATH-Gene3D") color = "rgb(205,220,57)";
+    else if (domainName == "PIRSF") color = "rgb(255,235,59)";
+    else if (domainName == "PRINTS") color = "rgb(255,193,7)";
+    else if (domainName == "TIGERFAMs") color = "rgb(255,112,67)";
+    else if (domainName == "SFLD") color = "rgb(121,85,72)";
     else if (domainName == "PROSITE patterns") color = "rgb(55,71,79)";
     else color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
     return color;
