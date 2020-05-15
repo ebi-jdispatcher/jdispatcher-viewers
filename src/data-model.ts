@@ -96,139 +96,75 @@ export interface IPRMCResultModel {
     interpromatch: IPRMC;
 }
 
-export interface IPRMC {
+interface IPRMC {
     release: Release;
     protein: Protein[];
 }
 
-export interface Protein {
+interface Protein {
     _attributes: ProteinAttributes;
     match: Match[];
 }
 
-export interface ProteinAttributes {
+interface ProteinAttributes {
     id: string;
     name: string;
     length: string;
     crc64: string;
 }
 
-export interface Match {
+interface Match {
     _attributes: MatchAttributes;
     ipr?: Ipr;
     lcn: Lcn;
 }
 
-export interface MatchAttributes {
+interface MatchAttributes {
     id: string;
     name: string;
-    dbname: IprDbname;
-    status: IprStatus;
     model: string;
-    evd: IprEvd;
+    [key: string]: string;
 }
 
-export enum IprDbname {
-    Cathgene3D = "CATHGENE3D",
-    Cdd = "CDD",
-    Panther = "PANTHER",
-    Pfam = "PFAM",
-    Pirsf = "PIRSF",
-    Prints = "PRINTS",
-    Profile = "PROFILE",
-    Smart = "SMART",
-    Ssf = "SSF",
-    Unclassified = "Unclassified",
-    // IPR = "InterPro",
-    // INTERPRO = "InterPro",
-    // PANTHER = "PANTHER",
-    // PFAM = "Pfam",
-    // PIRSF = "PIRSF",
-    // PRINTS = "PRINTS",
-    // PRODOM = "PRODOM",
-    // PROFILE = "PROSITE profiles",
-    // PROSITE = "PROSITE patterns",
-    // PROSITE_PROFILES = "PROSITE profiles",
-    // PROSITE_PATTERNS = "PROSITE patterns",
-    // SMART = "SMART",
-    // TIGERFAMS = "TIGERFAMs",
-    // GENE3D = "CATH-Gene3D",
-    // CATHGENE3D = "CATH-Gene3D",
-    // SSF = "SUPERFAMILY",
-    // SUPERFAMILY = "SUPERFAMILY",
-    // HAMAP = "HAMAP",
-    // SIGNALP = "SIGNALP",
-    // TMHMM = "TMHMM",
-    // MOBIDBLT = "MOBIDBLT",
-    // UNIPROT = "UniProt",
-    // SWISSPROT = "SWISSPROT",
-    // TREMBL = "TREMBL",
-    // GO = "GO",
-    // SFLD = "SFLD",
-    // MEROPS = "MEROPS",
-    // CDD = "CDD",
-    // UNCLASSIFIED = "UNCLASSIFIED",
-}
-
-export enum IprEvd {
-    FPrintScan = "FPrintScan",
-    HMMPfam = "HMMPfam",
-    PrfScan = "PrfScan",
-    RpsBlast = "RPS-BLAST",
-    SmartScan = "Smart scan",
-}
-
-export enum IprStatus {
-    T = "T",
-}
-
-export interface Ipr {
+interface Ipr {
     _attributes: IprAttributes;
 }
 
-export interface IprAttributes {
+interface IprAttributes {
     id: string;
     name: string;
-    type: IprType;
-    parent_id?: string;
+    [key: string]: string;
 }
 
-export enum IprType {
-    Domain = "Domain",
-    Family = "Family",
-    HomologousSuperfamily = "Homologous_superfamily",
-    Repeat = "Repeat",
-}
-
-export interface Lcn {
+interface Lcn {
     _attributes: LcnAttributes;
 }
 
-export interface LcnAttributes {
+interface LcnAttributes {
     start: string;
     end: string;
     fragments?: string;
     score: string;
 }
 
-export interface Declaration {
+interface Declaration {
     _attributes: DeclarationAttributes;
 }
 
-export interface DeclarationAttributes {
+interface DeclarationAttributes {
     version: string;
     encoding: string;
 }
 
-export interface Release {
+interface Release {
     dbinfo: Dbinfo[];
 }
 
-export interface Dbinfo {
+interface Dbinfo {
     _attributes: DbinfoAttributes;
 }
 
-export interface DbinfoAttributes {
+interface DbinfoAttributes {
     dbname: string;
     version: string;
     entry_count: string;
