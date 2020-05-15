@@ -4,14 +4,26 @@ import {
     IPRMCResultModel,
     IPRMCResultModelFlat,
 } from "./data-model";
-import { getQuerySubjPixelCoords, getPixelCoords } from "./coords-utilities";
-import { getGradientSteps } from "./color-utilities";
+import {
+    getQuerySubjPixelCoords,
+    getPixelCoords,
+    getHspBoxPixelCoords,
+    getDomainPixelCoords,
+} from "./coords-utilities";
+import {
+    getGradientSteps,
+    colorByDatabaseName,
+    getRgbColorFixed,
+    getRgbColorGradient,
+} from "./color-utilities";
+import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
 import {
     getDataFromURLorFile,
     validateJobId,
     getServiceURLfromJobId,
     getUniqueIPRMCDomainDatabases,
     getFlattenIPRMCDataModel,
+    domainDatabaseNameToEnum,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -54,6 +66,7 @@ import {
     drawContentFooterTextGroup,
     drawContentSequenceInfoText,
     drawDomainLineTracks,
+    drawHitTransparentBox,
 } from "./drawing-utilities";
 
 const defaultDomainDatabaseList = [
@@ -134,7 +147,7 @@ export class BasicCanvasRenderer {
 
     constructor(
         private element: string | HTMLCanvasElement,
-        renderOptions: RenderOptions
+        protected renderOptions: RenderOptions
     ) {
         renderOptions.canvasWidth != undefined
             ? (this.canvasWidth = renderOptions.canvasWidth)
@@ -324,39 +337,54 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     private loadIPRMCdata() {
         let accessions: string = "";
-        for (const hit of this.sssDataObj.hits) {
-            if (accessions === "") accessions += `${hit.hit_acc}`;
-            else accessions += `,${hit.hit_acc}`;
-        }
-        //    const xmlURL = getIPRMCDbfetchURL(accessions);
-        //    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
-        //    xml.then((data) => {
-        //        if (typeof this.iprmcDataObj === "undefined") {
-        //            this.iprmcDataObj = parseXMLData(data);
-        //            this.render();
-        //        }
-        //    }).catch((error) => console.log(error));
-        // Temporarily to avoid hitting Dbfetch
-        const json = getDataFromURLorFile("./src/testdata/iprmc.json").then(
-            (data) => data
-        );
-        json.then((data) => {
-            if (typeof this.iprmcDataObj === "undefined") {
-                this.iprmcDataObj = data as IPRMCResultModel;
-                this.render();
+        if (this.sssDataObj != undefined) {
+            for (const hit of this.sssDataObj.hits) {
+                if (accessions === "") accessions += `${hit.hit_acc}`;
+                else accessions += `,${hit.hit_acc}`;
             }
-        }).catch((error) => console.log(error));
+            //    const xmlURL = getIPRMCDbfetchURL(accessions);
+            //    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
+            //    xml.then((data) => {
+            //        if (typeof this.iprmcDataObj === "undefined") {
+            //            this.iprmcDataObj = parseXMLData(data);
+            //            this.render();
+            //        }
+            //    }).catch((error) => console.log(error));
+            // Temporarily to avoid hitting Dbfetch
+            const json = getDataFromURLorFile("./src/testdata/iprmc.json").then(
+                (data) => data
+            );
+            json.then((data) => {
+                if (typeof this.iprmcDataObj === "undefined") {
+                    this.iprmcDataObj = data as IPRMCResultModel;
+                    this.render();
+                }
+            }).catch((error) => console.log(error));
 
-        // disable domain checkboxes that have no predictions
-        // and get 'workable' IPRMC data structure
-        if (this.iprmcDataObj != undefined) {
-            this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
-                this.iprmcDataObj
-            );
-            this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
-                this.iprmcDataObj,
-                this.numberHits
-            );
+            // disable domain checkboxes that have no predictions
+            // and get 'workable' IPRMC data structure
+            if (this.iprmcDataObj != undefined) {
+                this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
+                    this.iprmcDataObj
+                );
+                // remove domainDatabases not in the set of unique domainDatabases
+                for (const db of this.domainDatabaseList) {
+                    if (
+                        !this.uniqueDomainDatabases.includes(
+                            domainDatabaseNameToEnum(db)
+                        )
+                    ) {
+                        const indx = this.domainDatabaseList.indexOf(db);
+                        if (indx > -1) {
+                            this.domainDatabaseList.splice(indx, 1);
+                        }
+                    }
+                }
+                this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
+                    this.iprmcDataObj,
+                    this.numberHits
+                );
+            }
         }
     }
 
@@ -691,10 +719,91 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
                 this.canvas.add(textContentFooterGroup);
 
-                // domain predictions
-                this.topPadding += 10;
-                for (const dp of this.uniqueDomainDatabases) {
-                    this.topPadding += 10;
+                // hit (1st HSP) transparent domain
+                let boxColor: string = "white";
+                let hspStart = 0;
+                let hspEnd = 0;
+                for (const hsp of hit.hit_hsps) {
+                    hspStart = hsp.hsp_hit_from;
+                    hspEnd = hsp.hsp_hit_to;
+                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
+                        boxColor = getRgbColorFixed(
+                            hsp.hsp_bit_score!,
+                            this.gradientSteps,
+                            ncbiBlastGradient
+                        );
+                    } else {
+                        boxColor = getRgbColorGradient(
+                            hsp.hsp_expect!,
+                            this.gradientSteps,
+                            defaultGradient
+                        );
+                    }
+                    break;
+                }
+                let startDomainPixels: number = 0;
+                let endDomainPixels: number = 0;
+                [startDomainPixels, endDomainPixels] = getHspBoxPixelCoords(
+                    this.startPixels,
+                    this.endPixels,
+                    hit.hit_len,
+                    hspStart,
+                    hspEnd,
+                    this.marginWidth
+                );
+
+                // unique domain predictions && selected domain Databases
+                let selectedDomainDatabases: DomainDatabaseEnum[] = [];
+                for (const did of this.iprmcDataFlatObj[hit.hit_acc][
+                    "matches"
+                ]) {
+                    if (did.startsWith("IPR")) {
+                        if (
+                            this.domainDatabaseList.includes(
+                                DomainDatabaseEnum.INTERPRO.toString()
+                            )
+                        )
+                            selectedDomainDatabases.push(
+                                DomainDatabaseEnum.INTERPRO
+                            );
+                    } else {
+                        if (
+                            this.domainDatabaseList.includes(
+                                this.iprmcDataFlatObj[hit.hit_acc]["match"][
+                                    did
+                                ][0]["dbname"] as string
+                            )
+                        )
+                            selectedDomainDatabases.push(
+                                domainDatabaseNameToEnum(
+                                    this.iprmcDataFlatObj[hit.hit_acc]["match"][
+                                        did
+                                    ][0]["dbname"] as string
+                                )
+                            );
+                    }
+                }
+                let adjustedTopPadding = this.topPadding;
+                let boxHeight = selectedDomainDatabases.length * 15 + 15;
+                if (selectedDomainDatabases.length === 0 ) {
+                    boxHeight = 15;
+                    adjustedTopPadding -= 25;
+                    console.log(selectedDomainDatabases.length)
+                }
+                
+                const hitTransparentBox = drawHitTransparentBox(
+                    startDomainPixels,
+                    endDomainPixels,
+                    adjustedTopPadding,
+                    boxColor,
+                    boxHeight
+                );
+                this.canvas.add(hitTransparentBox);
+                
+                // domain dashed-line tracks
+                this.topPadding += 15;
+                for (const _ of selectedDomainDatabases) {
+                    this.topPadding += 15;
                     let dashedLineTrackGroup = drawDomainLineTracks(
                         {
                             startPixels: this.startPixels,
@@ -707,7 +816,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 }
 
                 // final padding
-                this.topPadding += 20;
+                this.topPadding += 30;
             } else {
                 // canvas content suppressed output
                 let supressText: fabric.Text;
@@ -905,9 +1014,11 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     private wrapCanvas() {
         this.topPadding += 20;
-        if (this.canvasHeight < this.topPadding) {
-            this.canvasHeight = this.topPadding;
-        }
+        // topPadding always overrides the canvasHeight?
+        // if (this.canvasHeight < this.topPadding) {
+        //     this.canvasHeight = this.topPadding;
+        // }
+        this.canvasHeight = this.topPadding;
         if (this.canvasWrapperStroke) {
             // final canvas wrapper stroke
             const canvasWrapper = drawCanvasWrapperStroke({
