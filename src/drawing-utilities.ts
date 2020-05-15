@@ -998,7 +998,7 @@ export function drawContentTitleText(
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 2;
     textObj.top = topPadding;
-    textObj.left = 375;
+    textObj.left = 395;
     const title = "Fast Family and Domain Prediction";
     const titleText = new fabric.Text(`${title}`, textObj);
     return [titleText, textObj];
@@ -1015,8 +1015,8 @@ export function drawContentSupressText(
     textObj.left = renderOptions.contentWidth! / 2;
     textObj.fill = "red";
     const title =
-        `This is a partial representation of the result, ` + 
-            `only the first ${numberHits} hits are displayed!`;
+        `This is a partial representation of the result, ` +
+        `only the first ${numberHits} hits are displayed!`;
     const titleText = new fabric.Text(`${title}`, textObj);
     return [titleText, textObj];
 }

@@ -8,11 +8,9 @@ import {
     getQuerySubjPixelCoords,
     getPixelCoords,
     getHspBoxPixelCoords,
-    getDomainPixelCoords,
 } from "./coords-utilities";
 import {
     getGradientSteps,
-    colorByDatabaseName,
     getRgbColorFixed,
     getRgbColorGradient,
 } from "./color-utilities";
@@ -438,7 +436,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
             // query/subj sequence
             this.topPadding += 25;
-            this.drawContentHeader();
+            // this.drawContentHeader();
 
             // dynamic content
             this.topPadding += 25;

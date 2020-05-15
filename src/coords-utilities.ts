@@ -108,7 +108,8 @@ export function getHspBoxPixelCoords(
     marginWidth: number
 ): [number, number] {
     const totalPixels = endPixels - startPixels;
-    const startDomainPixels = startPixels + ((startDomain * totalPixels) / hitLen);
+    const startDomainPixels =
+        startPixels + (startDomain * totalPixels) / hitLen;
     const endDomainPixels =
         (endDomain * totalPixels) / hitLen - 2 * marginWidth;
     return [startDomainPixels, endDomainPixels];

@@ -1,9 +1,5 @@
 import { fabric } from "fabric";
-import {
-    TextType,
-    RectType,
-    ColorSchemeEnum,
-} from "./custom-types";
+import { TextType, RectType, ColorSchemeEnum } from "./custom-types";
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
 
@@ -144,9 +140,7 @@ export function mouseOverDomainCheckbox(
                 e.target.setOptions({ fill: "white", stroke: "grey" });
                 e.target.set("hoverCursor", "default");
             } else if (
-                !_this.domainDatabaseList.includes(
-                    currentDomainDatabase
-                )
+                !_this.domainDatabaseList.includes(currentDomainDatabase)
             ) {
                 e.target.setOptions({ stroke: "black" });
                 e.target.set("hoverCursor", "pointer");
@@ -166,11 +160,7 @@ export function mouseDownDomainCheckbox(
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
-            if (
-                !_this.domainDatabaseList.includes(
-                    currentDomainDatabase
-                )
-            ) {
+            if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
                 _this.domainDatabaseList.push(currentDomainDatabase);
                 _this.currentDomainDatabase = currentDomainDatabase;
                 _this.render();
@@ -200,11 +190,7 @@ export function mouseOutDomainCheckbox(
             if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
                 currentDomainDatabaseDisabled = true;
             }
-            if (
-                !_this.domainDatabaseList.includes(
-                    currentDomainDatabase
-                )
-            ) {
+            if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
                 e.target.setOptions({ stroke: "grey", fill: "white" });
             } else if (currentDomainDatabaseDisabled) {
                 e.target.setOptions({ stroke: "grey", fill: "white" });
