@@ -243,6 +243,7 @@ interface IPRMCFlat {
     id: string;
     name: string;
     length: string;
+    matches: string[];
     match: IprMatchesFlat;
 }
 

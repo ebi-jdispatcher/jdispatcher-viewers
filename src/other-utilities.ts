@@ -172,10 +172,14 @@ export function getFlattenIPRMCDataModel(
     for (const protein of dataObj["interpromatch"]["protein"]) {
         tmpNumberHits++;
         if (tmpNumberHits <= numberHits) {
+            let matches: string[] = [];
             let matchObjs: IprMatchesFlat = {};
             for (const match of protein["match"]) {
                 let matchObj: IprMatchFlat = {};
-                if (match.ipr != undefined) {
+                if (match.ipr !== undefined) {
+                    if (!matches.includes(match.ipr._attributes.id)) {
+                        matches.push(match.ipr._attributes.id);
+                    }
                     if (!(match.ipr._attributes.id in matchObjs)) {
                         matchObjs[match.ipr._attributes.id] = [];
                     }
@@ -197,6 +201,9 @@ export function getFlattenIPRMCDataModel(
                     };
                     matchObjs[match.ipr._attributes.id].push(matchObj);
                 } else {
+                    if (!matches.includes(match._attributes.id)) {
+                        matches.push(match._attributes.id);
+                    }
                     if (!(match._attributes.id in matchObjs)) {
                         matchObjs[match._attributes.id] = [];
                     }
@@ -221,6 +228,7 @@ export function getFlattenIPRMCDataModel(
                 name: protein._attributes.name,
                 length: protein._attributes.length,
                 match: matchObjs,
+                matches: matches.sort(),
             };
         } else {
             console.log(
