@@ -54,6 +54,7 @@ export function mouseOverDomain(
         if (e.target) {
             e.target.set("hoverCursor", "pointer");
             fabricGroupObj.set({ visible: true });
+            fabricObj.bringToFront();
             fabricGroupObj.bringToFront();
             _this.canvas.renderAll();
         }
