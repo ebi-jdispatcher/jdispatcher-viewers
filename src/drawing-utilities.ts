@@ -998,8 +998,8 @@ export function drawContentTitleText(
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 2;
     textObj.top = topPadding;
-    textObj.left = 395;
-    const title = "Fast Family and Domain Prediction";
+    textObj.left = 350;
+    const title = "Fast Family and Domain Prediction by InterPro";
     const titleText = new fabric.Text(`${title}`, textObj);
     return [titleText, textObj];
 }

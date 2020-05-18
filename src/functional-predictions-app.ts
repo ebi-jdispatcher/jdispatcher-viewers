@@ -5,9 +5,9 @@ import {
     IPRMCResultModelFlat,
 } from "./data-model";
 import {
-    getQuerySubjPixelCoords,
     getPixelCoords,
     getHspBoxPixelCoords,
+    getDomainPixelCoords,
 } from "./coords-utilities";
 import {
     getGradientSteps,
@@ -217,17 +217,11 @@ export class BasicCanvasRenderer {
 
 export class FunctionalPredictions extends BasicCanvasRenderer {
     private topPadding: number = 0;
-    private queryLen: number = 0;
     private subjLen: number = 0;
     private queryStart: number = 0;
     private queryEnd: number = 0;
     private startPixels: number;
     private endPixels: number;
-    private startQueryPixels: number;
-    private endQueryPixels: number;
-    private startEvalPixels: number;
-    private startSubjPixels: number;
-    private endSubjPixels: number;
     private gradientSteps: number[] = [];
     private sssDataObj: SSSResultModel;
     private iprmcDataObj: IPRMCResultModel;
@@ -303,7 +297,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private loadInitalProperties() {
         this.queryStart = 1;
         this.queryEnd = this.sssDataObj.query_len;
-        this.queryLen = this.sssDataObj.query_len;
         for (const hit of this.sssDataObj.hits) {
             if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
         }
@@ -315,21 +308,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.contentLabelWidth,
             this.marginWidth
         );
-        [
-            this.startQueryPixels,
-            this.endQueryPixels,
-            this.startSubjPixels,
-            this.endSubjPixels,
-        ] = getQuerySubjPixelCoords(
-            this.queryLen,
-            this.subjLen,
-            this.subjLen,
-            this.contentWidth,
-            this.contentScoringWidth,
-            this.contentLabelWidth,
-            this.marginWidth
-        );
-        this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
     }
 
     private loadIPRMCdata() {
@@ -620,7 +598,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // draw a new track group per hit
         // only display 30 hits by default
         // draw only one HSP per hit
-        const queryLen: number = this.sssDataObj.query_len;
         let subjLen: number = 0;
         let maxIDLen: number = 0;
         for (const hit of this.sssDataObj.hits) {
