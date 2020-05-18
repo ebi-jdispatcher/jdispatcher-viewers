@@ -437,7 +437,7 @@ export function drawScoreText(
     return hspScoreText;
 }
 
-export function drawDomainTracks(
+export function drawDomainQueySubject(
     startQueryPixels: number,
     endQueryPixels: number,
     startSubjPixels: number,

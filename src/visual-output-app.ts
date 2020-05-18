@@ -38,7 +38,7 @@ import {
     drawScoreText,
     drawContentQuerySubjFooterTextGroup,
     drawNoHitsFoundText,
-    drawDomainTracks,
+    drawDomainQueySubject,
     drawDomainTooltips,
     drawScaleTypeText,
     drawCheckBoxText,
@@ -506,7 +506,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     }
                     this.topPadding += 10;
                     let queryDomain, subjDomain: fabric.Rect;
-                    [queryDomain, subjDomain] = drawDomainTracks(
+                    [queryDomain, subjDomain] = drawDomainQueySubject(
                         startQueryHspPixels,
                         endQueryHspPixels,
                         startSubjHspPixels,
