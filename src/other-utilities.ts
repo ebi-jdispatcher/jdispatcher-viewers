@@ -147,7 +147,7 @@ export function domainDatabaseNameToString(domainName: string): string {
     } else if (domainName === "SUPERFAMILY" || domainName === "SSF") {
         domainNameEnum = "SUPERFAMILY";
     } else if (domainName === "TIGERFAMS") {
-        domainNameEnum = "TIGERFAMs";
+        domainNameEnum = "TIGRFAMs";
     } else if (domainName === "PRODOM") {
         domainNameEnum = "PRODOM";
     }

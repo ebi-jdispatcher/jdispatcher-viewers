@@ -253,7 +253,7 @@ export function colorByDatabaseName(domainName: string): string {
     else if (domainName == "CATH-Gene3D") color = "rgb(205,220,57)";
     else if (domainName == "PIRSF") color = "rgb(255,235,59)";
     else if (domainName == "PRINTS") color = "rgb(255,193,7)";
-    else if (domainName == "TIGERFAMs") color = "rgb(255,112,67)";
+    else if (domainName == "TIGRFAMs") color = "rgb(255,112,67)";
     else if (domainName == "SFLD") color = "rgb(121,85,72)";
     else if (domainName == "PROSITE patterns") color = "rgb(55,71,79)";
     else color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
@@ -270,7 +270,7 @@ export function colorByDatabaseName(domainName: string): string {
 // else if (domainName == "SFLD") color = "rgb(0,177,211)";
 // else if (domainName == "CDD") color = "rgb(173,220,88)";
 // else if (domainName == "PRINTS") color = "rgb(84,199,95)";
-// else if (domainName == "TIGERFAMs") color = "rgb(86,185,166)";
+// else if (domainName == "TIGRFAMs") color = "rgb(86,185,166)";
 // else if (domainName == "CATH-Gene3D") color = "rgb(168,140,195)";
 // else if (domainName == "PIRSF") color = "rgb(251,189,221)";
 // else if (domainName == "PROSITE patterns") color = "rgb(243,199,102)";

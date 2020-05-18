@@ -80,7 +80,7 @@ const defaultDomainDatabaseList = [
     "SFLD",
     "SMART",
     "SUPERFAMILY",
-    "TIGERFAMs",
+    "TIGRFAMs",
 ];
 
 function createDomainCheckbox(
@@ -592,7 +592,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         );
         createDomainCheckbox(
             this,
-            "TIGERFAMs",
+            "TIGRFAMs",
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 570,
