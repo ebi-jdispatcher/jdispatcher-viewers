@@ -252,3 +252,53 @@ export function getFlattenIPRMCDataModel(
     }
     return iprmcDataFlatObj;
 }
+
+export function getDomainURLbyDatabase(domainID: string, domainName: string) {
+    let domainURL = "";
+    if (domainID.startsWith("IPR")) {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/InterPro/${domainID}`;
+    } else if (domainName === "CATH-Gene3D") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/cathgene3d/${domainID}`;
+        // domainURL = `http://www.cathdb.info/version/latest/superfamily/${domainID}`;
+    } else if (domainName === "CDD") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/cdd/${domainID}`;
+        // domainURL = `https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?uid=${domainID}`;
+    } else if (domainName === "PANTHER") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/panther/${domainID}`;
+        // domainURL = `http://www.pantherdb.org/panther/family.do?clsAccession=${domainID}`;
+    } else if (domainName === "HAMAP") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/hamap/${domainID}`;
+        // domainURL = `https://hamap.expasy.org/signature/${domainID}`;
+    } else if (domainName === "Pfam") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/pfam/${domainID}`;
+        // domainURL = `https://pfam.xfam.org/family/${domainID}`;
+    } else if (domainName === "PIRSF") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/pirsf/${domainID}`;
+        // domainURL = `https://pir.georgetown.edu/cgi-bin/ipcSF?id=${domainID}`;
+    } else if (domainName === "PRINTS") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/prints/${domainID}`;
+        // domainURL = `http://www.bioinf.manchester.ac.uk/cgi-bin/dbbrowser/sprint/searchprintss.cgi?prints_accn=${domainID}&display_opts=Prints&category=None&queryform=false&regexpr=off`;
+    } else if (domainName === "PROSITE profiles") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/profile/${domainID}`;
+        // domainURL = `https://www.expasy.org/prosite/${domainID}`;
+    } else if (domainName === "PROSITE patterns") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/prosite/${domainID}`;
+        // domainURL = `https://www.expasy.org/prosite/${domainID}`;
+    } else if (domainName === "SFLD") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/sfld/${domainID}`;
+        // domainURL = `http://sfld.rbvi.ucsf.edu/django/family/${domainID}`;
+    } else if (domainName === "SMART") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/smart/${domainID}`;
+        // domainURL = `https://smart.embl-heidelberg.de/smart/do_annotation.pl?BLAST=DUMMY&amp;ACC=${domainID}`;
+    } else if (domainName === "SUPERFAMILY") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/ssf/${domainID}`;
+        // domainURL = `https://supfam.org/SUPERFAMILY/cgi-bin/scop.cgi?ipid=${domainID}`;
+    } else if (domainName === "TIGRFAMs") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/tigrfams/${domainID}`;
+        // domainURL = `https://cmr.tigr.org/tigr-scripts/CMR/HmmReport.cgi?hmm_acc=${domainID}`;
+    } else if (domainName === "PRODOM") {
+        domainURL = `https://www.ebi.ac.uk/interpro/entry/prodom/${domainID}`;
+        // domainURL = `https://prodom.prabi.fr/prodom/current/cgi-bin/request.pl?SSID=1289309949_1085&amp;db_ent1=${domainID}`;
+    }
+    return domainURL;
+}
