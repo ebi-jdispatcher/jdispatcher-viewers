@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { numberToString } from "./other-utilities";
-import { SSSResultModel, Hit, Hsp } from "./data-model";
+import { SSSResultModel, Hit, Hsp, IprMatchFlat } from "./data-model";
 import { getTotalPixels, getTextLegendPaddingFactor } from "./coords-utilities";
 import { colorDefaultGradient, colorNcbiBlastGradient } from "./color-schemes";
 import {
@@ -1086,4 +1086,118 @@ export function drawHitTransparentBox(
     rectObj.width = endPixels;
     rectObj.height = height;
     return new fabric.Rect(rectObj);
+}
+
+export function drawContentDomainInfoText(
+    domainID: string,
+    renderOptions: RenderOptions,
+    topPadding: number
+): [fabric.Text, fabric.Text, TextType] {
+    // Domain ID text tracks
+    const textObj = { ...textDefaults };
+    textObj.fontFamily = "Menlo";
+    textObj.fontSize = renderOptions.fontSize! - 2;
+    textObj.top = topPadding - 5;
+    const variableSpace = " ".repeat(40 - domainID.length);
+    const spaceText: fabric.Text = new fabric.Text(variableSpace, textObj);
+
+    let domain: string = `${domainID}`;
+    let domain_full: string = `${variableSpace}${domainID}`;
+    if (domain_full.length > 40) {
+        domain = (domain_full.slice(0, 38) + "...").slice(
+            variableSpace.length
+        );
+    }
+    textObj.left = 12 + variableSpace.length * 6;
+    textObj.evented = true;
+    const hitText: fabric.Text = new fabric.Text(domain, textObj);
+    return [spaceText, hitText, textObj];
+}
+
+// TODO FIXME: fix boxes around the edges of the canvas
+export function drawDomains(
+    startPixels: number,
+    endPixels: number,
+    topPadding: number,
+    color: string
+): fabric.Rect {
+    const rectObj = { ...rectDefaults };
+    rectObj.evented = true;
+    rectObj.top = topPadding;
+    rectObj.fill = color;
+    rectObj.rx = 5;
+    rectObj.ry = 5;
+    //  Domain
+    rectObj.top = topPadding - 15;
+    rectObj.left = startPixels;
+    rectObj.width = endPixels;
+    rectObj.height = 10;
+    rectObj.stroke = "black";
+    rectObj.strokeWidth = 0.5;
+    return new fabric.Rect(rectObj);
+}
+
+export function drawDomainInfoTooltips(
+    startPixels: number,
+    endPixels: number,
+    seq_from: number,
+    seq_to: number,
+    domain: IprMatchFlat,
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Group {
+    const floatTextObj = { ...textDefaults };
+    floatTextObj.fontSize = renderOptions.fontSize! + 1;
+    floatTextObj.textAlign = "left";
+    floatTextObj.originX = "top";
+    floatTextObj.originY = "top";
+    floatTextObj.top = 5;
+    floatTextObj.left = 10;
+    floatTextObj.paddingLeft = 10;
+    floatTextObj.splitByGrapheme = true;
+    floatTextObj.width = 200;
+    const dbname = (domain.dbname as string).split(" ")[0];
+    let tooltip: string =
+        `Start: ${seq_from}\n` +
+        `End: ${seq_to}\n` + 
+        `Database: ${domain.dbname}\n`;
+    if (domain.altid !== undefined && domain.altname !== undefined) {
+        tooltip +=
+            `ID: ${domain.altid}\n` +
+            `Name: ${domain.altname}\n` + 
+            `Type: ${domain.type}\n` +
+            `IPR ID: ${domain.id}\n` +
+            `IPR Name: ${domain.name}\n`;
+    } else {
+        tooltip +=
+            `ID: ${domain.id}\n` +
+            `Name: ${domain.name}\n` + 
+            `Type: ${domain.type}\n`;
+    }
+    const tooltipText = new fabric.Textbox(tooltip, floatTextObj);
+
+    const rectObj = { ...rectDefaults };
+    rectObj.fill = "white";
+    rectObj.stroke = "lightseagreen";
+    rectObj.rx = 5;
+    rectObj.ry = 5;
+    rectObj.originX = "top";
+    rectObj.originY = "top";
+    rectObj.width = 240;
+    rectObj.height = tooltipText.height!;
+    rectObj.opacity = 0.95;
+
+    const tooltipBox: fabric.Rect = new fabric.Rect(rectObj);
+    const tooltipGroup: fabric.Group = new fabric.Group(
+        [tooltipBox, tooltipText],
+        {
+            selectable: false,
+            evented: false,
+            objectCaching: false,
+            visible: false,
+            top: topPadding,
+            left: startPixels + endPixels / 2,
+        }
+    );
+    return tooltipGroup;
 }
