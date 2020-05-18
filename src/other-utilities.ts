@@ -180,11 +180,14 @@ export function getFlattenIPRMCDataModel(
             for (const match of protein["match"]) {
                 let matchObj: IprMatchFlat = {};
                 if (match.ipr !== undefined) {
-                    if (!matches.includes(match.ipr._attributes.id)) {
-                        matches.push(match.ipr._attributes.id);
+                    const iprdomain = `${domainDatabaseNameToString(
+                        match._attributes.dbname
+                    )}_${match.ipr._attributes.id}`;
+                    if (!matches.includes(iprdomain)) {
+                        matches.push(iprdomain);
                     }
-                    if (!(match.ipr._attributes.id in matchObjs)) {
-                        matchObjs[match.ipr._attributes.id] = [];
+                    if (!(iprdomain in matchObjs)) {
+                        matchObjs[iprdomain] = [];
                     }
                     matchObj = {
                         id: match.ipr._attributes.id,
@@ -204,13 +207,16 @@ export function getFlattenIPRMCDataModel(
                         fragments: match.lcn._attributes.fragments,
                         score: match.lcn._attributes.fragments,
                     };
-                    matchObjs[match.ipr._attributes.id].push(matchObj);
+                    matchObjs[iprdomain].push(matchObj);
                 } else {
-                    if (!matches.includes(match._attributes.id)) {
-                        matches.push(match._attributes.id);
+                    const iprdomain = `${domainDatabaseNameToString(
+                        match._attributes.dbname
+                    )}_${match._attributes.id}`;
+                    if (!matches.includes(iprdomain)) {
+                        matches.push(iprdomain);
                     }
-                    if (!(match._attributes.id in matchObjs)) {
-                        matchObjs[match._attributes.id] = [];
+                    if (!(iprdomain in matchObjs)) {
+                        matchObjs[iprdomain] = [];
                     }
                     matchObj = {
                         id: match._attributes.id,
@@ -227,7 +233,7 @@ export function getFlattenIPRMCDataModel(
                         fragments: match.lcn._attributes.fragments,
                         score: match.lcn._attributes.fragments,
                     };
-                    matchObjs[match._attributes.id].push(matchObj);
+                    matchObjs[iprdomain].push(matchObj);
                 }
             }
             iprmcDataFlatObj[protein._attributes.id] = {
