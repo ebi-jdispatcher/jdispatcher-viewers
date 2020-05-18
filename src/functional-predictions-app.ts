@@ -13,6 +13,7 @@ import {
     getGradientSteps,
     getRgbColorFixed,
     getRgbColorGradient,
+    colorByDatabaseName,
 } from "./color-utilities";
 import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
 import {
@@ -22,6 +23,10 @@ import {
     getUniqueIPRMCDomainDatabases,
     getFlattenIPRMCDataModel,
     domainDatabaseNameToString,
+    getDomainURLbyDatabase,
+    getIPRMCDbfetchURL,
+    getXMLDataFromURL,
+    parseXMLData,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -40,6 +45,8 @@ import {
     mouseOverDomainCheckbox,
     mouseDownDomainCheckbox,
     mouseOutDomainCheckbox,
+    mouseOverDomain,
+    mouseOutDomain,
 } from "./custom-events";
 import {
     drawHeaderTextGroup,
@@ -64,6 +71,9 @@ import {
     drawContentSequenceInfoText,
     drawDomainLineTracks,
     drawHitTransparentBox,
+    drawContentDomainInfoText,
+    drawDomains,
+    drawDomainInfoTooltips,
 } from "./drawing-utilities";
 
 const defaultDomainDatabaseList = [
@@ -692,6 +702,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                     this.topPadding
                 );
                 this.canvas.add(textContentFooterGroup);
+                this.topPadding += 15;
 
                 // hit (1st HSP) transparent domain
                 let boxColor: string = "white";
@@ -727,7 +738,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
 
                 // unique domain predictions && selected domain Databases
-                let selectedDomainDatabases: string[] = [];
+                let boxHeight = 0;
+                let tmpTopPadding = this.topPadding - 15;
                 for (const did of this.iprmcDataFlatObj[hit.hit_acc][
                     "matches"
                 ]) {
@@ -737,38 +749,104 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                         ] as string
                     );
                     if (this.domainDatabaseList.includes(domain)) {
-                        selectedDomainDatabases.push(domain);
+                        this.topPadding += 15;
+                        boxHeight += 15;
+                        // domain dashed-line tracks
+                        let dashedLineTrackGroup = drawDomainLineTracks(
+                            {
+                                startPixels: this.startPixels,
+                                endPixels: this.endPixels,
+                            },
+                            { strokeWidth: 1, strokeDashArray: [1, 5] },
+                            this.topPadding
+                        );
+                        this.canvas.add(dashedLineTrackGroup);
+                        dashedLineTrackGroup.sendToBack();
+
+                        // draw domain ID text
+                        let textObj: TextType;
+                        let spaceText, hitText: fabric.Text;
+                        [
+                            spaceText,
+                            hitText,
+                            textObj,
+                        ] = drawContentDomainInfoText(
+                            did.split("_")[1] + " ►",
+                            { fontSize: this.fontSize },
+                            this.topPadding
+                        );
+                        this.canvas.add(spaceText);
+                        this.canvas.add(hitText);
+                        // Domain URL mapping
+                        const domainURL = getDomainURLbyDatabase(
+                            did.split("_")[1],
+                            domain
+                        );
+                        mouseOverText(hitText, textObj, this);
+                        mouseDownText(hitText, domainURL, this);
+                        mouseOutText(hitText, textObj, this);
+
+                        // draw domain Predictions (loop over each prediction)
+                        for (const dp of this.iprmcDataFlatObj[hit.hit_acc][
+                            "match"
+                        ][did]) {
+                            // domain coordinates
+                            let domainStart = dp.start as number;
+                            let domainEnd = dp.end as number;
+                            let startDomainPixels: number = 0;
+                            let endDomainPixels: number = 0;
+                            [
+                                startDomainPixels,
+                                endDomainPixels,
+                            ] = getDomainPixelCoords(
+                                this.startPixels,
+                                this.endPixels,
+                                hit.hit_len,
+                                domainStart,
+                                domainEnd,
+                                this.marginWidth
+                            );
+
+                            // domain predictions
+                            const dpDomain = drawDomains(
+                                startDomainPixels,
+                                endDomainPixels,
+                                this.topPadding + 10,
+                                colorByDatabaseName(dp.dbname as string)
+                            );
+                            this.canvas.add(dpDomain);
+                            // Domain tooltip
+                            const domainTooltipGroup = drawDomainInfoTooltips(
+                                startDomainPixels,
+                                endDomainPixels,
+                                domainStart,
+                                domainEnd,
+                                dp,
+                                {
+                                    fontSize: this.fontSize,
+                                },
+                                this.topPadding
+                            );
+                            this.canvas.add(domainTooltipGroup);
+                            mouseOverDomain(dpDomain, domainTooltipGroup, this);
+                            mouseOutDomain(dpDomain, domainTooltipGroup, this);
+                        }
                     }
                 }
-                let boxHeight = selectedDomainDatabases.length * 15 + 15;
-                if (selectedDomainDatabases.length === 0) boxHeight = 0;
-
+                // draw domain transparent box
+                if (boxHeight !== 0) boxHeight += 15;
                 const hitTransparentBox = drawHitTransparentBox(
                     startDomainPixels,
                     endDomainPixels,
-                    this.topPadding,
+                    tmpTopPadding,
                     boxColor,
                     boxHeight
                 );
                 this.canvas.add(hitTransparentBox);
-
-                // domain dashed-line tracks
-                this.topPadding += 15;
-                for (const _ of selectedDomainDatabases) {
-                    this.topPadding += 15;
-                    let dashedLineTrackGroup = drawDomainLineTracks(
-                        {
-                            startPixels: this.startPixels,
-                            endPixels: this.endPixels,
-                        },
-                        { strokeWidth: 1, strokeDashArray: [1, 5] },
-                        this.topPadding
-                    );
-                    this.canvas.add(dashedLineTrackGroup);
-                }
+                hitTransparentBox.sendToBack();
 
                 // final padding
-                this.topPadding += 30;
+                this.topPadding += 40;
             } else {
                 // canvas content suppressed output
                 let supressText: fabric.Text;
