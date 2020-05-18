@@ -195,12 +195,12 @@ export function getFlattenIPRMCDataModel(
                         type: match.ipr._attributes.type,
                         altid: match._attributes.id,
                         altname: match._attributes.name,
-                        altdbname: "InterPro",
+                        // altdbname: "InterPro",
                         status: match._attributes.status,
                         model: match._attributes.model,
                         evd: match._attributes.evd,
-                        start: match.lcn._attributes.start,
-                        end: match.lcn._attributes.end,
+                        start: Number(match.lcn._attributes.start),
+                        end: Number(match.lcn._attributes.end),
                         fragments: match.lcn._attributes.fragments,
                         score: match.lcn._attributes.fragments,
                     };
@@ -222,8 +222,8 @@ export function getFlattenIPRMCDataModel(
                         model: match._attributes.model,
                         evd: match._attributes.evd,
                         type: "Unclassified",
-                        start: match.lcn._attributes.start,
-                        end: match.lcn._attributes.end,
+                        start: Number(match.lcn._attributes.start),
+                        end: Number(match.lcn._attributes.end),
                         fragments: match.lcn._attributes.fragments,
                         score: match.lcn._attributes.fragments,
                     };
@@ -233,9 +233,9 @@ export function getFlattenIPRMCDataModel(
             iprmcDataFlatObj[protein._attributes.id] = {
                 id: protein._attributes.id,
                 name: protein._attributes.name,
-                length: protein._attributes.length,
-                match: matchObjs,
+                length: Number(protein._attributes.length),
                 matches: matches.sort(),
+                match: matchObjs,
             };
         }
         // else {

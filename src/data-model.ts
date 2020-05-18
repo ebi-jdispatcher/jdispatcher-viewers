@@ -178,7 +178,7 @@ export interface IPRMCResultModelFlat {
 interface IPRMCFlat {
     id: string;
     name: string;
-    length: string;
+    length: number;
     matches: string[];
     match: IprMatchesFlat;
 }
@@ -188,5 +188,5 @@ export interface IprMatchesFlat {
 }
 
 export interface IprMatchFlat {
-    [key: string]: string | undefined;
+    [key: string]: string | number | undefined;
 }
