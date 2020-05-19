@@ -161,11 +161,16 @@ export function mouseDownDomainCheckbox(
 ) {
     fabricObj.on("mousedown", (e: fabric.IEvent) => {
         if (e.target) {
-            if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
+            if (
+                !_this.domainDatabaseList.includes(currentDomainDatabase) &&
+                _this.uniqueDomainDatabases.includes(currentDomainDatabase)
+            ) {
                 _this.domainDatabaseList.push(currentDomainDatabase);
                 _this.currentDomainDatabase = currentDomainDatabase;
                 _this.render();
-            } else {
+            } else if (
+                _this.uniqueDomainDatabases.includes(currentDomainDatabase)
+            ) {
                 const indx = _this.domainDatabaseList.indexOf(
                     currentDomainDatabase
                 );
