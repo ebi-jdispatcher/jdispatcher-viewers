@@ -513,7 +513,7 @@ export function drawDomainTooltips(
             evented: false,
             objectCaching: false,
             visible: false,
-            top: topPadding - 10,
+            top: topPadding,
             left: startHspPixels + endHspPixels / 2,
         }
     );

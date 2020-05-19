@@ -874,31 +874,20 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                                 colorByDatabaseName(dp.dbname as string)
                             );
                             this.canvas.add(dpDomain);
-                            // Domain tooltip
-                            let domainTooltipGroup: fabric.Group;
-                            domainTooltipGroup = objCache.get(
-                                `${hit.hit_id}_${did}_${dp.id}_${dp.start}_${dp.end}`
-                            ) as fabric.Group;
-                            if (!domainTooltipGroup) {
-                                domainTooltipGroup = drawDomainInfoTooltips(
-                                    startDomainPixels,
-                                    endDomainPixels,
-                                    domainStart,
-                                    domainEnd,
-                                    dp,
-                                    {
-                                        fontSize: this.fontSize,
-                                    },
-                                    this.topPadding
-                                );
-                                objCache.put(
-                                    `${hit.hit_id}_${did}_${dp.id}_${dp.start}_${dp.end}`,
-                                    domainTooltipGroup
-                                );
-                            }
-                            this.canvas.add(domainTooltipGroup);
-                            mouseOverDomain(dpDomain, domainTooltipGroup, this);
-                            mouseOutDomain(dpDomain, domainTooltipGroup, this);
+                            // Domain hovering and tooltip
+                            mouseOverDomain(
+                                dpDomain,
+                                startDomainPixels,
+                                endDomainPixels,
+                                domainStart,
+                                domainEnd,
+                                dp,
+                                {
+                                    fontSize: this.fontSize,
+                                },
+                                this
+                            );
+                            mouseOutDomain(dpDomain, this);
                         }
                     }
                 }

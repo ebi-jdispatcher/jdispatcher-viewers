@@ -574,60 +574,37 @@ export class VisualOutput extends BasicCanvasRenderer {
                     );
                     scoreText.width = this.contentScoringWidth;
                     this.canvas.add(scoreText);
+                    // Query hovering and tooltip
+                    mouseOverDomain(
+                        queryDomain,
+                        startQueryHspPixels,
+                        endQueryHspPixels,
+                        hsp.hsp_query_from,
+                        hsp.hsp_query_to,
+                        hsp,
+                        {
+                            fontSize: this.fontSize,
+                            colorScheme: this.colorScheme,
+                        },
+                        this
+                    );
+                    mouseOutDomain(queryDomain, this);
 
-                    // Query tooltip
-                    let queryTooltipGroup: fabric.Group;
-                    queryTooltipGroup = objCache.get(
-                        `query_${hit.hit_num}_${hsp.hsp_num}`
-                    ) as fabric.Group;
-                    if (!queryTooltipGroup) {
-                        queryTooltipGroup = drawDomainTooltips(
-                            startQueryHspPixels,
-                            endQueryHspPixels,
-                            hsp.hsp_query_from,
-                            hsp.hsp_query_to,
-                            hsp,
-                            {
-                                fontSize: this.fontSize,
-                                colorScheme: this.colorScheme,
-                            },
-                            this.topPadding
-                        );
-                        objCache.put(
-                            `query_${hit.hit_num}_${hsp.hsp_num}`,
-                            queryTooltipGroup
-                        );
-                    }
-                    this.canvas.add(queryTooltipGroup);
-                    mouseOverDomain(queryDomain, queryTooltipGroup, this);
-                    mouseOutDomain(queryDomain, queryTooltipGroup, this);
-
-                    // Subject tooltip
-                    let subjTooltipGroup: fabric.Group;
-                    subjTooltipGroup = objCache.get(
-                        `subj_${hit.hit_num}_${hsp.hsp_num}`
-                    ) as fabric.Group;
-                    if (!subjTooltipGroup) {
-                        subjTooltipGroup = drawDomainTooltips(
-                            startSubjHspPixels,
-                            endSubjHspPixels,
-                            hsp.hsp_hit_from,
-                            hsp.hsp_hit_to,
-                            hsp,
-                            {
-                                fontSize: this.fontSize,
-                                colorScheme: this.colorScheme,
-                            },
-                            this.topPadding
-                        );
-                        objCache.put(
-                            `subj_${hit.hit_num}_${hsp.hsp_num}`,
-                            subjTooltipGroup
-                        );
-                    }
-                    this.canvas.add(subjTooltipGroup);
-                    mouseOverDomain(subjDomain, subjTooltipGroup, this);
-                    mouseOutDomain(subjDomain, subjTooltipGroup, this);
+                    // Subject hovering and tooltip
+                    mouseOverDomain(
+                        subjDomain,
+                        startSubjHspPixels,
+                        endSubjHspPixels,
+                        hsp.hsp_hit_from,
+                        hsp.hsp_hit_to,
+                        hsp,
+                        {
+                            fontSize: this.fontSize,
+                            colorScheme: this.colorScheme,
+                        },
+                        this
+                    );
+                    mouseOutDomain(subjDomain, this);
                 } else {
                     if (this.logSkippedHsps === true) {
                         let hspTextNotice: fabric.Text;

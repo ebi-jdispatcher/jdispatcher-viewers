@@ -1,7 +1,17 @@
 import { fabric } from "fabric";
-import { TextType, RectType, ColorSchemeEnum } from "./custom-types";
+import {
+    TextType,
+    RectType,
+    ColorSchemeEnum,
+    RenderOptions,
+} from "./custom-types";
 import { VisualOutput } from "./visual-output-app";
+import { Hsp, IprMatchFlat } from "./data-model";
 import { FunctionalPredictions } from "./functional-predictions-app";
+import {
+    drawDomainTooltips,
+    drawDomainInfoTooltips,
+} from "./drawing-utilities";
 
 export function mouseOverText(
     fabricObj: fabric.Object,
@@ -45,30 +55,63 @@ export function mouseOutText(
     });
 }
 
+function isHsp(object: any): object is Hsp {
+    return "hsp_hit_from" in object;
+}
+
 export function mouseOverDomain(
     fabricObj: fabric.Object,
-    fabricGroupObj: fabric.Object,
+    startPixels: number,
+    endPixels: number,
+    seq_from: number,
+    seq_to: number,
+    domain: Hsp | IprMatchFlat,
+    renderOptions: RenderOptions,
     _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
         if (e.target) {
             e.target.set("hoverCursor", "pointer");
-            fabricGroupObj.set({ visible: true });
+            let tooltipGroup: fabric.Group;
+            if (isHsp(domain)) {
+                // Query/Subject tooltip
+                tooltipGroup = drawDomainTooltips(
+                    startPixels,
+                    endPixels,
+                    seq_from,
+                    seq_to,
+                    domain as Hsp,
+                    renderOptions,
+                    fabricObj.top!
+                );
+            } else {
+                // Domain tooltip
+                tooltipGroup = drawDomainInfoTooltips(
+                    startPixels,
+                    endPixels,
+                    seq_from,
+                    seq_to,
+                    domain as IprMatchFlat,
+                    renderOptions,
+                    fabricObj.top!
+                );
+            }
+            _this.canvas.add(tooltipGroup);
+            tooltipGroup.set({ visible: true });
             fabricObj.bringToFront();
-            fabricGroupObj.bringToFront();
+            tooltipGroup.bringToFront();
             _this.canvas.renderAll();
+            tooltipGroup.set({ visible: false });
         }
     });
 }
 
 export function mouseOutDomain(
     fabricObj: fabric.Object,
-    fabricGroupObj: fabric.Object,
     _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
-            fabricGroupObj.set({ visible: false });
             _this.canvas.renderAll();
         }
     });
