@@ -27,6 +27,7 @@ import {
     getIPRMCDbfetchURL,
     getXMLDataFromURL,
     parseXMLData,
+    ObjectCache,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -133,32 +134,6 @@ function createDomainCheckbox(
     mouseDownDomainCheckbox(rect, currentDomainDatabase, _this);
 }
 
-class ObjectCache<T> {
-    private values: Map<string, T> = new Map<string, T>();
-
-    public get(key: string): T | undefined {
-        const hasKey = this.values.has(key);
-        if (hasKey) {
-            return this.values.get(key) as T;
-        }
-        return;
-    }
-
-    public put(key: string, value: T) {
-        const hasKey = this.values.has(key);
-        if (!hasKey) {
-            this.values.set(key, value);
-        }
-    }
-
-    public delete(key: string) {
-        // const keyToDelete = this.values.keys().next().value;
-        const hasKey = this.values.has(key);
-        if (hasKey) {
-            this.values.delete(key);
-        }
-    }
-}
 
 let objCache = new ObjectCache();
 

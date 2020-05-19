@@ -11,6 +11,7 @@ import {
     getDataFromURLorFile,
     validateJobId,
     getServiceURLfromJobId,
+    ObjectCache,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -51,6 +52,8 @@ import {
     drawFooterText,
     drawCanvasWrapperStroke,
 } from "./drawing-utilities";
+
+let objCache = new ObjectCache();
 
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
@@ -195,62 +198,100 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
 
     private loadData() {
-        const json = getDataFromURLorFile(this.data).then((data) => data);
-        json.then((data) => {
-            if (typeof this.dataObj === "undefined") {
-                this.dataObj = data as SSSResultModel;
-                this.render();
-            }
-        }).catch((error) => console.log(error));
+        this.dataObj = objCache.get("sssDataObj") as SSSResultModel;
+        if (!this.dataObj) {
+            const json = getDataFromURLorFile(this.data).then((data) => data);
+            json.then((data) => {
+                if (typeof this.dataObj === "undefined") {
+                    this.dataObj = data as SSSResultModel;
+                    objCache.put("sssDataObj", this.dataObj);
+                    this.render();
+                }
+            }).catch((error) => console.log(error));
+        }
     }
 
     private loadInitalProperties() {
-        this.queryLen = this.dataObj.query_len;
-        for (const hit of this.dataObj.hits) {
-            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+        this.queryLen = objCache.get("queryLen") as number;
+        if (!this.queryLen) {
+            this.queryLen = this.dataObj.query_len;
+            for (const hit of this.dataObj.hits) {
+                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+            }
+            objCache.put("queryLen", this.queryLen);
         }
     }
 
     private loadInitialCoords() {
-        [
-            this.startQueryPixels,
-            this.endQueryPixels,
-            this.startSubjPixels,
-            this.endSubjPixels,
-        ] = getQuerySubjPixelCoords(
-            this.queryLen,
-            this.subjLen,
-            this.subjLen,
-            this.contentWidth,
-            this.contentScoringWidth,
-            this.contentLabelWidth,
-            this.marginWidth
-        );
-        this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
+        this.startQueryPixels = objCache.get("startQueryPixels") as number;
+        this.endQueryPixels = objCache.get("endQueryPixels") as number;
+        this.startSubjPixels = objCache.get("startSubjPixels") as number;
+        this.endSubjPixels = objCache.get("endSubjPixels") as number;
+        this.startEvalPixels = objCache.get("startEvalPixels") as number;
+        if (
+            !this.startQueryPixels &&
+            !this.endQueryPixels &&
+            !this.startSubjPixels &&
+            !this.endSubjPixels &&
+            !this.startEvalPixels
+        ) {
+            [
+                this.startQueryPixels,
+                this.endQueryPixels,
+                this.startSubjPixels,
+                this.endSubjPixels,
+            ] = getQuerySubjPixelCoords(
+                this.queryLen,
+                this.subjLen,
+                this.subjLen,
+                this.contentWidth,
+                this.contentScoringWidth,
+                this.contentLabelWidth,
+                this.marginWidth
+            );
+            this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
+            objCache.put("startQueryPixels", this.startQueryPixels);
+            objCache.put("endQueryPixels", this.endQueryPixels);
+            objCache.put("startSubjPixels", this.startSubjPixels);
+            objCache.put("endSubjPixels", this.endSubjPixels);
+            objCache.put("endSubjPixels", this.endSubjPixels);
+        }
     }
 
     private drawHeaderGroup() {
         // canvas header
         this.topPadding = 2;
-        const textHeaderGroup = drawHeaderTextGroup(
-            this.dataObj,
-            {
-                fontSize: this.fontSize,
-                canvasWidth: this.canvasWidth,
-            },
-            this.topPadding
-        );
+        let textHeaderGroup: fabric.Object;
+        textHeaderGroup = objCache.get("textHeaderGroup") as fabric.Object;
+        if (!textHeaderGroup) {
+            textHeaderGroup = drawHeaderTextGroup(
+                this.dataObj,
+                {
+                    fontSize: this.fontSize,
+                    canvasWidth: this.canvasWidth,
+                },
+                this.topPadding
+            );
+            objCache.put("textHeaderGroup", textHeaderGroup);
+        }
         this.canvas.add(textHeaderGroup);
 
         // canvas header (sequence info)
         this.topPadding += 45;
         let textHeaderLink: fabric.Text;
         let textSeqObj: TextType;
-        [textHeaderLink, textSeqObj] = drawHeaderLinkText(
-            this.dataObj,
-            { fontSize: this.fontSize },
-            this.topPadding
-        );
+        textHeaderLink = objCache.get("textHeaderLink") as fabric.Text;
+        textSeqObj = objCache.get("textHeaderLink_textSeqObj") as TextType;
+        if (!textHeaderLink) {
+            [textHeaderLink, textSeqObj] = drawHeaderLinkText(
+                this.dataObj,
+                { fontSize: this.fontSize },
+                this.topPadding
+            );
+            objCache.put("textHeaderLink", textHeaderLink);
+            objCache.put("textHeaderLink_textSeqObj", textSeqObj);
+        }
+        textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
         if (this.dataObj.query_url != null) {
             mouseOverText(textHeaderLink, textSeqObj, this);
@@ -263,53 +304,72 @@ export class VisualOutput extends BasicCanvasRenderer {
         if (this.dataObj.hits.length > 0) {
             // content header
             this.topPadding += 25;
-            const textContentHeaderGroup = drawContentHeaderTextGroup(
-                {
-                    queryLen: this.queryLen,
-                    subjLen: this.subjLen,
-                    startQueryPixels: this.startQueryPixels,
-                    startEvalPixels: this.startEvalPixels,
-                    startSubjPixels: this.startSubjPixels,
-                },
-                {
-                    contentWidth: this.contentWidth,
-                    contentScoringWidth: this.contentScoringWidth,
-                    fontSize: this.fontSize,
-                    colorScheme: this.colorScheme,
-                },
-                this.topPadding
-            );
+            let textContentHeaderGroup: fabric.Group;
+            textContentHeaderGroup = objCache.get(
+                "textContentHeaderGroup"
+            ) as fabric.Group;
+            if (!textContentHeaderGroup) {
+                textContentHeaderGroup = drawContentHeaderTextGroup(
+                    {
+                        queryLen: this.queryLen,
+                        subjLen: this.subjLen,
+                        startQueryPixels: this.startQueryPixels,
+                        startEvalPixels: this.startEvalPixels,
+                        startSubjPixels: this.startSubjPixels,
+                    },
+                    {
+                        contentWidth: this.contentWidth,
+                        contentScoringWidth: this.contentScoringWidth,
+                        fontSize: this.fontSize,
+                        colorScheme: this.colorScheme,
+                    },
+                    this.topPadding
+                );
+                objCache.put("textContentHeaderGroup", textContentHeaderGroup);
+            }
             this.canvas.add(textContentHeaderGroup);
 
             // content header line tracks
             this.topPadding += 20;
-            const lineTrackGroup = drawLineTracksQuerySubject(
-                {
-                    startQueryPixels: this.startQueryPixels,
-                    endQueryPixels: this.endQueryPixels,
-                    startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels,
-                },
-                { strokeWidth: 2 },
-                this.topPadding
-            );
+            let lineTrackGroup: fabric.Group;
+            lineTrackGroup = objCache.get("lineTrackGroup") as fabric.Group;
+            if (!lineTrackGroup) {
+                lineTrackGroup = drawLineTracksQuerySubject(
+                    {
+                        startQueryPixels: this.startQueryPixels,
+                        endQueryPixels: this.endQueryPixels,
+                        startSubjPixels: this.startSubjPixels,
+                        endSubjPixels: this.endSubjPixels,
+                    },
+                    { strokeWidth: 2 },
+                    this.topPadding
+                );
+                objCache.put("lineTrackGroup", lineTrackGroup);
+            }
             this.canvas.add(lineTrackGroup);
 
             this.topPadding += 5;
-            const textContentFooterGroup = drawContentQuerySubjFooterTextGroup(
-                {
-                    queryLen: this.queryLen,
-                    subjLen: this.subjLen,
-                    startQueryPixels: this.startQueryPixels,
-                    endQueryPixels: this.endQueryPixels,
-                    startSubjPixels: this.startSubjPixels,
-                    endSubjPixels: this.endSubjPixels,
-                },
-                {
-                    fontSize: this.fontSize,
-                },
-                this.topPadding
-            );
+            let textContentFooterGroup: fabric.Group;
+            textContentFooterGroup = objCache.get(
+                "textContentFooterGroup"
+            ) as fabric.Group;
+            if (!textContentFooterGroup) {
+                textContentFooterGroup = drawContentQuerySubjFooterTextGroup(
+                    {
+                        queryLen: this.queryLen,
+                        subjLen: this.subjLen,
+                        startQueryPixels: this.startQueryPixels,
+                        endQueryPixels: this.endQueryPixels,
+                        startSubjPixels: this.startSubjPixels,
+                        endSubjPixels: this.endSubjPixels,
+                    },
+                    {
+                        fontSize: this.fontSize,
+                    },
+                    this.topPadding
+                );
+                objCache.put("textContentFooterGroup", textContentFooterGroup);
+            }
             this.canvas.add(textContentFooterGroup);
 
             // dynamic content
@@ -406,22 +466,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             mouseOutText(hitText, textObj, this);
             for (const hsp of hit.hit_hsps) {
                 numberHsps++;
-                if (numberHsps > this.numberHsps) {
-                    if (this.logSkippedHsps === true) {
-                        const hspTextNotice = drawHspNoticeText(
-                            totalNumberHsps,
-                            this.numberHsps,
-                            {
-                                fontSize: this.fontSize,
-                                contentWidth: this.contentWidth,
-                            },
-                            this.topPadding
-                        );
-                        this.canvas.add(hspTextNotice);
-                        this.topPadding += 20;
-                    }
-                    break;
-                } else {
+                if (numberHsps <= this.numberHsps) {
                     // line Tracks
                     const subjHspLen: number = hit.hit_len;
                     let startQueryPixels: number;
@@ -531,38 +576,80 @@ export class VisualOutput extends BasicCanvasRenderer {
                     this.canvas.add(scoreText);
 
                     // Query tooltip
-                    const queryTooltipGroup = drawDomainTooltips(
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                        hsp.hsp_query_from,
-                        hsp.hsp_query_to,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme,
-                        },
-                        this.topPadding
-                    );
+                    let queryTooltipGroup: fabric.Group;
+                    queryTooltipGroup = objCache.get(
+                        `query_${hit.hit_num}_${hsp.hsp_num}`
+                    ) as fabric.Group;
+                    if (!queryTooltipGroup) {
+                        queryTooltipGroup = drawDomainTooltips(
+                            startQueryHspPixels,
+                            endQueryHspPixels,
+                            hsp.hsp_query_from,
+                            hsp.hsp_query_to,
+                            hsp,
+                            {
+                                fontSize: this.fontSize,
+                                colorScheme: this.colorScheme,
+                            },
+                            this.topPadding
+                        );
+                        objCache.put(
+                            `query_${hit.hit_num}_${hsp.hsp_num}`,
+                            queryTooltipGroup
+                        );
+                    }
                     this.canvas.add(queryTooltipGroup);
                     mouseOverDomain(queryDomain, queryTooltipGroup, this);
                     mouseOutDomain(queryDomain, queryTooltipGroup, this);
 
                     // Subject tooltip
-                    const subjTooltipGroup = drawDomainTooltips(
-                        startSubjHspPixels,
-                        endSubjHspPixels,
-                        hsp.hsp_hit_from,
-                        hsp.hsp_hit_to,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme,
-                        },
-                        this.topPadding
-                    );
+                    let subjTooltipGroup: fabric.Group;
+                    subjTooltipGroup = objCache.get(
+                        `subj_${hit.hit_num}_${hsp.hsp_num}`
+                    ) as fabric.Group;
+                    if (!subjTooltipGroup) {
+                        subjTooltipGroup = drawDomainTooltips(
+                            startSubjHspPixels,
+                            endSubjHspPixels,
+                            hsp.hsp_hit_from,
+                            hsp.hsp_hit_to,
+                            hsp,
+                            {
+                                fontSize: this.fontSize,
+                                colorScheme: this.colorScheme,
+                            },
+                            this.topPadding
+                        );
+                        objCache.put(
+                            `subj_${hit.hit_num}_${hsp.hsp_num}`,
+                            subjTooltipGroup
+                        );
+                    }
                     this.canvas.add(subjTooltipGroup);
                     mouseOverDomain(subjDomain, subjTooltipGroup, this);
                     mouseOutDomain(subjDomain, subjTooltipGroup, this);
+                } else {
+                    if (this.logSkippedHsps === true) {
+                        let hspTextNotice: fabric.Text;
+                        hspTextNotice = objCache.get(
+                            "hspTextNotice"
+                        ) as fabric.Text;
+                        if (!hspTextNotice) {
+                            hspTextNotice = drawHspNoticeText(
+                                totalNumberHsps,
+                                this.numberHsps,
+                                {
+                                    fontSize: this.fontSize,
+                                    contentWidth: this.contentWidth,
+                                },
+                                this.topPadding
+                            );
+                            objCache.put("hspTextNotice", hspTextNotice);
+                        }
+                        this.canvas.add(hspTextNotice);
+                        this.topPadding += 20;
+                    }
+                    break;
                 }
             }
         }
@@ -733,12 +820,18 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.topPadding += 30;
         let copyrightText: fabric.Text;
         let textFooterObj: TextType;
-        [copyrightText, textFooterObj] = drawFooterText(
-            {
-                fontSize: this.fontSize,
-            },
-            this.topPadding
-        );
+        copyrightText = objCache.get("copyrightText") as fabric.Text;
+        textFooterObj = objCache.get("copyrightText_textFooterObj") as TextType;
+        if (!copyrightText && !textFooterObj) {
+            [copyrightText, textFooterObj] = drawFooterText(
+                {
+                    fontSize: this.fontSize,
+                },
+                this.topPadding
+            );
+            objCache.put("copyrightText", copyrightText);
+            objCache.put("copyrightText_textFooterObj", textFooterObj);
+        }
         this.canvas.add(copyrightText);
         mouseOverText(copyrightText, textFooterObj, this);
         mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
