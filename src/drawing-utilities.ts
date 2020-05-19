@@ -993,22 +993,21 @@ export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {
 export function drawContentTitleText(
     renderOptions: RenderOptions,
     topPadding: number
-): [fabric.Text, TextType] {
+): fabric.Text {
     const textObj = { ...textDefaults };
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 2;
     textObj.top = topPadding;
     textObj.left = 350;
     const title = "Fast Family and Domain Prediction by InterPro";
-    const titleText = new fabric.Text(`${title}`, textObj);
-    return [titleText, textObj];
+    return new fabric.Text(`${title}`, textObj);
 }
 
 export function drawContentSupressText(
     renderOptions: RenderOptions,
     topPadding: number,
     numberHits: number
-): [fabric.Text, TextType] {
+): fabric.Text {
     const textObj = { ...textDefaults };
     textObj.fontSize = renderOptions.fontSize!;
     textObj.top = topPadding;
@@ -1017,8 +1016,7 @@ export function drawContentSupressText(
     const title =
         `This is a partial representation of the result, ` +
         `only the first ${numberHits} hits are displayed!`;
-    const titleText = new fabric.Text(`${title}`, textObj);
-    return [titleText, textObj];
+    return new fabric.Text(`${title}`, textObj);
 }
 
 export function drawProteinFeaturesText(

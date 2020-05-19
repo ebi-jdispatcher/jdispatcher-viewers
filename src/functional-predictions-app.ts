@@ -324,63 +324,92 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     }
 
     private loadData() {
-        const json = getDataFromURLorFile(this.data).then((data) => data);
-        json.then((data) => {
-            if (typeof this.sssDataObj === "undefined") {
-                this.sssDataObj = data as SSSResultModel;
-                this.render();
-            }
-        }).catch((error) => console.log(error));
+        this.sssDataObj = objCache.get("sssDataObj") as SSSResultModel;
+        if (!this.sssDataObj) {
+            const json = getDataFromURLorFile(this.data).then((data) => data);
+            json.then((data) => {
+                if (typeof this.sssDataObj === "undefined") {
+                    this.sssDataObj = data as SSSResultModel;
+                    objCache.put("sssDataObj", this.sssDataObj);
+                    this.render();
+                }
+            }).catch((error) => console.log(error));
+        }
     }
 
     private loadInitalProperties() {
         this.queryStart = 1;
-        this.queryEnd = this.sssDataObj.query_len;
-        for (const hit of this.sssDataObj.hits) {
-            if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+        this.queryEnd = objCache.get("queryEnd") as number;
+        if (!this.queryEnd) {
+            this.queryEnd = this.sssDataObj.query_len;
+            for (const hit of this.sssDataObj.hits) {
+                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+            }
+            objCache.put("queryEnd", this.queryEnd);
         }
     }
 
     private loadInitialCoords() {
-        [this.startPixels, this.endPixels] = getPixelCoords(
-            this.contentWidth,
-            this.contentLabelWidth,
-            this.marginWidth
-        );
+        this.startPixels = objCache.get("startPixels") as number;
+        this.endPixels = objCache.get("endPixels") as number;
+        if (!this.startPixels && !this.endPixels) {
+            [this.startPixels, this.endPixels] = getPixelCoords(
+                this.contentWidth,
+                this.contentLabelWidth,
+                this.marginWidth
+            );
+            objCache.put("startPixels", this.startPixels);
+            objCache.put("endPixels", this.endPixels);
+        }
     }
 
     private loadIPRMCdata() {
         let accessions: string = "";
         if (this.sssDataObj != undefined) {
-            for (const hit of this.sssDataObj.hits) {
-                if (accessions === "") accessions += `${hit.hit_acc}`;
-                else accessions += `,${hit.hit_acc}`;
-            }
-            //    const xmlURL = getIPRMCDbfetchURL(accessions);
-            //    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
-            //    xml.then((data) => {
-            //        if (typeof this.iprmcDataObj === "undefined") {
-            //            this.iprmcDataObj = parseXMLData(data);
-            //            this.render();
-            //        }
-            //    }).catch((error) => console.log(error));
-            // Temporarily to avoid hitting Dbfetch
-            const json = getDataFromURLorFile("./src/testdata/iprmc.json").then(
-                (data) => data
-            );
-            json.then((data) => {
-                if (typeof this.iprmcDataObj === "undefined") {
-                    this.iprmcDataObj = data as IPRMCResultModel;
-                    this.render();
+            this.iprmcDataObj = objCache.get(
+                "IPRMCResultModel"
+            ) as IPRMCResultModel;
+            if (!this.iprmcDataObj) {
+                for (const hit of this.sssDataObj.hits) {
+                    if (accessions === "") accessions += `${hit.hit_acc}`;
+                    else accessions += `,${hit.hit_acc}`;
                 }
-            }).catch((error) => console.log(error));
+                //    const xmlURL = getIPRMCDbfetchURL(accessions);
+                //    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
+                //    xml.then((data) => {
+                //        if (typeof this.iprmcDataObj === "undefined") {
+                //            this.iprmcDataObj = parseXMLData(data);
+                //            this.render();
+                //        }
+                //    }).catch((error) => console.log(error));
+                // Temporarily to avoid hitting Dbfetch
+                const json = getDataFromURLorFile(
+                    "./src/testdata/iprmc.json"
+                ).then((data) => data);
+                json.then((data) => {
+                    if (typeof this.iprmcDataObj === "undefined") {
+                        this.iprmcDataObj = data as IPRMCResultModel;
+                        objCache.put("IPRMCResultModel", this.iprmcDataObj);
+                        this.render();
+                    }
+                }).catch((error) => console.log(error));
+            }
 
             // disable domain checkboxes that have no predictions
             // and get 'workable' IPRMC data structure
             if (this.iprmcDataObj != undefined) {
-                this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
-                    this.iprmcDataObj
-                );
+                this.uniqueDomainDatabases = objCache.get(
+                    "uniqueDomainDatabases"
+                ) as string[];
+                if (!this.uniqueDomainDatabases) {
+                    this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
+                        this.iprmcDataObj
+                    );
+                    objCache.put(
+                        "uniqueDomainDatabases",
+                        this.uniqueDomainDatabases
+                    );
+                }
                 // remove domainDatabases not in the set of unique domainDatabases
                 for (const db of this.domainDatabaseList) {
                     if (
@@ -394,10 +423,16 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                         }
                     }
                 }
-                this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
-                    this.iprmcDataObj,
-                    this.numberHits
-                );
+                this.iprmcDataFlatObj = objCache.get(
+                    "iprmcDataFlatObj"
+                ) as IPRMCResultModelFlat;
+                if (!this.iprmcDataFlatObj) {
+                    this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
+                        this.iprmcDataObj,
+                        this.numberHits
+                    );
+                    objCache.put("iprmcDataFlatObj", this.iprmcDataFlatObj);
+                }
             }
         }
     }
@@ -405,25 +440,37 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private drawHeaderGroup() {
         // canvas header
         this.topPadding = 2;
-        const textHeaderGroup = drawHeaderTextGroup(
-            this.sssDataObj,
-            {
-                fontSize: this.fontSize,
-                canvasWidth: this.canvasWidth,
-            },
-            this.topPadding
-        );
+        let textHeaderGroup: fabric.Object;
+        textHeaderGroup = objCache.get("textHeaderGroup") as fabric.Object;
+        if (!textHeaderGroup) {
+            textHeaderGroup = drawHeaderTextGroup(
+                this.sssDataObj,
+                {
+                    fontSize: this.fontSize,
+                    canvasWidth: this.canvasWidth,
+                },
+                this.topPadding
+            );
+            objCache.put("textHeaderGroup", textHeaderGroup);
+        }
         this.canvas.add(textHeaderGroup);
 
         // canvas header (sequence info)
         this.topPadding += 45;
         let textHeaderLink: fabric.Text;
         let textSeqObj: TextType;
-        [textHeaderLink, textSeqObj] = drawHeaderLinkText(
-            this.sssDataObj,
-            { fontSize: this.fontSize },
-            this.topPadding
-        );
+        textHeaderLink = objCache.get("textHeaderLink") as fabric.Text;
+        textSeqObj = objCache.get("textHeaderLink_textSeqObj") as TextType;
+        if (!textHeaderLink) {
+            [textHeaderLink, textSeqObj] = drawHeaderLinkText(
+                this.sssDataObj,
+                { fontSize: this.fontSize },
+                this.topPadding
+            );
+            objCache.put("textHeaderLink", textHeaderLink);
+            objCache.put("textHeaderLink_textSeqObj", textSeqObj);
+        }
+        textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
         if (this.sssDataObj.query_url != null) {
             mouseOverText(textHeaderLink, textSeqObj, this);
@@ -436,13 +483,16 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // canvas content title
         this.topPadding += 25;
         let titleText: fabric.Text;
-        let textTitleObj: TextType;
-        [titleText, textTitleObj] = drawContentTitleText(
-            {
-                fontSize: this.fontSize + 1,
-            },
-            this.topPadding
-        );
+        titleText = objCache.get("titleText") as fabric.Text;
+        if (!titleText) {
+            titleText = drawContentTitleText(
+                {
+                    fontSize: this.fontSize + 1,
+                },
+                this.topPadding
+            );
+            objCache.put("titleText", titleText);
+        }
         this.canvas.add(titleText);
 
         // canvas dynamic content
@@ -508,13 +558,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     private drawPredictionsGroup() {
         // Protein Features - Database Selection
-        const pfLabelText = drawProteinFeaturesText(
-            {
-                fontSize: this.fontSize,
-                scaleLabelWidth: this.scaleLabelWidth - 50,
-            },
-            this.topPadding
-        );
+        let pfLabelText: fabric.Text;
+        pfLabelText = objCache.get("pfLabelText") as fabric.Text;
+        if (!pfLabelText) {
+            pfLabelText = drawProteinFeaturesText(
+                {
+                    fontSize: this.fontSize,
+                    scaleLabelWidth: this.scaleLabelWidth - 50,
+                },
+                this.topPadding
+            );
+            objCache.put("pfLabelText", pfLabelText);
+        }
         this.canvas.add(pfLabelText);
 
         // display the domain checkboxes
@@ -845,17 +900,27 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                             );
                             this.canvas.add(dpDomain);
                             // Domain tooltip
-                            const domainTooltipGroup = drawDomainInfoTooltips(
-                                startDomainPixels,
-                                endDomainPixels,
-                                domainStart,
-                                domainEnd,
-                                dp,
-                                {
-                                    fontSize: this.fontSize,
-                                },
-                                this.topPadding
-                            );
+                            let domainTooltipGroup: fabric.Group;
+                            domainTooltipGroup = objCache.get(
+                                `${hit.hit_id}_${did}_${dp.id}_${dp.start}_${dp.end}`
+                            ) as fabric.Group;
+                            if (!domainTooltipGroup) {
+                                domainTooltipGroup = drawDomainInfoTooltips(
+                                    startDomainPixels,
+                                    endDomainPixels,
+                                    domainStart,
+                                    domainEnd,
+                                    dp,
+                                    {
+                                        fontSize: this.fontSize,
+                                    },
+                                    this.topPadding
+                                );
+                                objCache.put(
+                                    `${hit.hit_id}_${did}_${dp.id}_${dp.start}_${dp.end}`,
+                                    domainTooltipGroup
+                                );
+                            }
                             this.canvas.add(domainTooltipGroup);
                             mouseOverDomain(dpDomain, domainTooltipGroup, this);
                             mouseOutDomain(dpDomain, domainTooltipGroup, this);
@@ -879,15 +944,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             } else {
                 // canvas content suppressed output
                 let supressText: fabric.Text;
-                let textSupressObj: TextType;
-                [supressText, textSupressObj] = drawContentSupressText(
-                    {
-                        fontSize: this.fontSize,
-                        contentWidth: this.contentWidth,
-                    },
-                    this.topPadding,
-                    this.numberHits
-                );
+                supressText = objCache.get("supressText") as fabric.Text;
+                if (!supressText) {
+                    supressText = drawContentSupressText(
+                        {
+                            fontSize: this.fontSize,
+                            contentWidth: this.contentWidth,
+                        },
+                        this.topPadding,
+                        this.numberHits
+                    );
+                    objCache.put("supressText", supressText);
+                }
                 this.canvas.add(supressText);
                 break;
             }
@@ -1059,12 +1127,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         this.topPadding += 30;
         let copyrightText: fabric.Text;
         let textFooterObj: TextType;
-        [copyrightText, textFooterObj] = drawFooterText(
-            {
-                fontSize: this.fontSize,
-            },
-            this.topPadding
-        );
+        copyrightText = objCache.get("copyrightText") as fabric.Text;
+        textFooterObj = objCache.get("copyrightText_textFooterObj") as TextType;
+        if (!copyrightText && !textFooterObj) {
+            [copyrightText, textFooterObj] = drawFooterText(
+                {
+                    fontSize: this.fontSize,
+                },
+                this.topPadding
+            );
+            objCache.put("copyrightText", copyrightText);
+            objCache.put("copyrightText_textFooterObj", textFooterObj);
+        }
         this.canvas.add(copyrightText);
         mouseOverText(copyrightText, textFooterObj, this);
         mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
