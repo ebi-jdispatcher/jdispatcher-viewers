@@ -1199,3 +1199,62 @@ export function drawDomainInfoTooltips(
     );
     return tooltipGroup;
 }
+
+export function drawURLInfoTooltip(
+    startPixels: number,
+    sequence: string,
+    URL: string,
+    renderOptions: RenderOptions,
+    topPadding: number
+): fabric.Group {
+    const floatTextObj = { ...textDefaults };
+    floatTextObj.fontSize = renderOptions.fontSize! + 1;
+    floatTextObj.originX = "left";
+    floatTextObj.originY = "top";
+    floatTextObj.top = 5;
+    floatTextObj.left = 5;
+    if (sequence.length > 150) {
+        sequence = sequence.slice(0, 150) + "...";
+    }
+    let tooltipText: fabric.Text;
+    if (sequence !== "") {
+        const seqLabel = sequence.length * 6.3;
+        const urlLabel = URL.length * 6.3;
+        if (seqLabel > urlLabel) {
+            floatTextObj.width = seqLabel + 5;
+        } else {
+            floatTextObj.width = urlLabel + 5;
+        }
+        tooltipText = new fabric.Text(`${sequence}\n` + `${URL}`, floatTextObj);
+    } else {
+        const urlLabel = URL.length * 6.3;
+        floatTextObj.width = urlLabel + 5;
+        tooltipText = new fabric.Text(`${URL}`, floatTextObj);
+    }
+    const rectObj = { ...rectDefaults };
+    rectObj.fill = "white";
+    rectObj.stroke = "lightseagreen";
+    rectObj.strokeWidth = 0.5;
+    rectObj.rx = 5;
+    rectObj.ry = 5;
+    rectObj.originX = "left";
+    rectObj.originY = "top";
+    rectObj.width = tooltipText.width! + 10;
+    rectObj.height = tooltipText.height! + 10;
+    rectObj.opacity = 0.95;
+
+    const tooltipBox: fabric.Rect = new fabric.Rect(rectObj);
+    const tooltipGroup: fabric.Group = new fabric.Group(
+        [tooltipBox, tooltipText],
+        {
+            selectable: false,
+            evented: false,
+            objectCaching: false,
+            visible: true,
+            top: topPadding,
+            originX: "left",
+        }
+    );
+    tooltipGroup.left = startPixels + 10;
+    return tooltipGroup;
+}

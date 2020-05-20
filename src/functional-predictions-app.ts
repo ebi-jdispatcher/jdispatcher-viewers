@@ -447,8 +447,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         }
         textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
-        if (this.sssDataObj.query_url != null) {
-            mouseOverText(textHeaderLink, textSeqObj, this);
+        if (
+            this.sssDataObj.query_url != null &&
+            this.sssDataObj.query_url !== ""
+        ) {
+            mouseOverText(
+                textHeaderLink,
+                textSeqObj,
+                this.sssDataObj.query_def,
+                this.sssDataObj.query_url,
+                { fontSize: this.fontSize },
+                this
+            );
             mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
             mouseOutText(textHeaderLink, textSeqObj, this);
         }
@@ -731,11 +741,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
                 this.canvas.add(spaceText);
                 this.canvas.add(hitText);
-                mouseOverText(hitText, textObj, this);
+                mouseOverText(
+                    hitText,
+                    textObj,
+                    hit.hit_def,
+                    hit.hit_url,
+                    { fontSize: this.fontSize },
+                    this
+                );
                 mouseDownText(hitText, hit.hit_url, this);
                 mouseOutText(hitText, textObj, this);
 
-                // subject line tracks
+                // domain line tracks
                 const lineTrackGroup = drawLineTracks(
                     {
                         startPixels: this.startPixels,
@@ -746,7 +763,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
                 this.canvas.add(lineTrackGroup);
 
-                // subject line tracks - legends
+                // domain line tracks - legends
                 this.topPadding += 5;
                 const textContentFooterGroup = drawContentFooterTextGroup(
                     {

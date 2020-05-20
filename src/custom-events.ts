@@ -9,6 +9,7 @@ import { VisualOutput } from "./visual-output-app";
 import { Hsp, IprMatchFlat } from "./data-model";
 import { FunctionalPredictions } from "./functional-predictions-app";
 import {
+    drawURLInfoTooltip,
     drawDomainTooltips,
     drawDomainInfoTooltips,
 } from "./drawing-utilities";
@@ -16,6 +17,9 @@ import {
 export function mouseOverText(
     fabricObj: fabric.Object,
     textObj: TextType,
+    sequence: string,
+    URL: string,
+    renderOptions: RenderOptions,
     _this: VisualOutput | FunctionalPredictions
 ) {
     fabricObj.on("mouseover", (e: fabric.IEvent) => {
@@ -23,7 +27,17 @@ export function mouseOverText(
             e.target.set("hoverCursor", "pointer");
             e.target.setOptions(textObj);
             e.target.setOptions({ underline: true });
+            // add tooltip (on the flight)
+            const urlTooltip = drawURLInfoTooltip(
+                +fabricObj.left!,
+                sequence,
+                URL,
+                renderOptions,
+                +fabricObj.top! + 15
+            );
+            _this.canvas.add(urlTooltip);
             _this.canvas.renderAll();
+            urlTooltip.visible = false;
         }
     });
 }

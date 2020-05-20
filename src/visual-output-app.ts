@@ -40,7 +40,6 @@ import {
     drawContentQuerySubjFooterTextGroup,
     drawNoHitsFoundText,
     drawDomainQueySubject,
-    drawDomainTooltips,
     drawScaleTypeText,
     drawCheckBoxText,
     drawScaleScoreText,
@@ -293,9 +292,16 @@ export class VisualOutput extends BasicCanvasRenderer {
         }
         textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
-        if (this.dataObj.query_url != null) {
-            mouseOverText(textHeaderLink, textSeqObj, this);
-            mouseDownText(textHeaderLink, this.dataObj.query_url, this);
+        if (this.dataObj.query_url !== null && this.dataObj.query_url !== "") {
+            mouseOverText(
+                textHeaderLink,
+                textSeqObj,
+                this.dataObj.query_def!,
+                this.dataObj.query_url!,
+                { fontSize: this.fontSize },
+                this
+            );
+            mouseDownText(textHeaderLink, this.dataObj.query_url!, this);
             mouseOutText(textHeaderLink, textSeqObj, this);
         }
     }
@@ -461,7 +467,15 @@ export class VisualOutput extends BasicCanvasRenderer {
             );
             this.canvas.add(spaceText);
             this.canvas.add(hitText);
-            mouseOverText(hitText, textObj, this);
+            mouseOverText(
+                hitText,
+                textObj,
+                hit.hit_def,
+                hit.hit_url,
+                { fontSize: this.fontSize },
+                this
+            );
+            // mouseOverText(hitText, textObj, this);
             mouseDownText(hitText, hit.hit_url, this);
             mouseOutText(hitText, textObj, this);
             for (const hsp of hit.hit_hsps) {
