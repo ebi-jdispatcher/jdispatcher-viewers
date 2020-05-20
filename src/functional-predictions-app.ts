@@ -831,95 +831,109 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 // unique domain predictions && selected domain Databases
                 let boxHeight = 0;
                 let tmpTopPadding = this.topPadding - 15;
-                for (const did of this.iprmcDataFlatObj[hit.hit_acc][
-                    "matches"
-                ]) {
-                    const domain = domainDatabaseNameToString(
-                        this.iprmcDataFlatObj[hit.hit_acc]["match"][did][0][
-                            "dbname"
-                        ] as string
-                    );
-                    if (this.domainDatabaseList.includes(domain)) {
-                        this.topPadding += 15;
-                        boxHeight += 15;
-                        // domain dashed-line tracks
-                        let dashedLineTrackGroup = drawDomainLineTracks(
-                            {
-                                startPixels: this.startPixels,
-                                endPixels: this.endPixels,
-                            },
-                            { strokeWidth: 1, strokeDashArray: [1, 5] },
-                            this.topPadding
-                        );
-                        this.canvas.add(dashedLineTrackGroup);
-                        dashedLineTrackGroup.sendToBack();
-
-                        // draw domain ID text
-                        let textObj: TextType;
-                        let spaceText, hitText: fabric.Text;
-                        [
-                            spaceText,
-                            hitText,
-                            textObj,
-                        ] = drawContentDomainInfoText(
-                            did.split("_")[1] + " ►",
-                            { fontSize: this.fontSize },
-                            this.topPadding
-                        );
-                        this.canvas.add(spaceText);
-                        this.canvas.add(hitText);
-                        // Domain URL mapping
-                        const domainURL = getDomainURLbyDatabase(
-                            did.split("_")[1],
-                            domain
-                        );
-                        mouseOverText(hitText, textObj, this);
-                        mouseDownText(hitText, domainURL, this);
-                        mouseOutText(hitText, textObj, this);
-
-                        // draw domain Predictions (loop over each prediction)
-                        for (const dp of this.iprmcDataFlatObj[hit.hit_acc][
-                            "match"
-                        ][did]) {
-                            // domain coordinates
-                            let domainStart = dp.start as number;
-                            let domainEnd = dp.end as number;
-                            let startDomainPixels: number = 0;
-                            let endDomainPixels: number = 0;
-                            [
-                                startDomainPixels,
-                                endDomainPixels,
-                            ] = getDomainPixelCoords(
-                                this.startPixels,
-                                this.endPixels,
-                                hit.hit_len,
-                                domainStart,
-                                domainEnd,
-                                this.marginWidth
+                if (hit.hit_acc in this.iprmcDataFlatObj) {
+                    if (
+                        this.iprmcDataFlatObj[hit.hit_acc]["matches"] !==
+                        undefined
+                    ) {
+                        for (const did of this.iprmcDataFlatObj[hit.hit_acc][
+                            "matches"
+                        ]) {
+                            const domain = domainDatabaseNameToString(
+                                this.iprmcDataFlatObj[hit.hit_acc]["match"][
+                                    did
+                                ][0]["dbname"] as string
                             );
+                            if (this.domainDatabaseList.includes(domain)) {
+                                this.topPadding += 15;
+                                boxHeight += 15;
+                                // domain dashed-line tracks
+                                let dashedLineTrackGroup = drawDomainLineTracks(
+                                    {
+                                        startPixels: this.startPixels,
+                                        endPixels: this.endPixels,
+                                    },
+                                    { strokeWidth: 1, strokeDashArray: [1, 5] },
+                                    this.topPadding
+                                );
+                                this.canvas.add(dashedLineTrackGroup);
+                                dashedLineTrackGroup.sendToBack();
 
-                            // domain predictions
-                            const dpDomain = drawDomains(
-                                startDomainPixels,
-                                endDomainPixels,
-                                this.topPadding + 10,
-                                colorByDatabaseName(dp.dbname as string)
-                            );
-                            this.canvas.add(dpDomain);
-                            // Domain hovering and tooltip
-                            mouseOverDomain(
-                                dpDomain,
-                                startDomainPixels,
-                                endDomainPixels,
-                                domainStart,
-                                domainEnd,
-                                dp,
-                                {
-                                    fontSize: this.fontSize,
-                                },
-                                this
-                            );
-                            mouseOutDomain(dpDomain, this);
+                                // draw domain ID text
+                                let textObj: TextType;
+                                let spaceText, hitText: fabric.Text;
+                                [
+                                    spaceText,
+                                    hitText,
+                                    textObj,
+                                ] = drawContentDomainInfoText(
+                                    did.split("_")[1] + " ►",
+                                    { fontSize: this.fontSize },
+                                    this.topPadding
+                                );
+                                this.canvas.add(spaceText);
+                                this.canvas.add(hitText);
+                                // Domain URL mapping
+                                const domainURL = getDomainURLbyDatabase(
+                                    did.split("_")[1],
+                                    domain
+                                );
+                                mouseOverText(
+                                    hitText,
+                                    textObj,
+                                    "",
+                                    domainURL,
+                                    { fontSize: this.fontSize },
+                                    this
+                                );
+                                mouseDownText(hitText, domainURL, this);
+                                mouseOutText(hitText, textObj, this);
+
+                                // draw domain Predictions (loop over each prediction)
+                                for (const dp of this.iprmcDataFlatObj[
+                                    hit.hit_acc
+                                ]["match"][did]) {
+                                    // domain coordinates
+                                    let domainStart = dp.start as number;
+                                    let domainEnd = dp.end as number;
+                                    let startDomainPixels: number = 0;
+                                    let endDomainPixels: number = 0;
+                                    [
+                                        startDomainPixels,
+                                        endDomainPixels,
+                                    ] = getDomainPixelCoords(
+                                        this.startPixels,
+                                        this.endPixels,
+                                        hit.hit_len,
+                                        domainStart,
+                                        domainEnd,
+                                        this.marginWidth
+                                    );
+
+                                    // domain predictions
+                                    const dpDomain = drawDomains(
+                                        startDomainPixels,
+                                        endDomainPixels,
+                                        this.topPadding + 10,
+                                        colorByDatabaseName(dp.dbname as string)
+                                    );
+                                    this.canvas.add(dpDomain);
+                                    // Domain hovering and tooltip
+                                    mouseOverDomain(
+                                        dpDomain,
+                                        startDomainPixels,
+                                        endDomainPixels,
+                                        domainStart,
+                                        domainEnd,
+                                        dp,
+                                        {
+                                            fontSize: this.fontSize,
+                                        },
+                                        this
+                                    );
+                                    mouseOutDomain(dpDomain, this);
+                                }
+                            }
                         }
                     }
                 }
