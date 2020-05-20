@@ -8,6 +8,14 @@ export function getTextLegendPaddingFactor(inputString: string): number {
         positionFactor = 15.5;
     } else if (inputString.length === 4) {
         positionFactor = 21;
+    } else if (inputString.length === 5) {
+        positionFactor = 29;
+    } else if (inputString.length === 6) {
+        positionFactor = 35;
+    } else if (inputString.length === 7) {
+        positionFactor = 41;
+    } else if (inputString.length === 8) {
+        positionFactor = 47;
     }
     return positionFactor;
 }
