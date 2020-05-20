@@ -127,8 +127,16 @@ export async function getXMLDataFromURL(dataLoc: string): Promise<string> {
     }
 }
 
-export function parseXMLData(data: string): IPRMCResultModel {
-    return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
+export function parseXMLData(data: string): IPRMCResultModel | object {
+    try {
+        return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
+    } catch (error) {
+        console.log(
+            "Cannot parse the resulting " +
+                "Dbfetch response (likely not formatted XML)!"
+        );
+        return {};
+    }
 }
 
 export function domainDatabaseNameToString(domainName: string): string {
