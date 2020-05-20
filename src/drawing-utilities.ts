@@ -1102,9 +1102,7 @@ export function drawContentDomainInfoText(
     let domain: string = `${domainID}`;
     let domain_full: string = `${variableSpace}${domainID}`;
     if (domain_full.length > 40) {
-        domain = (domain_full.slice(0, 38) + "...").slice(
-            variableSpace.length
-        );
+        domain = (domain_full.slice(0, 38) + "...").slice(variableSpace.length);
     }
     textObj.left = 12 + variableSpace.length * 6;
     textObj.evented = true;
@@ -1151,25 +1149,22 @@ export function drawDomainInfoTooltips(
     floatTextObj.originY = "top";
     floatTextObj.top = 5;
     floatTextObj.left = 10;
-    floatTextObj.paddingLeft = 10;
-    floatTextObj.splitByGrapheme = true;
     floatTextObj.width = 200;
-    const dbname = (domain.dbname as string).split(" ")[0];
     let tooltip: string =
         `Start: ${seq_from}\n` +
-        `End: ${seq_to}\n` + 
+        `End: ${seq_to}\n` +
         `Database: ${domain.dbname}\n`;
     if (domain.altid !== undefined && domain.altname !== undefined) {
         tooltip +=
             `ID: ${domain.altid}\n` +
-            `Name: ${domain.altname}\n` + 
+            `Name: ${domain.altname}\n` +
             `Type: ${domain.type}\n` +
             `IPR ID: ${domain.id}\n` +
             `IPR Name: ${domain.name}\n`;
     } else {
         tooltip +=
             `ID: ${domain.id}\n` +
-            `Name: ${domain.name}\n` + 
+            `Name: ${domain.name}\n` +
             `Type: ${domain.type}\n`;
     }
     const tooltipText = new fabric.Textbox(tooltip, floatTextObj);
@@ -1181,7 +1176,7 @@ export function drawDomainInfoTooltips(
     rectObj.ry = 5;
     rectObj.originX = "top";
     rectObj.originY = "top";
-    rectObj.width = 240;
+    rectObj.width = tooltipText.width! + 40;
     rectObj.height = tooltipText.height!;
     rectObj.opacity = 0.95;
 

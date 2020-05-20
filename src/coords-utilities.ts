@@ -133,7 +133,10 @@ export function getDomainPixelCoords(
     const totalPixels = endPixels - startPixels;
     const startDomainPixels =
         startPixels + (startDomain * totalPixels) / hitLen - marginWidth;
-    const endDomainPixels = (
-        startPixels + (endDomain * totalPixels) / hitLen - marginWidth) - startDomainPixels;
+    const endDomainPixels =
+        startPixels +
+        (endDomain * totalPixels) / hitLen -
+        marginWidth -
+        startDomainPixels;
     return [startDomainPixels, endDomainPixels];
 }

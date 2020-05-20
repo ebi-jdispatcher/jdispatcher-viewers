@@ -96,7 +96,7 @@ export function mouseOverDomain(
                     seq_to,
                     domain as Hsp,
                     renderOptions,
-                    fabricObj.top!
+                    fabricObj.top! + 5
                 );
             } else {
                 // Domain tooltip
@@ -107,7 +107,7 @@ export function mouseOverDomain(
                     seq_to,
                     domain as IprMatchFlat,
                     renderOptions,
-                    fabricObj.top!
+                    fabricObj.top! + 5
                 );
             }
             _this.canvas.add(tooltipGroup);

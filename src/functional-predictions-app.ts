@@ -134,7 +134,6 @@ function createDomainCheckbox(
     mouseDownDomainCheckbox(rect, currentDomainDatabase, _this);
 }
 
-
 let objCache = new ObjectCache();
 
 export class BasicCanvasRenderer {
@@ -504,8 +503,15 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.drawDynamicContentGroup();
 
             // color scale
-            this.topPadding += 35;
-            this.drawColorScaleGroup();
+            if (
+                this.domainDatabaseList.length > 0 &&
+                this.uniqueDomainDatabases.length > 0
+            ) {
+                this.topPadding += 30;
+                this.drawColorScaleGroup();
+            } else {
+                this.topPadding -= 40;
+            }
         } else {
             // text content: "No predictions found!"
             this.topPadding += 20;
@@ -1128,10 +1134,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     private wrapCanvas() {
         this.topPadding += 20;
-        // topPadding always overrides the canvasHeight?
-        // if (this.canvasHeight < this.topPadding) {
-        //     this.canvasHeight = this.topPadding;
-        // }
+        // topPadding always overrides the canvasHeight
         this.canvasHeight = this.topPadding;
         if (this.canvasWrapperStroke) {
             // final canvas wrapper stroke

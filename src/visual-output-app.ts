@@ -253,7 +253,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             objCache.put("endQueryPixels", this.endQueryPixels);
             objCache.put("startSubjPixels", this.startSubjPixels);
             objCache.put("endSubjPixels", this.endSubjPixels);
-            objCache.put("endSubjPixels", this.endSubjPixels);
+            objCache.put("startEvalPixels", this.startEvalPixels);
         }
     }
 
@@ -828,10 +828,7 @@ export class VisualOutput extends BasicCanvasRenderer {
 
     private wrapCanvas() {
         this.topPadding += 20;
-        // topPadding always overrides the canvasHeight?
-        // if (this.canvasHeight < this.topPadding) {
-        //     this.canvasHeight = this.topPadding;
-        // }
+        // topPadding always overrides the canvasHeight
         this.canvasHeight = this.topPadding;
         if (this.canvasWrapperStroke) {
             // final canvas wrapper stroke
