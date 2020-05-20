@@ -1108,22 +1108,13 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         this.topPadding += 30;
         let copyrightText: fabric.Text;
         let textFooterObj: TextType;
-        copyrightText = objCache.get("copyrightText") as fabric.Text;
-        textFooterObj = objCache.get("copyrightText_textFooterObj") as TextType;
-        if (!copyrightText && !textFooterObj) {
-            [copyrightText, textFooterObj] = drawFooterText(
-                {
-                    fontSize: this.fontSize,
-                },
-                this.topPadding
-            );
-            objCache.put("copyrightText", copyrightText);
-            objCache.put("copyrightText_textFooterObj", textFooterObj);
-        }
+        [copyrightText, textFooterObj] = drawFooterText(
+            {
+                fontSize: this.fontSize,
+            },
+            this.topPadding
+        );
         this.canvas.add(copyrightText);
-        mouseOverText(copyrightText, textFooterObj, this);
-        mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
-        mouseOutText(copyrightText, textFooterObj, this);
     }
 
     private wrapCanvas() {

@@ -824,9 +824,6 @@ export class VisualOutput extends BasicCanvasRenderer {
             objCache.put("copyrightText_textFooterObj", textFooterObj);
         }
         this.canvas.add(copyrightText);
-        mouseOverText(copyrightText, textFooterObj, this);
-        mouseDownText(copyrightText, "https://www.ebi.ac.uk", this);
-        mouseOutText(copyrightText, textFooterObj, this);
     }
 
     private wrapCanvas() {
