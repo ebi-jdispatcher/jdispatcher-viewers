@@ -800,8 +800,13 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 let hspStart = 0;
                 let hspEnd = 0;
                 for (const hsp of hit.hit_hsps) {
-                    hspStart = hsp.hsp_hit_from;
-                    hspEnd = hsp.hsp_hit_to;
+                    if (hsp.hsp_hit_frame! === "-1") {
+                        hspStart = hsp.hsp_hit_to;
+                        hspEnd = hsp.hsp_hit_from;
+                    } else {
+                        hspStart = hsp.hsp_hit_from;
+                        hspEnd = hsp.hsp_hit_to;
+                    }
                     if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                         boxColor = getRgbColorFixed(
                             hsp.hsp_bit_score!,

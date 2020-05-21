@@ -225,10 +225,10 @@ export class VisualOutput extends BasicCanvasRenderer {
         const diffSubjFactor = this.subjLen / this.queryLen;
         if (diffQueryFactor > 10) {
             this.subjFactor = (this.queryLen * 0.5) / this.subjLen;
-        } 
+        }
         if (diffSubjFactor > 10) {
             this.queryFactor = (this.subjLen * 0.5) / this.queryLen;
-        } 
+        }
     }
 
     private loadInitialCoords() {
@@ -529,26 +529,40 @@ export class VisualOutput extends BasicCanvasRenderer {
                     let endQueryHspPixels: number;
                     let startSubjHspPixels: number;
                     let endSubjHspPixels: number;
-                    const hspQueryStart: number = hsp.hsp_query_from;
-                    const hspQueryEnd: number = hsp.hsp_query_to;
-                    const hspSubjStart: number = hsp.hsp_hit_from;
-                    const hspSubjEnd: number = hsp.hsp_hit_to;
+                    let hspQueryStart: number;
+                    let hspQueryEnd: number;
+                    let hspSubjStart: number;
+                    let hspSubjEnd: number;
+                    if (hsp.hsp_query_frame! === "-1") {
+                        hspQueryStart = hsp.hsp_query_to;
+                        hspQueryEnd = hsp.hsp_query_from;
+                    } else {
+                        hspQueryStart = hsp.hsp_query_from;
+                        hspQueryEnd = hsp.hsp_query_to;
+                    }
+                    if (hsp.hsp_hit_frame! === "-1") {
+                        hspSubjStart = hsp.hsp_hit_to;
+                        hspSubjEnd = hsp.hsp_hit_from;
+                    } else {
+                        hspSubjStart = hsp.hsp_hit_from;
+                        hspSubjEnd = hsp.hsp_hit_to;
+                    }
                     [
                         startQueryHspPixels,
                         endQueryHspPixels,
                     ] = getHspPixelCoords(
                         startQueryPixels,
                         endQueryPixels,
-                        this.queryLen / this.queryFactor,
-                        hspQueryStart / this.queryFactor,
-                        hspQueryEnd / this.queryFactor
+                        this.queryLen,
+                        hspQueryStart,
+                        hspQueryEnd
                     );
                     [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
                         startSubjPixels,
                         endSubjPixels,
-                        subjHspLen  / this.subjFactor,
-                        hspSubjStart / this.subjFactor,
-                        hspSubjEnd / this.subjFactor,
+                        subjHspLen,
+                        hspSubjStart,
+                        hspSubjEnd
                     );
                     let color: string;
                     if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
