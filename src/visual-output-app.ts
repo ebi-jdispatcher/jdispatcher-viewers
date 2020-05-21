@@ -152,6 +152,8 @@ export class VisualOutput extends BasicCanvasRenderer {
     private endSubjPixels: number;
     private gradientSteps: number[] = [];
     private dataObj: SSSResultModel;
+    private queryFactor: number = 1.0;
+    private subjFactor: number = 1.0;
 
     constructor(
         element: string | HTMLCanvasElement,
@@ -211,14 +213,22 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
 
     private loadInitalProperties() {
-        this.queryLen = objCache.get("queryLen") as number;
-        if (!this.queryLen) {
-            this.queryLen = this.dataObj.query_len;
-            for (const hit of this.dataObj.hits) {
-                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
+        this.queryLen = this.dataObj.query_len;
+        for (const hit of this.dataObj.hits) {
+            if (hit.hit_len > this.subjLen) {
+                this.subjLen = hit.hit_len;
             }
-            objCache.put("queryLen", this.queryLen);
         }
+        // if size of query and subject sequences is to high,
+        // use a scalling factor
+        const diffQueryFactor = this.queryLen / this.subjLen;
+        const diffSubjFactor = this.subjLen / this.queryLen;
+        if (diffQueryFactor > 10) {
+            this.subjFactor = (this.queryLen * 0.5) / this.subjLen;
+        } 
+        if (diffSubjFactor > 10) {
+            this.queryFactor = (this.subjLen * 0.5) / this.queryLen;
+        } 
     }
 
     private loadInitialCoords() {
@@ -240,9 +250,9 @@ export class VisualOutput extends BasicCanvasRenderer {
                 this.startSubjPixels,
                 this.endSubjPixels,
             ] = getQuerySubjPixelCoords(
-                this.queryLen,
-                this.subjLen,
-                this.subjLen,
+                this.queryLen * this.queryFactor,
+                this.subjLen * this.subjFactor,
+                this.subjLen * this.subjFactor,
                 this.contentWidth,
                 this.contentScoringWidth,
                 this.contentLabelWidth,
@@ -317,8 +327,8 @@ export class VisualOutput extends BasicCanvasRenderer {
             if (!textContentHeaderGroup) {
                 textContentHeaderGroup = drawContentHeaderTextGroup(
                     {
-                        queryLen: this.queryLen,
-                        subjLen: this.subjLen,
+                        queryLen: this.queryLen * this.queryFactor,
+                        subjLen: this.subjLen * this.subjFactor,
                         startQueryPixels: this.startQueryPixels,
                         startEvalPixels: this.startEvalPixels,
                         startSubjPixels: this.startSubjPixels,
@@ -402,7 +412,6 @@ export class VisualOutput extends BasicCanvasRenderer {
     private drawDynamicContentGroup() {
         // draw a new track per hsp for each hit
         // only display 10 hsps per hit
-        const queryLen: number = this.dataObj.query_len;
         let subjLen: number = 0;
         let maxIDLen: number = 0;
         for (const hit of this.dataObj.hits) {
@@ -493,8 +502,8 @@ export class VisualOutput extends BasicCanvasRenderer {
                         startSubjPixels,
                         endSubjPixels,
                     ] = getQuerySubjPixelCoords(
-                        queryLen,
-                        subjLen,
+                        this.queryLen * this.queryFactor,
+                        this.subjLen * this.subjFactor,
                         subjHspLen,
                         this.contentWidth,
                         this.contentScoringWidth,
@@ -528,26 +537,18 @@ export class VisualOutput extends BasicCanvasRenderer {
                         startQueryHspPixels,
                         endQueryHspPixels,
                     ] = getHspPixelCoords(
-                        queryLen,
-                        subjLen,
-                        queryLen,
                         startQueryPixels,
-                        hspQueryStart,
-                        hspQueryEnd,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.marginWidth
+                        endQueryPixels,
+                        this.queryLen / this.queryFactor,
+                        hspQueryStart / this.queryFactor,
+                        hspQueryEnd / this.queryFactor
                     );
                     [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
-                        queryLen,
-                        subjLen,
-                        subjHspLen,
                         startSubjPixels,
-                        hspSubjStart,
-                        hspSubjEnd,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.marginWidth
+                        endSubjPixels,
+                        subjHspLen  / this.subjFactor,
+                        hspSubjStart / this.subjFactor,
+                        hspSubjEnd / this.subjFactor,
                     );
                     let color: string;
                     if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
@@ -589,12 +590,13 @@ export class VisualOutput extends BasicCanvasRenderer {
                     scoreText.width = this.contentScoringWidth;
                     this.canvas.add(scoreText);
                     // Query hovering and tooltip
+
                     mouseOverDomain(
                         queryDomain,
                         startQueryHspPixels,
                         endQueryHspPixels,
-                        hsp.hsp_query_from,
-                        hsp.hsp_query_to,
+                        hspQueryStart,
+                        hspQueryEnd,
                         hsp,
                         {
                             fontSize: this.fontSize,
@@ -609,8 +611,8 @@ export class VisualOutput extends BasicCanvasRenderer {
                         subjDomain,
                         startSubjHspPixels,
                         endSubjHspPixels,
-                        hsp.hsp_hit_from,
-                        hsp.hsp_hit_to,
+                        hspSubjStart,
+                        hspSubjEnd,
                         hsp,
                         {
                             fontSize: this.fontSize,

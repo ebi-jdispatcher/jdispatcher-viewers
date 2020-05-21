@@ -83,27 +83,18 @@ export function getQuerySubjPixelCoords(
 }
 
 export function getHspPixelCoords(
-    queryLen: number,
-    subjLen: number,
-    varLen: number,
-    paddingPixels: number,
+    startPixels: number,
+    endPixels: number,
+    hitLen: number,
     hspStart: number,
-    hspEnd: number,
-    contentWidth: number,
-    contentScoringWidth: number,
-    marginWidth: number
+    hspEnd: number
 ) {
-    const totalPixels = getTotalPixels(
-        queryLen,
-        subjLen,
-        varLen,
-        contentWidth,
-        contentScoringWidth
-    );
-    const startPixels = (hspStart * totalPixels) / varLen;
-    const endPixels = ((hspEnd - hspStart) * totalPixels) / varLen;
-    const startHspPixels = paddingPixels + startPixels;
-    const endHspPixels = endPixels - 2 * marginWidth;
+    const startHspPixels =
+        startPixels + (hspStart * (endPixels - startPixels)) / hitLen;
+    const endHspPixels =
+        startPixels +
+        (hspEnd * (endPixels - startPixels)) / hitLen -
+        startHspPixels;
     return [startHspPixels, endHspPixels];
 }
 
