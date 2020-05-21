@@ -484,7 +484,6 @@ export class VisualOutput extends BasicCanvasRenderer {
                 { fontSize: this.fontSize },
                 this
             );
-            // mouseOverText(hitText, textObj, this);
             mouseDownText(hitText, hit.hit_url, this);
             mouseOutText(hitText, textObj, this);
             for (const hsp of hit.hit_hsps) {

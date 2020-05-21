@@ -958,6 +958,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 this.topPadding += 40;
             } else {
                 // canvas content suppressed output
+                this.topPadding -= 20;
                 let supressText: fabric.Text;
                 supressText = objCache.get("supressText") as fabric.Text;
                 if (!supressText) {
@@ -972,6 +973,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                     objCache.put("supressText", supressText);
                 }
                 this.canvas.add(supressText);
+                this.topPadding += 40;
                 break;
             }
         }
