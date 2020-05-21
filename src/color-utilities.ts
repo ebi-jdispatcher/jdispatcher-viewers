@@ -78,9 +78,9 @@ export function getRgbColorFixed(
 }
 
 export function getGradientSteps(
-    minScore: number,
-    maxScore: number,
-    minNotZeroScore: number,
+    minEvalue: number,
+    maxEvalue: number,
+    minEvalueNotZero: number,
     colorScheme: ColorSchemeEnum
 ): number[] {
     let gradientSteps: number[] = [];
@@ -93,7 +93,7 @@ export function getGradientSteps(
             Math.pow(10, 2),
         ];
     } else if (colorScheme === ColorSchemeEnum.dynamic) {
-        if (maxScore < 1e-304) {
+        if (maxEvalue < 1e-304) {
             const eScale = -304;
             gradientSteps = [
                 0,
@@ -102,63 +102,63 @@ export function getGradientSteps(
                 Math.pow(10, eScale / 4),
                 Math.pow(10, eScale / 8),
             ];
-        } else if (minScore < 1) {
-            const maxLog10 = Math.log10(maxScore);
-            if (maxScore <= 1) {
-                let secondNotZeroEvalue: number;
-                if (minScore === 0 && minNotZeroScore > 0) {
-                    secondNotZeroEvalue = Math.log10(minNotZeroScore) - 1;
+        } else if (minEvalue < 1) {
+            const maxLog10 = Math.log10(maxEvalue);
+            if (maxEvalue <= 1) {
+                let secondEvalue: number;
+                let thirdEvalue: number;
+                let forthEvalue: number;
+                if (minEvalue === 0 && minEvalueNotZero > 0) {
+                    secondEvalue = Math.log10(minEvalueNotZero) - 1;
                 } else {
-                    const minLog10 = Math.log10(minScore);
-                    secondNotZeroEvalue = minLog10 + (maxLog10 - minLog10) / 2;
+                    const minLog10 = Math.log10(minEvalue);
+                    secondEvalue = minLog10 + (maxLog10 - minLog10) / 2;
                 }
-                const thirdNotZeroEvalue =
-                    secondNotZeroEvalue + (maxScore - secondNotZeroEvalue) / 2;
-                const fourthNotZeroEvalue =
-                    thirdNotZeroEvalue + (maxScore - thirdNotZeroEvalue) / 2;
+                thirdEvalue = secondEvalue + (maxLog10 - secondEvalue) / 2;
+                forthEvalue = thirdEvalue + (maxLog10 - thirdEvalue) / 2;
                 gradientSteps = [
-                    minScore,
-                    Math.pow(10, secondNotZeroEvalue),
-                    Math.pow(10, thirdNotZeroEvalue),
-                    Math.pow(10, fourthNotZeroEvalue),
-                    maxScore,
+                    minEvalue,
+                    Math.pow(10, secondEvalue),
+                    Math.pow(10, thirdEvalue),
+                    Math.pow(10, forthEvalue),
+                    maxEvalue,
                 ];
             } else {
-                const evalueDiff =
-                    Math.log10(minNotZeroScore) - Math.log10(maxScore);
-                if (Math.abs(evalueDiff) <= 2) {
+                const diffEvalue =
+                    Math.log10(minEvalueNotZero) - Math.log10(maxEvalue);
+                if (Math.abs(diffEvalue) <= 2) {
                     gradientSteps = [
-                        minScore,
+                        minEvalue,
                         1,
-                        (2 + maxScore) / 3,
-                        (2 + 2 * maxScore) / 3,
-                        maxScore,
+                        (2 + maxEvalue) / 3,
+                        (2 + 2 * maxEvalue) / 3,
+                        maxEvalue,
                     ];
-                } else if (Math.abs(evalueDiff) <= 4) {
+                } else if (Math.abs(diffEvalue) <= 4) {
                     gradientSteps = [
-                        minScore,
-                        Math.pow(10, evalueDiff / 2),
+                        minEvalue,
+                        Math.pow(10, diffEvalue / 2),
                         1,
-                        (maxScore + 1) / 2,
-                        maxScore,
+                        (maxEvalue + 1) / 2,
+                        maxEvalue,
                     ];
                 } else {
                     gradientSteps = [
-                        minScore,
-                        Math.pow(10, evalueDiff / 2),
-                        Math.pow(10, evalueDiff / 4),
+                        minEvalue,
+                        Math.pow(10, diffEvalue / 2),
+                        Math.pow(10, diffEvalue / 4),
                         1,
-                        maxScore,
+                        maxEvalue,
                     ];
                 }
             }
         } else {
             gradientSteps = [
-                minScore,
-                (3 * minScore + maxScore) / 4,
-                (minScore + maxScore) / 2,
-                (minScore + 3 * maxScore) / 4,
-                maxScore,
+                minEvalue,
+                (3 * minEvalue + maxEvalue) / 4,
+                (minEvalue + maxEvalue) / 2,
+                (minEvalue + 3 * maxEvalue) / 4,
+                maxEvalue,
             ];
         }
     } else if (colorScheme === ColorSchemeEnum.ncbiblast) {
