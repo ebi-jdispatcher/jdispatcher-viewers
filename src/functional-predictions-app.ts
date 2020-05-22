@@ -354,7 +354,10 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                         }
                     }).catch((error) => console.log(error));
                 } else {
-                    for (const hit of this.sssDataObj.hits) {
+                    for (const hit of this.sssDataObj.hits.slice(
+                        0,
+                        this.numberHits
+                    )) {
                         if (accessions === "") accessions += `${hit.hit_acc}`;
                         else accessions += `,${hit.hit_acc}`;
                     }
@@ -690,7 +693,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // draw only one HSP per hit
         let subjLen: number = 0;
         let maxIDLen: number = 0;
-        for (const hit of this.sssDataObj.hits) {
+        for (const hit of this.sssDataObj.hits.slice(0, this.numberHits)) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
@@ -698,7 +701,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         let minScore: number = Number.MAX_VALUE;
         let maxScore: number = 0;
         let minNotZeroScore: number = Number.MAX_VALUE;
-        for (const hit of this.sssDataObj.hits) {
+        for (const hit of this.sssDataObj.hits.slice(0, this.numberHits)) {
             for (const hsp of hit.hit_hsps) {
                 if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                     if (hsp.hsp_bit_score! < minScore)

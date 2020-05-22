@@ -218,7 +218,7 @@ export class VisualOutput extends BasicCanvasRenderer {
 
     private loadInitalProperties() {
         this.queryLen = this.dataObj.query_len;
-        for (const hit of this.dataObj.hits) {
+        for (const hit of this.dataObj.hits.slice(0, this.numberHits)) {
             if (hit.hit_len > this.subjLen) {
                 this.subjLen = hit.hit_len;
             }
@@ -418,7 +418,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         // only display 10 hsps per hit
         let subjLen: number = 0;
         let maxIDLen: number = 0;
-        for (const hit of this.dataObj.hits) {
+        for (const hit of this.dataObj.hits.slice(0, this.numberHits)) {
             if (hit.hit_len > subjLen) subjLen = hit.hit_len;
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
@@ -426,7 +426,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         let minScore: number = Number.MAX_VALUE;
         let maxScore: number = 0;
         let minNotZeroScore: number = Number.MAX_VALUE;
-        for (const hit of this.dataObj.hits) {
+        for (const hit of this.dataObj.hits.slice(0, this.numberHits)) {
             for (const hsp of hit.hit_hsps) {
                 if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                     if (hsp.hsp_bit_score! < minScore)
