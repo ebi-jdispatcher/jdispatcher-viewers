@@ -185,6 +185,7 @@ class FabricjsRenderer {
                 this.canvasInstance.data,
                 {
                     colorScheme: ColorSchemeEnum.dynamic,
+                    numberHits: 100,
                     numberHsps: 10,
                     logSkippedHsps: true,
                     canvasWrapperStroke: true,

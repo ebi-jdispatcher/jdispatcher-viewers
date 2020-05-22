@@ -6,6 +6,7 @@ import { VisualOutput } from "./visual-output-app";
 export class CanvasRendererComponent extends LitElement {
     @property({ type: String }) data = "";
     @property({ type: String }) colorScheme = "dynamic";
+    @property({ type: Number }) numberHits = 100;
     @property({ type: Number }) numberHsps = 10;
     @property({ type: Boolean }) logSkippedHsps = true;
     @property({ type: Boolean }) canvasWrapperStroke = true;
@@ -16,6 +17,7 @@ export class CanvasRendererComponent extends LitElement {
     render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
+            numberHits: this.numberHits,
             numberHsps: this.numberHsps,
             logSkippedHsps: this.logSkippedHsps,
             canvasWrapperStroke: this.canvasWrapperStroke,
