@@ -4,11 +4,7 @@ import {
     IPRMCResultModel,
     IPRMCResultModelFlat,
 } from "./data-model";
-import {
-    getPixelCoords,
-    getHspBoxPixelCoords,
-    getDomainPixelCoords,
-} from "./coords-utilities";
+import { getPixelCoords, getDomainPixelCoords } from "./coords-utilities";
 import {
     getGradientSteps,
     getRgbColorFixed,
@@ -824,7 +820,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 }
                 let startDomainPixels: number = 0;
                 let endDomainPixels: number = 0;
-                [startDomainPixels, endDomainPixels] = getHspBoxPixelCoords(
+                [startDomainPixels, endDomainPixels] = getDomainPixelCoords(
                     this.startPixels,
                     this.endPixels,
                     hit.hit_len,

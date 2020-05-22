@@ -98,21 +98,6 @@ export function getHspPixelCoords(
     return [startHspPixels, endHspPixels];
 }
 
-export function getHspBoxPixelCoords(
-    startPixels: number,
-    endPixels: number,
-    hitLen: number,
-    startDomain: number,
-    endDomain: number,
-    marginWidth: number
-): [number, number] {
-    const totalPixels = endPixels - startPixels;
-    const startDomainPixels =
-        startPixels + (startDomain * totalPixels) / hitLen - marginWidth;
-    const endDomainPixels = (endDomain * totalPixels) / hitLen - marginWidth;
-    return [startDomainPixels, endDomainPixels];
-}
-
 export function getDomainPixelCoords(
     startPixels: number,
     endPixels: number,
