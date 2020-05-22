@@ -228,10 +228,10 @@ export class VisualOutput extends BasicCanvasRenderer {
         // use a scalling factor
         const diffQueryFactor = this.queryLen / this.subjLen;
         const diffSubjFactor = this.subjLen / this.queryLen;
-        if (diffQueryFactor > 10) {
+        if (diffQueryFactor > 8) {
             this.subjFactor = (this.queryLen * 0.5) / this.subjLen;
         }
-        if (diffSubjFactor > 10) {
+        if (diffSubjFactor > 8) {
             this.queryFactor = (this.subjLen * 0.5) / this.queryLen;
         }
     }
