@@ -265,10 +265,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.drawHeaderGroup();
 
             // canvas content
-            // TODO?
-            "Query Sequence View - Switch to Subject Sequence View";
-            "Subject Sequence View - Switch to Query Sequence View";
-            // this.dataObj.hits = [];
             this.drawContentGroup();
 
             // canvas footer
@@ -310,14 +306,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     private loadInitalProperties() {
         this.queryStart = 1;
-        this.queryEnd = objCache.get("queryEnd") as number;
-        if (!this.queryEnd) {
-            this.queryEnd = this.sssDataObj.query_len;
-            for (const hit of this.sssDataObj.hits) {
-                if (hit.hit_len > this.subjLen) this.subjLen = hit.hit_len;
-            }
-            objCache.put("queryEnd", this.queryEnd);
-        }
+        this.queryEnd = this.sssDataObj.query_len;
     }
 
     private loadInitialCoords() {
@@ -493,24 +482,12 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.topPadding += 35;
             this.drawPredictionsGroup();
 
-            // query/subj sequence
-            this.topPadding += 25;
-            // this.drawContentHeader();
-
             // dynamic content
-            this.topPadding += 25;
+            this.topPadding += 50;
             this.drawDynamicContentGroup();
 
             // color scale
-            if (
-                this.domainDatabaseList.length > 0 &&
-                this.uniqueDomainDatabases.length > 0
-            ) {
-                this.topPadding += 30;
-                this.drawColorScaleGroup();
-            } else {
-                this.topPadding -= 40;
-            }
+            this.drawColorScaleGroup();
         } else {
             // text content: "No predictions found!"
             this.topPadding += 20;
@@ -942,7 +919,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                     }
                 }
                 // draw domain transparent box
-                if (boxHeight !== 0) boxHeight += 15;
+                boxHeight += 15;
                 const hitTransparentBox = drawHitTransparentBox(
                     startDomainPixels,
                     endDomainPixels,
@@ -957,7 +934,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 this.topPadding += 40;
             } else {
                 // canvas content suppressed output
-                this.topPadding -= 20;
                 let supressText: fabric.Text;
                 supressText = objCache.get("supressText") as fabric.Text;
                 if (!supressText) {
@@ -971,6 +947,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                     );
                     objCache.put("supressText", supressText);
                 }
+                supressText.top = this.topPadding;
                 this.canvas.add(supressText);
                 this.topPadding += 40;
                 break;

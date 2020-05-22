@@ -685,6 +685,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     );
                     objCache.put("supressText", supressText);
                 }
+                supressText.top = this.topPadding;
                 this.canvas.add(supressText);
                 this.topPadding += 20;
                 break;
