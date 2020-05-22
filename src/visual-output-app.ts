@@ -50,6 +50,7 @@ import {
     drawScaleTick4LabelsGroup,
     drawFooterText,
     drawCanvasWrapperStroke,
+    drawContentSupressText,
 } from "./drawing-utilities";
 
 let objCache = new ObjectCache();
@@ -466,201 +467,227 @@ export class VisualOutput extends BasicCanvasRenderer {
             );
         }
 
+        let tmpNumberHits = 0;
         for (const hit of this.dataObj.hits) {
-            let numberHsps: number = 0;
-            const totalNumberHsps: number = hit.hit_hsps.length;
-            // Hit ID + Hit Description text tracks
-            let textObj: TextType;
-            let spaceText, hitText: fabric.Text;
-            [spaceText, hitText, textObj] = drawContentSequenceInfoText(
-                maxIDLen,
-                hit,
-                { fontSize: this.fontSize },
-                this.topPadding
-            );
-            this.canvas.add(spaceText);
-            this.canvas.add(hitText);
-            mouseOverText(
-                hitText,
-                textObj,
-                hit.hit_def,
-                hit.hit_url,
-                { fontSize: this.fontSize },
-                this
-            );
-            mouseDownText(hitText, hit.hit_url, this);
-            mouseOutText(hitText, textObj, this);
-            for (const hsp of hit.hit_hsps) {
-                numberHsps++;
-                if (numberHsps <= this.numberHsps) {
-                    // line Tracks
-                    const subjHspLen: number = hit.hit_len;
-                    let startQueryPixels: number;
-                    let endQueryPixels: number;
-                    let startSubjPixels: number;
-                    let endSubjPixels: number;
-                    [
-                        startQueryPixels,
-                        endQueryPixels,
-                        startSubjPixels,
-                        endSubjPixels,
-                    ] = getQuerySubjPixelCoords(
-                        this.queryLen * this.queryFactor,
-                        this.subjLen * this.subjFactor,
-                        subjHspLen,
-                        this.contentWidth,
-                        this.contentScoringWidth,
-                        this.contentLabelWidth,
-                        this.marginWidth
-                    );
-
-                    this.topPadding += 5;
-                    const linesGroup = drawLineTracksQuerySubject(
-                        {
-                            startQueryPixels: startQueryPixels,
-                            endQueryPixels: endQueryPixels,
-                            startSubjPixels: startSubjPixels,
-                            endSubjPixels: endSubjPixels,
-                        },
-                        { strokeWidth: 1 },
-                        this.topPadding
-                    );
-                    this.canvas.add(linesGroup);
-
-                    // domain tracks
-                    let startQueryHspPixels: number;
-                    let endQueryHspPixels: number;
-                    let startSubjHspPixels: number;
-                    let endSubjHspPixels: number;
-                    let hspQueryStart: number;
-                    let hspQueryEnd: number;
-                    let hspSubjStart: number;
-                    let hspSubjEnd: number;
-                    if (hsp.hsp_query_frame! === "-1") {
-                        hspQueryStart = hsp.hsp_query_to;
-                        hspQueryEnd = hsp.hsp_query_from;
-                    } else {
-                        hspQueryStart = hsp.hsp_query_from;
-                        hspQueryEnd = hsp.hsp_query_to;
-                    }
-                    if (hsp.hsp_hit_frame! === "-1") {
-                        hspSubjStart = hsp.hsp_hit_to;
-                        hspSubjEnd = hsp.hsp_hit_from;
-                    } else {
-                        hspSubjStart = hsp.hsp_hit_from;
-                        hspSubjEnd = hsp.hsp_hit_to;
-                    }
-                    [
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                    ] = getHspPixelCoords(
-                        startQueryPixels,
-                        endQueryPixels,
-                        this.queryLen,
-                        hspQueryStart,
-                        hspQueryEnd
-                    );
-                    [startSubjHspPixels, endSubjHspPixels] = getHspPixelCoords(
-                        startSubjPixels,
-                        endSubjPixels,
-                        subjHspLen,
-                        hspSubjStart,
-                        hspSubjEnd
-                    );
-                    let color: string;
-                    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-                        color = getRgbColorFixed(
-                            hsp.hsp_bit_score!,
-                            this.gradientSteps,
-                            ncbiBlastGradient
+            tmpNumberHits++;
+            if (tmpNumberHits <= this.numberHits) {
+                let numberHsps: number = 0;
+                const totalNumberHsps: number = hit.hit_hsps.length;
+                // Hit ID + Hit Description text tracks
+                let textObj: TextType;
+                let spaceText, hitText: fabric.Text;
+                [spaceText, hitText, textObj] = drawContentSequenceInfoText(
+                    maxIDLen,
+                    hit,
+                    { fontSize: this.fontSize },
+                    this.topPadding
+                );
+                this.canvas.add(spaceText);
+                this.canvas.add(hitText);
+                mouseOverText(
+                    hitText,
+                    textObj,
+                    hit.hit_def,
+                    hit.hit_url,
+                    { fontSize: this.fontSize },
+                    this
+                );
+                mouseDownText(hitText, hit.hit_url, this);
+                mouseOutText(hitText, textObj, this);
+                for (const hsp of hit.hit_hsps) {
+                    numberHsps++;
+                    if (numberHsps <= this.numberHsps) {
+                        // line Tracks
+                        const subjHspLen: number = hit.hit_len;
+                        let startQueryPixels: number;
+                        let endQueryPixels: number;
+                        let startSubjPixels: number;
+                        let endSubjPixels: number;
+                        [
+                            startQueryPixels,
+                            endQueryPixels,
+                            startSubjPixels,
+                            endSubjPixels,
+                        ] = getQuerySubjPixelCoords(
+                            this.queryLen * this.queryFactor,
+                            this.subjLen * this.subjFactor,
+                            subjHspLen,
+                            this.contentWidth,
+                            this.contentScoringWidth,
+                            this.contentLabelWidth,
+                            this.marginWidth
                         );
-                    } else {
-                        color = getRgbColorGradient(
-                            hsp.hsp_expect!,
-                            this.gradientSteps,
-                            defaultGradient
+
+                        this.topPadding += 5;
+                        const linesGroup = drawLineTracksQuerySubject(
+                            {
+                                startQueryPixels: startQueryPixels,
+                                endQueryPixels: endQueryPixels,
+                                startSubjPixels: startSubjPixels,
+                                endSubjPixels: endSubjPixels,
+                            },
+                            { strokeWidth: 1 },
+                            this.topPadding
                         );
-                    }
-                    this.topPadding += 10;
-                    let queryDomain, subjDomain: fabric.Rect;
-                    [queryDomain, subjDomain] = drawDomainQueySubject(
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                        startSubjHspPixels,
-                        endSubjHspPixels,
-                        this.topPadding,
-                        color
-                    );
-                    this.canvas.add(queryDomain);
-                    this.canvas.add(subjDomain);
+                        this.canvas.add(linesGroup);
 
-                    // E-value text tracks
-                    const scoreText = drawScoreText(
-                        this.startEvalPixels,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme,
-                        },
-                        this.topPadding
-                    );
-                    scoreText.width = this.contentScoringWidth;
-                    this.canvas.add(scoreText);
-                    // Query hovering and tooltip
-
-                    mouseOverDomain(
-                        queryDomain,
-                        startQueryHspPixels,
-                        endQueryHspPixels,
-                        hspQueryStart,
-                        hspQueryEnd,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme,
-                        },
-                        this
-                    );
-                    mouseOutDomain(queryDomain, this);
-
-                    // Subject hovering and tooltip
-                    mouseOverDomain(
-                        subjDomain,
-                        startSubjHspPixels,
-                        endSubjHspPixels,
-                        hspSubjStart,
-                        hspSubjEnd,
-                        hsp,
-                        {
-                            fontSize: this.fontSize,
-                            colorScheme: this.colorScheme,
-                        },
-                        this
-                    );
-                    mouseOutDomain(subjDomain, this);
-                } else {
-                    if (this.logSkippedHsps === true) {
-                        let hspTextNotice: fabric.Text;
-                        hspTextNotice = objCache.get(
-                            "hspTextNotice"
-                        ) as fabric.Text;
-                        if (!hspTextNotice) {
-                            hspTextNotice = drawHspNoticeText(
-                                totalNumberHsps,
-                                this.numberHsps,
-                                {
-                                    fontSize: this.fontSize,
-                                    contentWidth: this.contentWidth,
-                                },
-                                this.topPadding
-                            );
-                            objCache.put("hspTextNotice", hspTextNotice);
+                        // domain tracks
+                        let startQueryHspPixels: number;
+                        let endQueryHspPixels: number;
+                        let startSubjHspPixels: number;
+                        let endSubjHspPixels: number;
+                        let hspQueryStart: number;
+                        let hspQueryEnd: number;
+                        let hspSubjStart: number;
+                        let hspSubjEnd: number;
+                        if (hsp.hsp_query_frame! === "-1") {
+                            hspQueryStart = hsp.hsp_query_to;
+                            hspQueryEnd = hsp.hsp_query_from;
+                        } else {
+                            hspQueryStart = hsp.hsp_query_from;
+                            hspQueryEnd = hsp.hsp_query_to;
                         }
-                        this.canvas.add(hspTextNotice);
-                        this.topPadding += 20;
+                        if (hsp.hsp_hit_frame! === "-1") {
+                            hspSubjStart = hsp.hsp_hit_to;
+                            hspSubjEnd = hsp.hsp_hit_from;
+                        } else {
+                            hspSubjStart = hsp.hsp_hit_from;
+                            hspSubjEnd = hsp.hsp_hit_to;
+                        }
+                        [
+                            startQueryHspPixels,
+                            endQueryHspPixels,
+                        ] = getHspPixelCoords(
+                            startQueryPixels,
+                            endQueryPixels,
+                            this.queryLen,
+                            hspQueryStart,
+                            hspQueryEnd
+                        );
+                        [
+                            startSubjHspPixels,
+                            endSubjHspPixels,
+                        ] = getHspPixelCoords(
+                            startSubjPixels,
+                            endSubjPixels,
+                            subjHspLen,
+                            hspSubjStart,
+                            hspSubjEnd
+                        );
+                        let color: string;
+                        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
+                            color = getRgbColorFixed(
+                                hsp.hsp_bit_score!,
+                                this.gradientSteps,
+                                ncbiBlastGradient
+                            );
+                        } else {
+                            color = getRgbColorGradient(
+                                hsp.hsp_expect!,
+                                this.gradientSteps,
+                                defaultGradient
+                            );
+                        }
+                        this.topPadding += 10;
+                        let queryDomain, subjDomain: fabric.Rect;
+                        [queryDomain, subjDomain] = drawDomainQueySubject(
+                            startQueryHspPixels,
+                            endQueryHspPixels,
+                            startSubjHspPixels,
+                            endSubjHspPixels,
+                            this.topPadding,
+                            color
+                        );
+                        this.canvas.add(queryDomain);
+                        this.canvas.add(subjDomain);
+
+                        // E-value text tracks
+                        const scoreText = drawScoreText(
+                            this.startEvalPixels,
+                            hsp,
+                            {
+                                fontSize: this.fontSize,
+                                colorScheme: this.colorScheme,
+                            },
+                            this.topPadding
+                        );
+                        scoreText.width = this.contentScoringWidth;
+                        this.canvas.add(scoreText);
+                        // Query hovering and tooltip
+
+                        mouseOverDomain(
+                            queryDomain,
+                            startQueryHspPixels,
+                            endQueryHspPixels,
+                            hspQueryStart,
+                            hspQueryEnd,
+                            hsp,
+                            {
+                                fontSize: this.fontSize,
+                                colorScheme: this.colorScheme,
+                            },
+                            this
+                        );
+                        mouseOutDomain(queryDomain, this);
+
+                        // Subject hovering and tooltip
+                        mouseOverDomain(
+                            subjDomain,
+                            startSubjHspPixels,
+                            endSubjHspPixels,
+                            hspSubjStart,
+                            hspSubjEnd,
+                            hsp,
+                            {
+                                fontSize: this.fontSize,
+                                colorScheme: this.colorScheme,
+                            },
+                            this
+                        );
+                        mouseOutDomain(subjDomain, this);
+                    } else {
+                        if (this.logSkippedHsps === true) {
+                            let hspTextNotice: fabric.Text;
+                            hspTextNotice = objCache.get(
+                                "hspTextNotice"
+                            ) as fabric.Text;
+                            if (!hspTextNotice) {
+                                hspTextNotice = drawHspNoticeText(
+                                    totalNumberHsps,
+                                    this.numberHsps,
+                                    {
+                                        fontSize: this.fontSize,
+                                        contentWidth: this.contentWidth,
+                                    },
+                                    this.topPadding
+                                );
+                                objCache.put("hspTextNotice", hspTextNotice);
+                            }
+                            this.canvas.add(hspTextNotice);
+                            this.topPadding += 20;
+                        }
+                        break;
                     }
-                    break;
                 }
+            } else {
+                // canvas content suppressed output
+                this.topPadding += 20;
+                let supressText: fabric.Text;
+                supressText = objCache.get("supressText") as fabric.Text;
+                if (!supressText) {
+                    supressText = drawContentSupressText(
+                        {
+                            fontSize: this.fontSize,
+                            contentWidth: this.contentWidth,
+                        },
+                        this.topPadding,
+                        this.numberHits
+                    );
+                    objCache.put("supressText", supressText);
+                }
+                this.canvas.add(supressText);
+                this.topPadding += 20;
+                break;
             }
         }
     }
