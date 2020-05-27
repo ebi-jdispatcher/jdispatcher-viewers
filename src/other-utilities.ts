@@ -7,7 +7,7 @@ import {
     IprMatchesFlat,
     IprMatchFlat,
 } from "./data-model";
-import { JobIdValitable, ColorSchemeEnum } from "./custom-types";
+import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas;
@@ -113,7 +113,7 @@ export async function getDataFromURLorFile(
     }
 }
 
-export function getServiceURLfromJobId(jobId: string) {
+function getServiceURLfromJobId(jobId: string) {
     const toolName = jobId.split("-")[0];
     return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
 }
@@ -143,6 +143,21 @@ export function validateJobId(
         }
     }
     return isValid;
+}
+
+export function validateSubmittedInput(data: string): string {
+    // check if input is a jobId
+    const jobId = { ...jobIdDefaults };
+    jobId.value = data;
+    // if so, get the service URL, else use as is
+    if (
+        !jobId.value.startsWith("http") &&
+        !jobId.value.includes("/") &&
+        validateJobId(jobId)
+    ) {
+        data = getServiceURLfromJobId(data);
+    }
+    return data;
 }
 
 // InterPro Match Complete XML data (via Dbfetch)

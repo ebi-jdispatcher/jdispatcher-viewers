@@ -11,13 +11,11 @@ import {
     BasicCanvasRenderer,
     ObjectCache,
     getDataFromURLorFile,
-    validateJobId,
-    getServiceURLfromJobId,
+    validateSubmittedInput,
 } from "./other-utilities";
 import {
     RenderOptions,
     ColorSchemeEnum,
-    jobIdDefaults,
     TextType,
 } from "./custom-types";
 import {
@@ -150,17 +148,7 @@ export class VisualOutput extends BasicCanvasRenderer {
     }
 
     private validateInput() {
-        // check if input is a jobId
-        const jobId = { ...jobIdDefaults };
-        jobId.value = this.data;
-        // if so, get the service URL, else use as is
-        if (
-            !jobId.value.startsWith("http") &&
-            !jobId.value.includes("/") &&
-            validateJobId(jobId)
-        ) {
-            this.data = getServiceURLfromJobId(this.data);
-        }
+        this.data = validateSubmittedInput(this.data);
     }
 
     private loadData() {
