@@ -212,10 +212,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.canvas.clear();
             // canvas header
             this.drawHeaderGroup();
-
             // canvas content
             this.drawContentGroup();
-
             // canvas footer
             this.drawFooterGroup();
             // finishing off
@@ -439,36 +437,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             );
             this.canvas.add(noHitsTextGroup);
         }
-    }
-
-    private drawContentHeader() {
-        // query sequence tracks
-        this.topPadding += 20;
-        // content header line tracks
-        const lineTrackGroup = drawLineTracks(
-            {
-                startPixels: this.startPixels,
-                endPixels: this.endPixels,
-            },
-            { strokeWidth: 2 },
-            this.topPadding
-        );
-        this.canvas.add(lineTrackGroup);
-        // content header line track legends
-        this.topPadding += 5;
-        const textContentFooterGroup = drawContentFooterTextGroup(
-            {
-                start: this.queryStart,
-                end: this.queryEnd,
-                startPixels: this.startPixels,
-                endPixels: this.endPixels,
-            },
-            {
-                fontSize: this.fontSize,
-            },
-            this.topPadding
-        );
-        this.canvas.add(textContentFooterGroup);
     }
 
     private drawPredictionsGroup() {
