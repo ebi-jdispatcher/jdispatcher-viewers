@@ -70,7 +70,6 @@ import {
     drawHitTransparentBox,
     drawContentDomainInfoText,
     drawDomains,
-    drawDomainInfoTooltips,
 } from "./drawing-utilities";
 
 const defaultDomainDatabaseList = [
@@ -137,10 +136,8 @@ export class BasicCanvasRenderer {
     protected canvasWidth: number;
     protected canvasHeight: number;
     protected contentWidth: number;
-    protected contentScoringWidth: number;
     protected contentLabelWidth: number;
     protected contentLabelLeftWidth: number;
-    protected contentLabelRightWidth: number;
     protected scaleWidth: number;
     protected scaleLabelWidth: number;
     protected marginWidth: number;
@@ -164,19 +161,12 @@ export class BasicCanvasRenderer {
         renderOptions.contentWidth != undefined
             ? (this.contentWidth = renderOptions.contentWidth)
             : (this.contentWidth = (72.5 * this.canvasWidth) / 100);
-        renderOptions.contentScoringWidth != undefined
-            ? (this.contentScoringWidth = renderOptions.contentScoringWidth)
-            : (this.contentScoringWidth = (7.0 * this.canvasWidth) / 100);
         renderOptions.contentLabelWidth != undefined
             ? (this.contentLabelWidth = renderOptions.contentLabelWidth)
             : (this.contentLabelWidth = (26.5 * this.canvasWidth) / 100);
         renderOptions.contentLabelLeftWidth != undefined
             ? (this.contentLabelLeftWidth = renderOptions.contentLabelLeftWidth)
             : (this.contentLabelLeftWidth = (8.25 * this.canvasWidth) / 100);
-        renderOptions.contentLabelRightWidth != undefined
-            ? (this.contentLabelRightWidth =
-                  renderOptions.contentLabelRightWidth)
-            : (this.contentLabelRightWidth = (18.25 * this.canvasWidth) / 100);
         renderOptions.scaleWidth != undefined
             ? (this.scaleWidth = renderOptions.scaleWidth)
             : (this.scaleWidth = (75.0 * this.canvasWidth) / 100);
@@ -226,7 +216,6 @@ export class BasicCanvasRenderer {
 
 export class FunctionalPredictions extends BasicCanvasRenderer {
     private topPadding: number = 0;
-    private subjLen: number = 0;
     private queryStart: number = 0;
     private queryEnd: number = 0;
     private startPixels: number;
@@ -668,10 +657,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // draw a new track group per hit
         // only display 30 hits by default
         // draw only one HSP per hit
-        let subjLen: number = 0;
         let maxIDLen: number = 0;
         for (const hit of this.sssDataObj.hits.slice(0, this.numberHits)) {
-            if (hit.hit_len > subjLen) subjLen = hit.hit_len;
             if (hit.hit_db.length + hit.hit_id.length > maxIDLen)
                 maxIDLen = hit.hit_db.length + hit.hit_id.length;
         }
