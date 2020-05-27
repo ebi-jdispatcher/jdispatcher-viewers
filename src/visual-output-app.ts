@@ -1,7 +1,10 @@
 import { fabric } from "fabric";
 import { SSSResultModel } from "./data-model";
 import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
-import { getQuerySubjPixelCoords, getHspPixelCoords } from "./coords-utilities";
+import {
+    getQuerySubjPixelCoords,
+    getDomainPixelCoords,
+} from "./coords-utilities";
 import {
     getRgbColorGradient,
     getRgbColorFixed,
@@ -13,11 +16,7 @@ import {
     getDataFromURLorFile,
     validateSubmittedInput,
 } from "./other-utilities";
-import {
-    RenderOptions,
-    ColorSchemeEnum,
-    TextType,
-} from "./custom-types";
+import { RenderOptions, ColorSchemeEnum, TextType } from "./custom-types";
 import {
     mouseDownText,
     mouseOverText,
@@ -505,22 +504,24 @@ export class VisualOutput extends BasicCanvasRenderer {
                         [
                             startQueryHspPixels,
                             endQueryHspPixels,
-                        ] = getHspPixelCoords(
+                        ] = getDomainPixelCoords(
                             startQueryPixels,
                             endQueryPixels,
                             this.queryLen,
                             hspQueryStart,
-                            hspQueryEnd
+                            hspQueryEnd,
+                            this.marginWidth
                         );
                         [
                             startSubjHspPixels,
                             endSubjHspPixels,
-                        ] = getHspPixelCoords(
+                        ] = getDomainPixelCoords(
                             startSubjPixels,
                             endSubjPixels,
                             subjHspLen,
                             hspSubjStart,
-                            hspSubjEnd
+                            hspSubjEnd,
+                            this.marginWidth
                         );
                         let color: string;
                         if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
