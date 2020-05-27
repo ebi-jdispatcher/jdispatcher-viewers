@@ -1,3 +1,4 @@
+import { fabric } from "fabric";
 import { xml2json } from "xml-js";
 import {
     SSSResultModel,
@@ -6,7 +7,47 @@ import {
     IprMatchesFlat,
     IprMatchFlat,
 } from "./data-model";
-import { JobIdValitable } from "./custom-types";
+import { JobIdValitable, ColorSchemeEnum } from "./custom-types";
+
+export class BasicCanvasRenderer {
+    public canvas: fabric.Canvas;
+    protected canvasWidth: number;
+    protected canvasHeight: number;
+    protected contentWidth: number;
+    protected contentScoringWidth: number;
+    protected contentLabelWidth: number;
+    protected contentLabelLeftWidth: number;
+    protected scaleWidth: number;
+    protected scaleLabelWidth: number;
+    protected marginWidth: number;
+    public colorScheme: ColorSchemeEnum;
+    protected numberHits: number;
+    protected numberHsps: number;
+    protected logSkippedHsps: boolean;
+    protected fontSize: number;
+    protected fontWeigth: string;
+    protected fontFamily: string;
+    protected canvasWrapperStroke: boolean;
+
+    constructor(private element: string | HTMLCanvasElement) {}
+
+    protected getFabricCanvas() {
+        this.canvas = new fabric.Canvas(this.element, {
+            defaultCursor: "default",
+            moveCursor: "default",
+            hoverCursor: "default",
+        });
+    }
+
+    protected setFrameSize() {
+        this.canvas.setWidth(this.canvasWidth);
+        this.canvas.setHeight(this.canvasHeight);
+    }
+
+    protected renderCanvas() {
+        this.canvas.renderAll();
+    }
+}
 
 export class ObjectCache<T> {
     private values: Map<string, T> = new Map<string, T>();

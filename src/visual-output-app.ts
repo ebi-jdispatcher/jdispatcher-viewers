@@ -8,10 +8,11 @@ import {
     getGradientSteps,
 } from "./color-utilities";
 import {
+    BasicCanvasRenderer,
+    ObjectCache,
     getDataFromURLorFile,
     validateJobId,
     getServiceURLfromJobId,
-    ObjectCache,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -55,29 +56,27 @@ import {
 
 let objCache = new ObjectCache();
 
-export class BasicCanvasRenderer {
-    public canvas: fabric.Canvas;
-    protected canvasWidth: number;
-    protected canvasHeight: number;
-    protected contentWidth: number;
-    protected contentScoringWidth: number;
-    protected contentLabelWidth: number;
-    protected scaleWidth: number;
-    protected scaleLabelWidth: number;
-    protected marginWidth: number;
-    public colorScheme: ColorSchemeEnum;
-    protected numberHits: number;
-    protected numberHsps: number;
-    protected logSkippedHsps: boolean;
-    protected fontSize: number;
-    protected fontWeigth: string;
-    protected fontFamily: string;
-    protected canvasWrapperStroke: boolean;
+export class VisualOutput extends BasicCanvasRenderer {
+    private topPadding: number = 0;
+    private queryLen: number = 0;
+    private subjLen: number = 0;
+    private startQueryPixels: number;
+    private endQueryPixels: number;
+    private startEvalPixels: number;
+    private startSubjPixels: number;
+    private endSubjPixels: number;
+    private gradientSteps: number[] = [];
+    private dataObj: SSSResultModel;
+    private queryFactor: number = 1.0;
+    private subjFactor: number = 1.0;
 
     constructor(
-        private element: string | HTMLCanvasElement,
+        element: string | HTMLCanvasElement,
+        private data: string,
         renderOptions: RenderOptions
     ) {
+        super(element);
+
         renderOptions.canvasWidth != undefined
             ? (this.canvasWidth = renderOptions.canvasWidth)
             : (this.canvasWidth = 1000);
@@ -126,46 +125,7 @@ export class BasicCanvasRenderer {
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
-    }
 
-    protected getFabricCanvas() {
-        this.canvas = new fabric.Canvas(this.element, {
-            defaultCursor: "default",
-            moveCursor: "default",
-            hoverCursor: "default",
-        });
-    }
-
-    protected setFrameSize() {
-        this.canvas.setWidth(this.canvasWidth);
-        this.canvas.setHeight(this.canvasHeight);
-    }
-
-    protected renderCanvas() {
-        this.canvas.renderAll();
-    }
-}
-
-export class VisualOutput extends BasicCanvasRenderer {
-    private topPadding: number = 0;
-    private queryLen: number = 0;
-    private subjLen: number = 0;
-    private startQueryPixels: number;
-    private endQueryPixels: number;
-    private startEvalPixels: number;
-    private startSubjPixels: number;
-    private endSubjPixels: number;
-    private gradientSteps: number[] = [];
-    private dataObj: SSSResultModel;
-    private queryFactor: number = 1.0;
-    private subjFactor: number = 1.0;
-
-    constructor(
-        element: string | HTMLCanvasElement,
-        private data: string,
-        renderOptions: RenderOptions
-    ) {
-        super(element, renderOptions);
         this.validateInput();
         this.getFabricCanvas();
     }

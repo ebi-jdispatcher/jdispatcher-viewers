@@ -13,6 +13,8 @@ import {
 } from "./color-utilities";
 import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
 import {
+    BasicCanvasRenderer,
+    ObjectCache,
     getDataFromURLorFile,
     validateJobId,
     getServiceURLfromJobId,
@@ -23,7 +25,6 @@ import {
     getIPRMCDbfetchURL,
     getXMLDataFromURL,
     parseXMLData,
-    ObjectCache,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -131,27 +132,28 @@ function createDomainCheckbox(
 
 let objCache = new ObjectCache();
 
-export class BasicCanvasRenderer {
-    public canvas: fabric.Canvas;
-    protected canvasWidth: number;
-    protected canvasHeight: number;
-    protected contentWidth: number;
-    protected contentLabelWidth: number;
-    protected contentLabelLeftWidth: number;
-    protected scaleWidth: number;
-    protected scaleLabelWidth: number;
-    protected marginWidth: number;
-    public colorScheme: ColorSchemeEnum;
-    protected numberHits: number;
-    protected fontSize: number;
-    protected fontWeigth: string;
-    protected fontFamily: string;
-    protected canvasWrapperStroke: boolean;
+export class FunctionalPredictions extends BasicCanvasRenderer {
+    private topPadding: number = 0;
+    private queryStart: number = 0;
+    private queryEnd: number = 0;
+    private startPixels: number;
+    private endPixels: number;
+    private gradientSteps: number[] = [];
+    private sssDataObj: SSSResultModel;
+    private iprmcDataObj: IPRMCResultModel | object;
+    private iprmcDataFlatObj: IPRMCResultModelFlat = {};
+    public currentDomainDatabase: string | undefined;
+    public uniqueDomainDatabases: string[] = [];
+    public currentDomainDatabaseDisabled: boolean = false;
 
     constructor(
-        private element: string | HTMLCanvasElement,
-        protected renderOptions: RenderOptions
+        element: string | HTMLCanvasElement,
+        private data: string,
+        renderOptions: RenderOptions,
+        public domainDatabaseList: string[] = defaultDomainDatabaseList
     ) {
+        super(element);
+
         renderOptions.canvasWidth != undefined
             ? (this.canvasWidth = renderOptions.canvasWidth)
             : (this.canvasWidth = 1000);
@@ -194,47 +196,7 @@ export class BasicCanvasRenderer {
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
-    }
 
-    protected getFabricCanvas() {
-        this.canvas = new fabric.Canvas(this.element, {
-            defaultCursor: "default",
-            moveCursor: "default",
-            hoverCursor: "default",
-        });
-    }
-
-    protected setFrameSize() {
-        this.canvas.setWidth(this.canvasWidth);
-        this.canvas.setHeight(this.canvasHeight);
-    }
-
-    protected renderCanvas() {
-        this.canvas.renderAll();
-    }
-}
-
-export class FunctionalPredictions extends BasicCanvasRenderer {
-    private topPadding: number = 0;
-    private queryStart: number = 0;
-    private queryEnd: number = 0;
-    private startPixels: number;
-    private endPixels: number;
-    private gradientSteps: number[] = [];
-    private sssDataObj: SSSResultModel;
-    private iprmcDataObj: IPRMCResultModel | object;
-    private iprmcDataFlatObj: IPRMCResultModelFlat = {};
-    public currentDomainDatabase: string | undefined;
-    public uniqueDomainDatabases: string[] = [];
-    public currentDomainDatabaseDisabled: boolean = false;
-
-    constructor(
-        element: string | HTMLCanvasElement,
-        private data: string,
-        renderOptions: RenderOptions,
-        public domainDatabaseList: string[] = defaultDomainDatabaseList
-    ) {
-        super(element, renderOptions);
         this.validateInput();
         this.getFabricCanvas();
     }
