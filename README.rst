@@ -63,6 +63,15 @@ Changelog
 
 - Build with webpack
 - Development with webpack-dev-server
+- Visual Output Visualisation
+- Functional Predictions Visualisation
+- Loads SSSResultModel from the SSS JSON
+- Converts Dbfetch IPRMC XML output into a flat JSON
+- E-value (dynamic and fixed) scale colouring
+- NCBI BLAST+ bit-score colouring
+- Domain tooltip information (e-value/bit-score, start and end)
+- Sequence tooltip information (description and resource URL)
+- Webcomponent and plugin support for both visualisations
 
 Credits
 =======
