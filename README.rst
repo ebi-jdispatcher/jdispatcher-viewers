@@ -59,6 +59,11 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
+**0.0.2**
+
+- Improved load times with basic in-memory caching
+- Save Visualisation as PNG and SVG
+
 **0.0.1-alpha**
 
 - Build with webpack
