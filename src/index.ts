@@ -125,7 +125,7 @@ class JobIdInputForm {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
                 canvasInstance.addCanvas(
                     jobId,
-                    "./src/testdata/ncbiblast.json",
+                    "../src/testdata/ncbiblast.json",
                     submittedEvent.submitter.name.trim()
                 );
             } else {

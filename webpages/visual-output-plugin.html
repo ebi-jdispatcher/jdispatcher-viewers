@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>jdistpatcher-viewers</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-        <script type="text/javascript" src="dist/jd_viewers_bundle.js" defer></script>
+        <script type="text/javascript" src="../dist/jd_viewers_bundle.js" defer></script>
     </head>
     <body>
         <div id="canvas-wrapper">
@@ -22,11 +22,13 @@
             // Render Options
             const options = {
                 colorScheme: "dynamic",
-                numberHits: 30,
+                numberHits: 100,
+                numberHsps: 10,
+                logSkippedHsps: true,
                 canvasWrapperStroke: true
             };
             // Call render method to display the viz
-            new FunctionalPredictions("canvas", data, options).render();
+            new VisualOutput("canvas", data, options).render();
         });
     </script>
 </html>
