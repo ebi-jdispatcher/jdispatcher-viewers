@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>jdistpatcher-viewers</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+        <script type="text/javascript" src="dist/jd_viewers_bundle_0.0.2.min.js" defer></script>
+    </head>
+    <body>
+        <div id="jd-viewers-app">
+            <form id="jd-viewers-form">
+                <label for="jobid">JobId:</label>
+                <input type="text" size="60" id="jobid" required="true"
+                value="mock_jobid-I20200317-103136-0485-5599422-np2" />
+                </br>
+                <button type="submit" name="visual-output">Generate Visual Output</button>
+                <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
+            </form>
+            <input type='button' id='btn-png' value='Save to PNG' />
+            <input type='button' id='btn-svg' value='Save to SVG' />
+            <p>
+                <div id="canvas-wrapper">
+                    <canvas id="canvas" />
+                </div>
+                <img id="svg"></img>
+                <img id="png"></img>
+            </p>
+        </div>
+    </body>
+    <script>
+        function eventHandler(event){
+            var submitter = event.submitter.name.trim();
+            var jobId = event.target.querySelector("#jobid").value.trim();
+            var jobIdObj = {
+                value: jobId,
+                required: true,
+                minLength: 35,
+                maxLength: 60,
+                pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)$/,
+            }
+            var data = "";
+            if (validateJobId(jobIdObj)) {
+                if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+                    data = "./src/testdata/ncbiblast.json";
+                } else {
+                    data = getServiceURLfromJobId(jobId);
+                }
+                // viz app
+                var fabricjs;
+                if (submitter == "visual-output") {
+                    // Render Options
+                    var options = {
+                        colorScheme: "dynamic",
+                        numberHits: 100,
+                        numberHsps: 10,
+                        logSkippedHsps: true,
+                        canvasWrapperStroke: true
+                    };
+                    // Call render method to display the viz
+                    fabricjs = new VisualOutput("canvas", data, options);
+                    fabricjs.render();
+                } else if (submitter == "functional-predictions"){
+                    // Render Options
+                    var options = {
+                        colorScheme: "dynamic",
+                        numberHits: 30,
+                        canvasWrapperStroke: true
+                    };
+                    // Call render method to display the viz
+                    fabricjs = new FunctionalPredictions("canvas", data, options);
+                    fabricjs.render();
+                }
+
+                // export as SVG and PNG
+                document.getElementById("btn-svg").onclick = function () {
+                    var img = document.getElementById(
+                        "svg"
+                    );
+                    img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
+                    // remove canvas-wrapper
+                    const el = document.getElementById("canvas-wrapper");
+                    el.parentNode?.removeChild(el);
+                };
+                document.getElementById("btn-png").onclick = function () {
+                    const img = document.getElementById(
+                        "png"
+                    );
+                    img.src = fabricjs.canvas
+                        .toDataURL({
+                            format: "png",
+                            enableRetinaScaling: true,
+                            withoutTransform: true,
+                        })
+                        .toString();
+                    img.width = fabricjs.canvas.getWidth();
+                    // remove canvas-wrapper
+                    const el = document.getElementById("canvas-wrapper");
+                    el.parentNode?.removeChild(el);
+                };
+
+            } else {
+                alert("The jobId provided is not valid!");
+                return;
+            }
+            event.preventDefault();
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            // Form submitt handler
+            var element = document.getElementById("jd-viewers-form");
+            var jobIdElement = element.querySelector("#jobid");
+            element.addEventListener("submit", eventHandler);
+        });
+    </script>
+</html>
