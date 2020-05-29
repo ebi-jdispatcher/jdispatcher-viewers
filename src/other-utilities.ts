@@ -112,7 +112,7 @@ export async function getDataFromURLorFile(
     }
 }
 
-function getServiceURLfromJobId(jobId: string) {
+export function getServiceURLfromJobId(jobId: string) {
     const toolName = jobId.split("-")[0];
     return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
 }
