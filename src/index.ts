@@ -2,6 +2,7 @@ import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 import { validateJobId } from "./other-utilities";
+import svgToMiniDataURI from "mini-svg-data-uri";
 
 interface InstanceObjType {
     data: string;
@@ -148,10 +149,6 @@ class FabricjsRenderer {
     private hostElement: HTMLDivElement;
     private elementCanvas: HTMLDivElement;
     private canvasInstance: InstanceObjType;
-    private fabricjs:
-        | VisualOutput
-        | FunctionalPredictions
-        | undefined = undefined;
 
     constructor() {
         this.templateElement = document.getElementById(
@@ -169,9 +166,6 @@ class FabricjsRenderer {
 
             canvasInstance.addListener((canvasInstance: InstanceObjType) => {
                 this.canvasInstance = canvasInstance;
-                if (this.fabricjs !== undefined) {
-                    this.fabricjs.canvas.clear();
-                }
                 this.renderCanvas();
             });
         }
@@ -179,21 +173,18 @@ class FabricjsRenderer {
 
     private renderCanvas() {
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
+        let fabricjs: VisualOutput | FunctionalPredictions;
         if (this.canvasInstance.submitter === "visual-output") {
-            this.fabricjs = new VisualOutput(
-                "canvas",
-                this.canvasInstance.data,
-                {
-                    colorScheme: ColorSchemeEnum.dynamic,
-                    numberHits: 100,
-                    numberHsps: 10,
-                    logSkippedHsps: true,
-                    canvasWrapperStroke: true,
-                }
-            );
-            this.fabricjs.render();
+            fabricjs = new VisualOutput("canvas", this.canvasInstance.data, {
+                colorScheme: ColorSchemeEnum.dynamic,
+                numberHits: 100,
+                numberHsps: 10,
+                logSkippedHsps: true,
+                canvasWrapperStroke: true,
+            });
+            fabricjs.render();
         } else if (this.canvasInstance.submitter === "functional-predictions") {
-            this.fabricjs = new FunctionalPredictions(
+            fabricjs = new FunctionalPredictions(
                 "canvas",
                 this.canvasInstance.data,
                 {
@@ -202,8 +193,34 @@ class FabricjsRenderer {
                     canvasWrapperStroke: true,
                 }
             );
-            this.fabricjs.render();
+            fabricjs.render();
         }
+        // export as SVG and PNG
+        document.getElementById("btn-svg")!.onclick = function () {
+            const img: HTMLImageElement = document.getElementById(
+                "svg"
+            ) as HTMLImageElement;
+            img.src = svgToMiniDataURI(fabricjs!.canvas.toSVG().toString());
+            // remove canvas-wrapper
+            const el: HTMLElement = document.getElementById("canvas-wrapper")!;
+            el.parentNode?.removeChild(el);
+        };
+        document.getElementById("btn-png")!.onclick = function () {
+            const img: HTMLImageElement = document.getElementById(
+                "png"
+            ) as HTMLImageElement;
+            img.src = fabricjs!.canvas
+                .toDataURL({
+                    format: "png",
+                    enableRetinaScaling: true,
+                    withoutTransform: true,
+                })
+                .toString();
+            img.width = fabricjs.canvas.getWidth();
+            // remove canvas-wrapper
+            const el: HTMLElement = document.getElementById("canvas-wrapper")!;
+            el.parentNode?.removeChild(el);
+        };
     }
 }
 
