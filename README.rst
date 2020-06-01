@@ -3,9 +3,7 @@ jdispatcher-viewers
 ###################
 
 Job Dispatcher viewers is a TypeScript application that uses `Fabric.js`_ (based on a HTML canvas) to implement interactive 
-visualisations that we currently provide (i.e. SSS Visual Output and SSS Functional Predictions).
-
-More information coming soon.
+visualisations, Visual Output and SSS Functional Predictions. Static images are generated with `jdispatcher-viewers-cli`_.
 
 
 .. contents:: **Table of Contents**
@@ -15,7 +13,7 @@ More information coming soon.
 Dependencies and Installation
 =============================
 
-Installation requires `Node.js`_ (tested with 12.16.1 LTS). Additional requirements, are
+Building requires `Node.js`_ (tested with 12.16.1 LTS). Additional requirements, are
 downloaded and installed automatically with `npm`_ CLI. See full list of dependencies in `package.json`_
 
 Development Server
@@ -35,20 +33,14 @@ To play with the development server, run:
   npm run dev
 
 
-Production Application
-----------------------
+Building the Application
+------------------------
 
-To compile the application for deployment, run:
+To compile the application for production, run:
 
 .. code-block:: bash
 
   npm run build
-
-
-.. links
-.. _Fabric.js: http://fabricjs.com/
-.. _Node.js: https://nodejs.org/
-.. _npm: https://www.npmjs.com/
 
 
 Bug Tracking
@@ -66,8 +58,9 @@ Changelog
 
 **0.0.1-alpha**
 
-- Build with webpack
+- Build with `webpack`_
 - Development with webpack-dev-server
+- Canvas-based visualisations with `Fabric.js`_
 - Visual Output Visualisation
 - Functional Predictions Visualisation
 - Loads SSSResultModel from the SSS JSON
@@ -77,6 +70,7 @@ Changelog
 - Domain tooltip information (e-value/bit-score, start and end)
 - Sequence tooltip information (description and resource URL)
 - Webcomponent and plugin support for both visualisations
+
 
 Credits
 =======
@@ -89,6 +83,11 @@ Licensing
 Apache License 2.0. See `license`_ for details.
 
 .. links
+.. _Fabric.js: http://fabricjs.com/
+.. _Node.js: https://nodejs.org/
+.. _npm: https://www.npmjs.com/
 .. _package.json: ./package.json
 .. _issue tracker: ../../issues
 .. _license: LICENSE
+.. _webpack: https://webpack.js.org/
+.. _jdispatcher-viewers-cli: https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers-cli
