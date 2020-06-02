@@ -10,7 +10,7 @@ import {
 import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from "./custom-types";
 
 export class BasicCanvasRenderer {
-    public canvas: fabric.Canvas;
+    public canvas: fabric.Canvas | fabric.StaticCanvas;
     protected canvasWidth: number;
     protected canvasHeight: number;
     protected contentWidth: number;
@@ -33,11 +33,16 @@ export class BasicCanvasRenderer {
     constructor(private element: string | HTMLCanvasElement) {}
 
     protected getFabricCanvas() {
-        this.canvas = new fabric.Canvas(this.element, {
+        const startupDef = {
             defaultCursor: "default",
             moveCursor: "default",
             hoverCursor: "default",
-        });
+        };
+        if (this.staticCanvas) {
+            this.canvas = new fabric.StaticCanvas(this.element, startupDef);
+        } else {
+            this.canvas = new fabric.Canvas(this.element, startupDef);
+        }
     }
 
     protected setFrameSize() {
