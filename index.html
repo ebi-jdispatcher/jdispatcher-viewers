@@ -56,7 +56,8 @@
                         numberHits: 100,
                         numberHsps: 10,
                         logSkippedHsps: true,
-                        canvasWrapperStroke: true
+                        canvasWrapperStroke: true,
+                        staticCanvas: false,
                     };
                     // Call render method to display the viz
                     fabricjs = new VisualOutput("canvas", data, options);
@@ -66,7 +67,8 @@
                     var options = {
                         colorScheme: "dynamic",
                         numberHits: 30,
-                        canvasWrapperStroke: true
+                        canvasWrapperStroke: true,
+                        staticCanvas: false,
                     };
                     // Call render method to display the viz
                     fabricjs = new FunctionalPredictions("canvas", data, options);

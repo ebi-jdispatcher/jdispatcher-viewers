@@ -33,6 +33,7 @@ export interface RenderOptions {
     currentDomainDatabase?: string | undefined;
     currentColor?: string;
     currentDisabled?: boolean;
+    staticCanvas?: boolean; // No dynamic components (for CLI)
 }
 
 // jobId validation

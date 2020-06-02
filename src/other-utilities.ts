@@ -28,6 +28,7 @@ export class BasicCanvasRenderer {
     protected fontWeigth: string;
     protected fontFamily: string;
     protected canvasWrapperStroke: boolean;
+    protected staticCanvas: boolean;
 
     constructor(private element: string | HTMLCanvasElement) {}
 

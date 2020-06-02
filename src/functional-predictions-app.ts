@@ -123,9 +123,11 @@ function createDomainCheckbox(
     );
     _this.canvas.add(rect);
     _this.canvas.add(text);
-    mouseOverDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
-    mouseOutDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
-    mouseDownDomainCheckbox(rect, currentDomainDatabase, _this);
+    if (!renderOptions.staticCanvas) {
+        mouseOverDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
+        mouseOutDomainCheckbox(rect, rectObj, currentDomainDatabase, _this);
+        mouseDownDomainCheckbox(rect, currentDomainDatabase, _this);
+    }
 }
 
 let objCache = new ObjectCache();
@@ -194,6 +196,9 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
+        renderOptions.staticCanvas != undefined
+            ? (this.staticCanvas = renderOptions.staticCanvas)
+            : (this.staticCanvas = false);
 
         this.validateInput();
         this.getFabricCanvas();
@@ -378,22 +383,23 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             objCache.put("textHeaderLink", textHeaderLink);
             objCache.put("textHeaderLink_textSeqObj", textSeqObj);
         }
-        textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
-        if (
-            this.sssDataObj.query_url != null &&
-            this.sssDataObj.query_url !== ""
-        ) {
-            mouseOverText(
-                textHeaderLink,
-                textSeqObj,
-                this.sssDataObj.query_def,
-                this.sssDataObj.query_url,
-                { fontSize: this.fontSize },
-                this
-            );
-            mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
-            mouseOutText(textHeaderLink, textSeqObj, this);
+        if (!this.staticCanvas) {
+            if (
+                this.sssDataObj.query_url != null &&
+                this.sssDataObj.query_url !== ""
+            ) {
+                mouseOverText(
+                    textHeaderLink,
+                    textSeqObj,
+                    this.sssDataObj.query_def,
+                    this.sssDataObj.query_url,
+                    { fontSize: this.fontSize },
+                    this
+                );
+                mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
+                mouseOutText(textHeaderLink, textSeqObj, this);
+            }
         }
     }
 
@@ -462,7 +468,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 190,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -470,7 +476,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 260,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -478,7 +484,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 390,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -486,7 +492,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 480,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -494,7 +500,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 570,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -502,7 +508,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 680,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -510,7 +516,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 770,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         this.topPadding += 30;
         createDomainCheckbox(
@@ -519,7 +525,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 190,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -527,7 +533,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 260,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -535,7 +541,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 390,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -543,7 +549,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 480,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -551,7 +557,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 570,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -559,7 +565,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 680,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
         createDomainCheckbox(
             this,
@@ -567,7 +573,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             this.uniqueDomainDatabases,
             this.topPadding,
             this.contentLabelLeftWidth + 770,
-            { fontSize: this.fontSize }
+            { fontSize: this.fontSize, staticCanvas: this.staticCanvas }
         );
     }
 
@@ -637,16 +643,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 );
                 this.canvas.add(spaceText);
                 this.canvas.add(hitText);
-                mouseOverText(
-                    hitText,
-                    textObj,
-                    hit.hit_def,
-                    hit.hit_url,
-                    { fontSize: this.fontSize },
-                    this
-                );
-                mouseDownText(hitText, hit.hit_url, this);
-                mouseOutText(hitText, textObj, this);
+                if (!this.staticCanvas) {
+                    mouseOverText(
+                        hitText,
+                        textObj,
+                        hit.hit_def,
+                        hit.hit_url,
+                        { fontSize: this.fontSize },
+                        this
+                    );
+                    mouseDownText(hitText, hit.hit_url, this);
+                    mouseOutText(hitText, textObj, this);
+                }
 
                 // domain line tracks
                 const lineTrackGroup = drawLineTracks(
@@ -764,16 +772,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                                     did.split("_")[1],
                                     domain
                                 );
-                                mouseOverText(
-                                    hitText,
-                                    textObj,
-                                    "",
-                                    domainURL,
-                                    { fontSize: this.fontSize },
-                                    this
-                                );
-                                mouseDownText(hitText, domainURL, this);
-                                mouseOutText(hitText, textObj, this);
+                                if (!this.staticCanvas) {
+                                    mouseOverText(
+                                        hitText,
+                                        textObj,
+                                        "",
+                                        domainURL,
+                                        { fontSize: this.fontSize },
+                                        this
+                                    );
+                                    mouseDownText(hitText, domainURL, this);
+                                    mouseOutText(hitText, textObj, this);
+                                }
 
                                 // draw domain Predictions (loop over each prediction)
                                 for (const dp of this.iprmcDataFlatObj[
@@ -805,19 +815,21 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                                     );
                                     this.canvas.add(dpDomain);
                                     // Domain hovering and tooltip
-                                    mouseOverDomain(
-                                        dpDomain,
-                                        startDomainPixels,
-                                        endDomainPixels,
-                                        domainStart,
-                                        domainEnd,
-                                        dp,
-                                        {
-                                            fontSize: this.fontSize,
-                                        },
-                                        this
-                                    );
-                                    mouseOutDomain(dpDomain, this);
+                                    if (!this.staticCanvas) {
+                                        mouseOverDomain(
+                                            dpDomain,
+                                            startDomainPixels,
+                                            endDomainPixels,
+                                            domainStart,
+                                            domainEnd,
+                                            dp,
+                                            {
+                                                fontSize: this.fontSize,
+                                            },
+                                            this
+                                        );
+                                        mouseOutDomain(dpDomain, this);
+                                    }
                                 }
                             }
                         }
@@ -899,36 +911,46 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         );
         this.canvas.add(dynamicBoxText);
         this.canvas.add(dynamicText);
-        mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
-        mouseOutCheckbox(
-            dynamicBoxText,
-            textCheckDynObj,
-            ColorSchemeEnum.dynamic,
-            this
-        );
-        mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
+            mouseOutCheckbox(
+                dynamicBoxText,
+                textCheckDynObj,
+                ColorSchemeEnum.dynamic,
+                this
+            );
+            mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
+        }
 
         this.canvas.add(fixedBoxText);
         this.canvas.add(fixedText);
-        mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
-        mouseOutCheckbox(
-            fixedBoxText,
-            textCheckFixObj,
-            ColorSchemeEnum.fixed,
-            this
-        );
-        mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
+            mouseOutCheckbox(
+                fixedBoxText,
+                textCheckFixObj,
+                ColorSchemeEnum.fixed,
+                this
+            );
+            mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
+        }
 
         this.canvas.add(ncbiblastBoxText);
         this.canvas.add(ncbiblastText);
-        mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
-        mouseOutCheckbox(
-            ncbiblastBoxText,
-            textCheckNcbiObj,
-            ColorSchemeEnum.ncbiblast,
-            this
-        );
-        mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
+            mouseOutCheckbox(
+                ncbiblastBoxText,
+                textCheckNcbiObj,
+                ColorSchemeEnum.ncbiblast,
+                this
+            );
+            mouseDownCheckbox(
+                ncbiblastBoxText,
+                ColorSchemeEnum.ncbiblast,
+                this
+            );
+        }
 
         // E-value/Bit Score Text
         this.topPadding += 25;

@@ -122,6 +122,9 @@ export class VisualOutput extends BasicCanvasRenderer {
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
+        renderOptions.staticCanvas != undefined
+            ? (this.staticCanvas = renderOptions.staticCanvas)
+            : (this.staticCanvas = false);
 
         this.validateInput();
         this.getFabricCanvas();
@@ -252,19 +255,20 @@ export class VisualOutput extends BasicCanvasRenderer {
             objCache.put("textHeaderLink", textHeaderLink);
             objCache.put("textHeaderLink_textSeqObj", textSeqObj);
         }
-        textHeaderLink = textHeaderLink;
         this.canvas.add(textHeaderLink);
-        if (this.dataObj.query_url !== null && this.dataObj.query_url !== "") {
-            mouseOverText(
-                textHeaderLink,
-                textSeqObj,
-                this.dataObj.query_def!,
-                this.dataObj.query_url!,
-                { fontSize: this.fontSize },
-                this
-            );
-            mouseDownText(textHeaderLink, this.dataObj.query_url!, this);
-            mouseOutText(textHeaderLink, textSeqObj, this);
+        if (!this.staticCanvas) {
+            if (this.dataObj.query_url !== null && this.dataObj.query_url !== "") {
+                mouseOverText(
+                    textHeaderLink,
+                    textSeqObj,
+                    this.dataObj.query_def!,
+                    this.dataObj.query_url!,
+                    { fontSize: this.fontSize },
+                    this
+                );
+                mouseDownText(textHeaderLink, this.dataObj.query_url!, this);
+                mouseOutText(textHeaderLink, textSeqObj, this);
+            }
         }
     }
 
@@ -431,16 +435,18 @@ export class VisualOutput extends BasicCanvasRenderer {
                 );
                 this.canvas.add(spaceText);
                 this.canvas.add(hitText);
-                mouseOverText(
-                    hitText,
-                    textObj,
-                    hit.hit_def,
-                    hit.hit_url,
-                    { fontSize: this.fontSize },
-                    this
-                );
-                mouseDownText(hitText, hit.hit_url, this);
-                mouseOutText(hitText, textObj, this);
+                if (!this.staticCanvas) {
+                    mouseOverText(
+                        hitText,
+                        textObj,
+                        hit.hit_def,
+                        hit.hit_url,
+                        { fontSize: this.fontSize },
+                        this
+                    );
+                    mouseDownText(hitText, hit.hit_url, this);
+                    mouseOutText(hitText, textObj, this);
+                }
                 for (const hsp of hit.hit_hsps) {
                     numberHsps++;
                     if (numberHsps <= this.numberHsps) {
@@ -562,38 +568,39 @@ export class VisualOutput extends BasicCanvasRenderer {
                         );
                         scoreText.width = this.contentScoringWidth;
                         this.canvas.add(scoreText);
-                        // Query hovering and tooltip
+                        if (!this.staticCanvas) {
+                            // Query hovering and tooltip
+                            mouseOverDomain(
+                                queryDomain,
+                                startQueryHspPixels,
+                                endQueryHspPixels,
+                                hspQueryStart,
+                                hspQueryEnd,
+                                hsp,
+                                {
+                                    fontSize: this.fontSize,
+                                    colorScheme: this.colorScheme,
+                                },
+                                this
+                            );
+                            mouseOutDomain(queryDomain, this);
 
-                        mouseOverDomain(
-                            queryDomain,
-                            startQueryHspPixels,
-                            endQueryHspPixels,
-                            hspQueryStart,
-                            hspQueryEnd,
-                            hsp,
-                            {
-                                fontSize: this.fontSize,
-                                colorScheme: this.colorScheme,
-                            },
-                            this
-                        );
-                        mouseOutDomain(queryDomain, this);
-
-                        // Subject hovering and tooltip
-                        mouseOverDomain(
-                            subjDomain,
-                            startSubjHspPixels,
-                            endSubjHspPixels,
-                            hspSubjStart,
-                            hspSubjEnd,
-                            hsp,
-                            {
-                                fontSize: this.fontSize,
-                                colorScheme: this.colorScheme,
-                            },
-                            this
-                        );
-                        mouseOutDomain(subjDomain, this);
+                            // Subject hovering and tooltip
+                            mouseOverDomain(
+                                subjDomain,
+                                startSubjHspPixels,
+                                endSubjHspPixels,
+                                hspSubjStart,
+                                hspSubjEnd,
+                                hsp,
+                                {
+                                    fontSize: this.fontSize,
+                                    colorScheme: this.colorScheme,
+                                },
+                                this
+                            );
+                            mouseOutDomain(subjDomain, this);
+                        }
                     } else {
                         if (this.logSkippedHsps === true) {
                             let hspTextNotice: fabric.Text;
@@ -681,37 +688,42 @@ export class VisualOutput extends BasicCanvasRenderer {
         );
         this.canvas.add(dynamicBoxText);
         this.canvas.add(dynamicText);
-        mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
-        mouseOutCheckbox(
-            dynamicBoxText,
-            textCheckDynObj,
-            ColorSchemeEnum.dynamic,
-            this
-        );
-        mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
+            mouseOutCheckbox(
+                dynamicBoxText,
+                textCheckDynObj,
+                ColorSchemeEnum.dynamic,
+                this
+            );
+            mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
+        }
 
         this.canvas.add(fixedBoxText);
         this.canvas.add(fixedText);
-        mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
-        mouseOutCheckbox(
-            fixedBoxText,
-            textCheckFixObj,
-            ColorSchemeEnum.fixed,
-            this
-        );
-        mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
+            mouseOutCheckbox(
+                fixedBoxText,
+                textCheckFixObj,
+                ColorSchemeEnum.fixed,
+                this
+            );
+            mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
+        }
 
         this.canvas.add(ncbiblastBoxText);
         this.canvas.add(ncbiblastText);
-        mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
-        mouseOutCheckbox(
-            ncbiblastBoxText,
-            textCheckNcbiObj,
-            ColorSchemeEnum.ncbiblast,
-            this
-        );
-        mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
-
+        if (!this.staticCanvas) {
+            mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
+            mouseOutCheckbox(
+                ncbiblastBoxText,
+                textCheckNcbiObj,
+                ColorSchemeEnum.ncbiblast,
+                this
+            );
+            mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
+        }
         // E-value/Bit Score Text
         this.topPadding += 25;
         const scaleScoreText = drawScaleScoreText(
