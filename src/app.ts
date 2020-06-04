@@ -1,14 +1,25 @@
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
-import { getServiceURLfromJobId, validateJobId } from "./other-utilities";
+import {
+    validateJobId,
+    fetchData,
+    dataAsType,
+    validateSubmittedJobIdInput,
+    validateSubmittedDbfetchInput,
+    getIPRMCDataModelFlatFromXML,
+} from "./other-utilities";
 import svgToMiniDataURI from "mini-svg-data-uri";
 
 // plugin support
 (window as any).VisualOutput = VisualOutput;
 (window as any).FunctionalPredictions = FunctionalPredictions;
-(window as any).getServiceURLfromJobId = getServiceURLfromJobId;
 (window as any).validateJobId = validateJobId;
 (window as any).svgToMiniDataURI = svgToMiniDataURI;
+(window as any).fetchData = fetchData;
+(window as any).dataAsType = dataAsType;
+(window as any).validateSubmittedJobIdInput = validateSubmittedJobIdInput;
+(window as any).validateSubmittedDbfetchInput = validateSubmittedDbfetchInput;
+(window as any).getIPRMCDataModelFlatFromXML = getIPRMCDataModelFlatFromXML;
 
 // web-component support
 import "./visual-output-webcomponent.ts";
