@@ -18,8 +18,10 @@
                 <button type="submit" name="visual-output">Generate Visual Output</button>
                 <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
             </form>
-            <input type='button' id='btn-png' value='Save to PNG' />
-            <input type='button' id='btn-svg' value='Save to SVG' />
+            <input type='button' id='btn-png' value='Display as PNG' />
+            <input type='button' id='btn-png-download' value='Save as PNG' />
+            <input type='button' id='btn-svg' value='Dispay as SVG' />
+            <input type='button' id='btn-svg-download' value='Save as SVG' />
             <p>
                 <div id="canvas-wrapper">
                     <canvas id="canvas" />
@@ -32,9 +34,9 @@
     <script>
         async function eventHandler(event){
             event.preventDefault();
-            var submitter = event.submitter.name.trim();
-            var jobId = event.target.querySelector("#jobid").value.trim();
-            var jobIdObj = {
+            const submitter = event.submitter.name.trim();
+            const jobId = event.target.querySelector("#jobid").value.trim();
+            const jobIdObj = {
                 value: jobId,
                 required: true,
                 minLength: 35,
@@ -64,25 +66,30 @@
                 const iprmcDataObj = dataAsType(iprmcJSONResponse, "IPRMCResultModelFlat");
                 
                 // viz app
-                var fabricjs;
+                let fabricjs;
+                let submitterShort = ";" 
                 if (submitter == "visual-output") {
+                    submitterShort = "vo";
                     // Render Options
-                    var options = {
+                    const options = {
                         colorScheme: "dynamic",
                         numberHits: 100,
                         numberHsps: 10,
                         logSkippedHsps: true,
                         canvasWrapperStroke: true,
+                        staticCanvas: true,
                     };
                     // Call render method to display the viz
                     fabricjs = new VisualOutput("canvas", sssDataObj, options);
                     fabricjs.render();
                 } else if (submitter == "functional-predictions"){
+                    submitterShort = "fp";
                     // Render Options
-                    var options = {
+                    const options = {
                         colorScheme: "dynamic",
                         numberHits: 30,
                         canvasWrapperStroke: true,
+                        staticCanvas: false
                     };
                     // Call render method to display the viz
                     fabricjs = new FunctionalPredictions("canvas", sssDataObj, iprmcDataObj, options);
@@ -91,7 +98,7 @@
 
                 // export as SVG and PNG
                 document.getElementById("btn-svg").onclick = function () {
-                    var img = document.getElementById(
+                    const img = document.getElementById(
                         "svg"
                     );
                     img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
@@ -116,6 +123,39 @@
                     el.parentNode?.removeChild(el);
                 };
 
+                // download as SVG and PNG
+                document.getElementById("btn-svg-download").onclick = function () {
+                    const img = document.getElementById(
+                        "svg"
+                    );
+                    img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
+                    const a = document.createElement('a');
+                    // a.href = 'data:image/svg+xml;utf8,' + unescape($('#SVG')[0].outerHTML);
+                    a.href = img.src;
+                    a.download = `${jobId}-${submitterShort}.svg`;
+                    a.target = '_blank';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                };
+                document.getElementById("btn-png-download").onclick = function () {
+                    const img = document.getElementById(
+                        "png"
+                    );
+                    img.src = fabricjs.canvas
+                        .toDataURL({
+                            format: "png",
+                            enableRetinaScaling: true,
+                            withoutTransform: true,
+                        })
+                        .toString();
+                    img.width = fabricjs.canvas.getWidth();
+                    const a = document.createElement('a');
+                    // a.href = 'data:image/svg+xml;utf8,' + unescape($('#SVG')[0].outerHTML);
+                    a.href = img.src;
+                    a.download = `${jobId}-${submitterShort}.png`;
+                    a.target = '_blank';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                };
+
             } else {
                 alert("The jobId provided is not valid!");
                 return;
@@ -123,8 +163,8 @@
         }
         document.addEventListener("DOMContentLoaded", () => {
             // Form submitt handler
-            var element = document.getElementById("jd-viewers-form");
-            var jobIdElement = element.querySelector("#jobid");
+            const element = document.getElementById("jd-viewers-form");
+            const jobIdElement = element.querySelector("#jobid");
             element.addEventListener("submit", eventHandler);
         });
     </script>
