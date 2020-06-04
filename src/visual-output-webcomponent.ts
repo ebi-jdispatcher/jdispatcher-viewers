@@ -1,5 +1,10 @@
 import { LitElement, html, property, customElement } from "lit-element";
 import { RenderOptions, ColorSchemeEnum } from "./custom-types";
+import {
+    validateSubmittedJobIdInput,
+    fetchData,
+    dataAsType,
+} from "./other-utilities";
 import { VisualOutput } from "./visual-output-app";
 
 @customElement("jd-visual-output")
@@ -14,7 +19,7 @@ export class CanvasRendererComponent extends LitElement {
     constructor() {
         super();
     }
-    render() {
+    async render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
             numberHits: this.numberHits,
@@ -36,9 +41,14 @@ export class CanvasRendererComponent extends LitElement {
             newDiv.appendChild(newCanvas);
             document.body.appendChild(newDiv);
         }
+        // loading the JSON Data
+        const sssJsonData = validateSubmittedJobIdInput(this.data);
+        const sssJsonResponse = await fetchData(sssJsonData);
+        const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
+
         // New JD Viewers Fabricjs Canvas
-        new VisualOutput("canvas", this.data, renderOptions).render();
-        return html` ${this.canvasDivTemplate} `;
+        new VisualOutput("canvas", sssDataObj, renderOptions).render();
+        return html`${this.canvasDivTemplate}`;
     }
     get canvasDivTemplate() {
         return html``;

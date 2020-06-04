@@ -14,19 +14,37 @@
         </div>
     </body>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             // Get Sequence Similirity Search JSON URL
             const jobId = "ncbiblast-I20200529-100702-0318-54003026-np2";
             const data = getServiceURLfromJobId(jobId);
+            const sssJsonResponse = await fetchData(data);
+            const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
+
+            const iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj);
+            const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
+            // convert XML into Flattened JSON
+            const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(
+                iprmcXmlResponse
+            );
+            const iprmcDataObj = dataAsType(
+                iprmcJSONResponse,
+                "IPRMCResultModelFlat"
+            );
 
             // Render Options
             const options = {
                 colorScheme: "dynamic",
                 numberHits: 30,
-                canvasWrapperStroke: true
+                canvasWrapperStroke: true,
             };
             // Call render method to display the viz
-            new FunctionalPredictions("canvas", data, options).render();
+            new FunctionalPredictions(
+                "canvas",
+                sssDataObj,
+                iprmcDataObj,
+                options
+            ).render();
         });
     </script>
 </html>

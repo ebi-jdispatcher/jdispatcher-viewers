@@ -1,5 +1,12 @@
 import { LitElement, html, property, customElement } from "lit-element";
 import { RenderOptions, ColorSchemeEnum } from "./custom-types";
+import {
+    validateSubmittedJobIdInput,
+    validateSubmittedDbfetchInput,
+    getIPRMCDataModelFlatFromXML,
+    fetchData,
+    dataAsType,
+} from "./other-utilities";
 import { FunctionalPredictions } from "./functional-predictions-app";
 
 @customElement("jd-functional-predictions")
@@ -12,7 +19,7 @@ export class CanvasRendererComponent extends LitElement {
     constructor() {
         super();
     }
-    render() {
+    async render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
             numberHits: this.numberHits,
@@ -32,8 +39,30 @@ export class CanvasRendererComponent extends LitElement {
             newDiv.appendChild(newCanvas);
             document.body.appendChild(newDiv);
         }
+
+        // loading the JSON Data
+        const sssJsonData = validateSubmittedJobIdInput(this.data);
+        const sssJsonResponse = await fetchData(sssJsonData);
+        const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
+
+        const iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj);
+        const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
+        // convert XML into Flattened JSON
+        const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(
+            iprmcXmlResponse
+        );
+        const iprmcDataObj = dataAsType(
+            iprmcJSONResponse,
+            "IPRMCResultModelFlat"
+        );
+
         // New JD Viewers Fabricjs Canvas
-        new FunctionalPredictions("canvas", this.data, renderOptions).render();
+        new FunctionalPredictions(
+            "canvas",
+            sssDataObj,
+            iprmcDataObj,
+            renderOptions
+        ).render();
         return html` ${this.canvasDivTemplate} `;
     }
     get canvasDivTemplate() {

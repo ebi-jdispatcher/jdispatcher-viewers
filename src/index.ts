@@ -1,10 +1,18 @@
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
-import { validateJobId } from "./other-utilities";
+import {
+    validateJobId,
+    validateSubmittedJobIdInput,
+    validateSubmittedDbfetchInput,
+    fetchData,
+    dataAsType,
+    getIPRMCDataModelFlatFromXML,
+} from "./other-utilities";
 import svgToMiniDataURI from "mini-svg-data-uri";
 
 interface InstanceObjType {
+    jobId: string;
     data: string;
     submitter: string;
 }
@@ -48,6 +56,7 @@ class CanvasState {
             this.submitterName = submitter;
             this.jobIds.push(jobId);
             this.canvasInstance = {
+                jobId: jobId,
                 data: data,
                 submitter: submitter,
             };
@@ -171,11 +180,16 @@ class FabricjsRenderer {
         }
     }
 
-    private renderCanvas() {
+    private async renderCanvas() {
         this.hostElement.insertAdjacentElement("beforeend", this.elementCanvas);
         let fabricjs: VisualOutput | FunctionalPredictions;
+        const sssJsonData = validateSubmittedJobIdInput(
+            this.canvasInstance.data
+        );
+        const sssJsonResponse = await fetchData(sssJsonData);
+        const dataObj = dataAsType(sssJsonResponse, "SSSResultModel");
         if (this.canvasInstance.submitter === "visual-output") {
-            fabricjs = new VisualOutput("canvas", this.canvasInstance.data, {
+            fabricjs = new VisualOutput("canvas", dataObj, {
                 colorScheme: ColorSchemeEnum.dynamic,
                 numberHits: 100,
                 numberHsps: 10,
@@ -184,9 +198,29 @@ class FabricjsRenderer {
             });
             fabricjs.render();
         } else if (this.canvasInstance.submitter === "functional-predictions") {
+            let iprmcXmlData;
+            if (
+                this.canvasInstance.jobId ===
+                "mock_jobid-I20200317-103136-0485-5599422-np2"
+            ) {
+                iprmcXmlData = "../src/testdata/iprmc.xml";
+            } else {
+                iprmcXmlData = validateSubmittedDbfetchInput(dataObj);
+            }
+            const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
+            // convert XML into Flattened JSON
+            const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(
+                iprmcXmlResponse
+            );
+            const iprmcDataObj = dataAsType(
+                iprmcJSONResponse,
+                "IPRMCResultModelFlat"
+            );
+
             fabricjs = new FunctionalPredictions(
                 "canvas",
-                this.canvasInstance.data,
+                dataObj,
+                iprmcDataObj,
                 {
                     colorScheme: ColorSchemeEnum.dynamic,
                     numberHits: 30,
