@@ -4,6 +4,7 @@ import {
     validateJobId,
     fetchData,
     dataAsType,
+    getJdispatcherJsonURL,
     validateSubmittedJobIdInput,
     validateSubmittedDbfetchInput,
     getIPRMCDataModelFlatFromXML,
@@ -20,6 +21,7 @@ import svgToMiniDataURI from "mini-svg-data-uri";
 (window as any).validateSubmittedJobIdInput = validateSubmittedJobIdInput;
 (window as any).validateSubmittedDbfetchInput = validateSubmittedDbfetchInput;
 (window as any).getIPRMCDataModelFlatFromXML = getIPRMCDataModelFlatFromXML;
+(window as any).getJdispatcherJsonURL = getJdispatcherJsonURL;
 
 // web-component support
 import "./visual-output-webcomponent.ts";

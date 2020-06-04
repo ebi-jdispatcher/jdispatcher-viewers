@@ -17,7 +17,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             // Get Sequence Similirity Search JSON URL
             const jobId = "ncbiblast-I20200529-100702-0318-54003026-np2";
-            const data = getServiceURLfromJobId(jobId);
+            const data = getJdispatcherJsonURL(jobId);
             const sssJsonResponse = await fetchData(data);
             const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
 
