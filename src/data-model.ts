@@ -92,12 +92,12 @@ export interface Hsp {
 
 export interface IPRMCResultModel {
     _declaration: Declaration;
-    _doctype: string;
-    interpromatch: IPRMC;
+    _doctype: string[];
+    interpromatch: IPRMC[];
 }
 
 interface IPRMC {
-    release: Release;
+    release: Release[];
     protein: Protein[];
 }
 
@@ -115,8 +115,8 @@ interface ProteinAttributes {
 
 interface Match {
     _attributes: MatchAttributes;
-    ipr?: Ipr;
-    lcn: Lcn;
+    ipr?: Ipr[];
+    lcn: Lcn[];
 }
 
 interface MatchAttributes {

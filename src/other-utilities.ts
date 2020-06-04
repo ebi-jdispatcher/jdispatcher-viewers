@@ -214,7 +214,13 @@ export function getIPRMCDataModelFlatFromXML(
 
 export function parseXMLData(data: string): IPRMCResultModel | object {
     try {
-        return JSON.parse(xml2json(data, { compact: true, spaces: 2 }));
+        return JSON.parse(
+            xml2json(data, {
+                compact: true,
+                spaces: 2,
+                alwaysArray: true,
+            })
+        );
     } catch (error) {
         console.log(
             "Cannot parse the resulting " +
@@ -292,7 +298,7 @@ export function getFlattenIPRMCDataModel(
 ): IPRMCResultModelFlat {
     let tmpNumberHits = 0;
     let iprmcDataFlatObj: IPRMCResultModelFlat = {};
-    for (const protein of dataObj["interpromatch"]["protein"]) {
+    for (const protein of dataObj["interpromatch"][0]["protein"]) {
         tmpNumberHits++;
         if (tmpNumberHits <= numberHits) {
             let matches: string[] = [];
@@ -302,7 +308,7 @@ export function getFlattenIPRMCDataModel(
                 if (match.ipr !== undefined) {
                     const iprdomain = `${domainDatabaseNameToString(
                         match._attributes.dbname
-                    )}_${match.ipr._attributes.id}`;
+                    )}_${match.ipr[0]._attributes.id}`;
                     if (!matches.includes(iprdomain)) {
                         matches.push(iprdomain);
                     }
@@ -310,22 +316,22 @@ export function getFlattenIPRMCDataModel(
                         matchObjs[iprdomain] = [];
                     }
                     matchObj = {
-                        id: match.ipr._attributes.id,
-                        name: match.ipr._attributes.name,
+                        id: match.ipr[0]._attributes.id,
+                        name: match.ipr[0]._attributes.name,
                         dbname: domainDatabaseNameToString(
                             match._attributes.dbname
                         ),
-                        type: match.ipr._attributes.type,
+                        type: match.ipr[0]._attributes.type,
                         altid: match._attributes.id,
                         altname: match._attributes.name,
                         // altdbname: "InterPro",
                         status: match._attributes.status,
                         model: match._attributes.model,
                         evd: match._attributes.evd,
-                        start: Number(match.lcn._attributes.start),
-                        end: Number(match.lcn._attributes.end),
-                        fragments: match.lcn._attributes.fragments,
-                        score: match.lcn._attributes.fragments,
+                        start: Number(match.lcn[0]._attributes.start),
+                        end: Number(match.lcn[0]._attributes.end),
+                        fragments: match.lcn[0]._attributes.fragments,
+                        score: match.lcn[0]._attributes.fragments,
                     };
                     matchObjs[iprdomain].push(matchObj);
                 } else {
@@ -348,10 +354,10 @@ export function getFlattenIPRMCDataModel(
                         model: match._attributes.model,
                         evd: match._attributes.evd,
                         type: "Unclassified",
-                        start: Number(match.lcn._attributes.start),
-                        end: Number(match.lcn._attributes.end),
-                        fragments: match.lcn._attributes.fragments,
-                        score: match.lcn._attributes.fragments,
+                        start: Number(match.lcn[0]._attributes.start),
+                        end: Number(match.lcn[0]._attributes.end),
+                        fragments: match.lcn[0]._attributes.fragments,
+                        score: match.lcn[0]._attributes.fragments,
                     };
                     matchObjs[iprdomain].push(matchObj);
                 }
