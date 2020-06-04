@@ -20,7 +20,7 @@
             </form>
             <input type='button' id='btn-png' value='Display as PNG' />
             <input type='button' id='btn-png-download' value='Save as PNG' />
-            <input type='button' id='btn-svg' value='Dispay as SVG' />
+            <input type='button' id='btn-svg' value='Display as SVG' />
             <input type='button' id='btn-svg-download' value='Save as SVG' />
             <p>
                 <div id="canvas-wrapper">
@@ -34,6 +34,25 @@
     <script>
         async function eventHandler(event){
             event.preventDefault();
+            // remove canvas-wrapper (if some available)
+            const el = document.getElementById("canvas-wrapper");
+            if (el !== null) el.parentNode.removeChild(el);
+            // create new canvas-wrapper
+            const canvasElement = document.getElementById("canvas");
+            if (canvasElement === null) {
+                const newDiv = document.createElement("div");
+                newDiv.id = "canvas-wrapper";
+                const newCanvas = document.createElement("canvas");
+                newCanvas.id = "canvas";
+                newDiv.appendChild(newCanvas);
+                document.body.appendChild(newDiv);
+            }
+            // reset images if not empty
+            const png = document.getElementById("png");
+            png.src = ""
+            const svg = document.getElementById("svg");
+            svg.src = ""
+
             const submitter = event.submitter.name.trim();
             const jobId = event.target.querySelector("#jobid").value.trim();
             const jobIdObj = {
@@ -77,7 +96,7 @@
                         numberHsps: 10,
                         logSkippedHsps: true,
                         canvasWrapperStroke: true,
-                        staticCanvas: true,
+                        staticCanvas: false
                     };
                     // Call render method to display the viz
                     fabricjs = new VisualOutput("canvas", sssDataObj, options);
@@ -130,7 +149,6 @@
                     );
                     img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
                     const a = document.createElement('a');
-                    // a.href = 'data:image/svg+xml;utf8,' + unescape($('#SVG')[0].outerHTML);
                     a.href = img.src;
                     a.download = `${jobId}-${submitterShort}.svg`;
                     a.target = '_blank';
@@ -149,7 +167,6 @@
                         .toString();
                     img.width = fabricjs.canvas.getWidth();
                     const a = document.createElement('a');
-                    // a.href = 'data:image/svg+xml;utf8,' + unescape($('#SVG')[0].outerHTML);
                     a.href = img.src;
                     a.download = `${jobId}-${submitterShort}.png`;
                     a.target = '_blank';
