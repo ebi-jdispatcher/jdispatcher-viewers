@@ -98,27 +98,40 @@ export function numberToString(n: number) {
     }
 }
 
-export async function getDataFromURLorFile(
-    dataLoc: string
-): Promise<SSSResultModel | IPRMCResultModel> {
-    const request = new Request(dataLoc);
-    try {
-        return fetch(request).then((response) => {
+export async function fetchData(dataLoc: string, format: string = "json") {
+    return await fetch(dataLoc)
+        .then((response) => {
             if (!response.ok) {
                 throw new Error(`Could not retrieve data from ${dataLoc}`);
             }
-            try {
-                return response.json();
-            } catch (error) {
-                throw new Error(`Could not decode JSON data from ${dataLoc}`);
+            if (format === "json") {
+                try {
+                    return response.json();
+                } catch (error) {
+                    throw new Error(
+                        `Could not decode JSON data from ${dataLoc}`
+                    );
+                }
+            } else {
+                return response.text();
             }
-        });
-    } catch (error) {
-        throw new Error(error);
+        })
+        .catch((error) => console.log(error));
+}
+
+export function dataAsType(data: any, dtype: string) {
+    if (dtype === "SSSResultModel") {
+        return data as SSSResultModel;
+    } else if (dtype === "IPRMCResultModel") {
+        return data as IPRMCResultModel;
+    } else if (dtype === "IPRMCResultModelFlat") {
+        return data as IPRMCResultModelFlat;
+    } else {
+        return data;
     }
 }
 
-export function getServiceURLfromJobId(jobId: string) {
+export function getJdispatcherJsonURL(jobId: string) {
     const toolName = jobId.split("-")[0];
     return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
 }
@@ -150,7 +163,7 @@ export function validateJobId(
     return isValid;
 }
 
-export function validateSubmittedInput(data: string): string {
+export function validateSubmittedJobIdInput(data: string): string {
     // check if input is a jobId
     const jobId = { ...jobIdDefaults };
     jobId.value = data;
@@ -158,9 +171,10 @@ export function validateSubmittedInput(data: string): string {
     if (
         !jobId.value.startsWith("http") &&
         !jobId.value.includes("/") &&
+        !jobId.value.includes("./") &&
         validateJobId(jobId)
     ) {
-        data = getServiceURLfromJobId(data);
+        data = getJdispatcherJsonURL(data);
     }
     return data;
 }
@@ -170,22 +184,32 @@ export function getIPRMCDbfetchURL(accessions: string) {
     return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
 }
 
-export async function getXMLDataFromURL(dataLoc: string): Promise<string> {
-    const request = new Request(dataLoc);
-    try {
-        return fetch(request).then((response) => {
-            if (!response.ok) {
-                throw new Error(`Could not retrieve data from ${dataLoc}`);
-            }
-            try {
-                return response.text();
-            } catch (error) {
-                throw new Error(`Could not decode JSON data from ${dataLoc}`);
-            }
-        });
-    } catch (error) {
-        throw new Error(error);
+export function getIPRMCDbfetchAccessions(
+    sssDataObj: SSSResultModel,
+    numberHits: number = 30
+): string {
+    let accessions: string = "";
+    for (const hit of sssDataObj.hits.slice(0, numberHits)) {
+        if (accessions === "") accessions += `${hit.hit_acc}`;
+        else accessions += `,${hit.hit_acc}`;
     }
+    return accessions;
+}
+
+export function validateSubmittedDbfetchInput(
+    sssDataObj: SSSResultModel,
+    numberHits: number = 30
+): string {
+    const accessions = getIPRMCDbfetchAccessions(sssDataObj, numberHits);
+    return getIPRMCDbfetchURL(accessions);
+}
+
+export function getIPRMCDataModelFlatFromXML(
+    iprmcXML: string,
+    numberHits: number = 30
+) {
+    const iprmcDataObj = parseXMLData(iprmcXML) as IPRMCResultModel;
+    return getFlattenIPRMCDataModel(iprmcDataObj, numberHits);
 }
 
 export function parseXMLData(data: string): IPRMCResultModel | object {
@@ -249,13 +273,14 @@ export function domainDatabaseNameToString(domainName: string): string {
     return domainNameEnum;
 }
 
-export function getUniqueIPRMCDomainDatabases(dataObj: IPRMCResultModel) {
+export function getUniqueIPRMCDomainDatabases(
+    dataObj: IPRMCResultModelFlat,
+    proteinIdList: string[]
+) {
     const domainPredictions: string[] = [];
-    for (const protein of dataObj["interpromatch"]["protein"]) {
-        for (const match of protein["match"]) {
-            domainPredictions.push(
-                domainDatabaseNameToString(match._attributes["dbname"])
-            );
+    for (const protein of proteinIdList) {
+        for (const match of dataObj[`${protein}`]["matches"]) {
+            domainPredictions.push(match.split("_")[0]);
         }
     }
     return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);

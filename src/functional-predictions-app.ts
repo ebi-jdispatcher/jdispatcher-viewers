@@ -1,9 +1,5 @@
 import { fabric } from "fabric";
-import {
-    SSSResultModel,
-    IPRMCResultModel,
-    IPRMCResultModelFlat,
-} from "./data-model";
+import { SSSResultModel, IPRMCResultModelFlat } from "./data-model";
 import { getPixelCoords, getDomainPixelCoords } from "./coords-utilities";
 import {
     getGradientSteps,
@@ -15,15 +11,9 @@ import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
 import {
     BasicCanvasRenderer,
     ObjectCache,
-    getDataFromURLorFile,
-    validateSubmittedInput,
     getUniqueIPRMCDomainDatabases,
-    getFlattenIPRMCDataModel,
     domainDatabaseNameToString,
     getDomainURLbyDatabase,
-    getIPRMCDbfetchURL,
-    getXMLDataFromURL,
-    parseXMLData,
 } from "./other-utilities";
 import {
     RenderOptions,
@@ -139,16 +129,14 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     private startPixels: number;
     private endPixels: number;
     private gradientSteps: number[] = [];
-    private sssDataObj: SSSResultModel;
-    private iprmcDataObj: IPRMCResultModel | object;
-    private iprmcDataFlatObj: IPRMCResultModelFlat = {};
     public currentDomainDatabase: string | undefined;
     public uniqueDomainDatabases: string[] = [];
     public currentDomainDatabaseDisabled: boolean = false;
 
     constructor(
         element: string | HTMLCanvasElement,
-        private data: string,
+        private sssDataObj: SSSResultModel,
+        private iprmcDataObj: IPRMCResultModelFlat,
         renderOptions: RenderOptions,
         public domainDatabaseList: string[] = defaultDomainDatabaseList
     ) {
@@ -200,50 +188,24 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             ? (this.staticCanvas = renderOptions.staticCanvas)
             : (this.staticCanvas = false);
 
-        this.validateInput();
         this.getFabricCanvas();
     }
     public render() {
-        this.loadData();
-        this.loadIPRMCdata();
-        if (
-            typeof this.sssDataObj !== "undefined" &&
-            typeof this.iprmcDataObj !== "undefined"
-        ) {
-            this.loadIPRMCFlatData();
-            this.loadInitalProperties();
-            this.loadInitialCoords();
-            // clear the canvas
-            this.canvas.clear();
-            // canvas header
-            this.drawHeaderGroup();
-            // canvas content
-            this.drawContentGroup();
-            // canvas footer
-            this.drawFooterGroup();
-            // finishing off
-            this.wrapCanvas();
-            this.setFrameSize();
-            this.renderCanvas();
-        }
-    }
-
-    private validateInput() {
-        this.data = validateSubmittedInput(this.data);
-    }
-
-    private loadData() {
-        this.sssDataObj = objCache.get("sssDataObj") as SSSResultModel;
-        if (!this.sssDataObj) {
-            const json = getDataFromURLorFile(this.data).then((data) => data);
-            json.then((data) => {
-                if (typeof this.sssDataObj === "undefined") {
-                    this.sssDataObj = data as SSSResultModel;
-                    objCache.put("sssDataObj", this.sssDataObj);
-                    this.render();
-                }
-            }).catch((error) => console.log(error));
-        }
+        this.loadIPRMCProperties();
+        this.loadInitalProperties();
+        this.loadInitialCoords();
+        // clear the canvas
+        this.canvas.clear();
+        // canvas header
+        this.drawHeaderGroup();
+        // canvas content
+        this.drawContentGroup();
+        // canvas footer
+        this.drawFooterGroup();
+        // finishing off
+        this.wrapCanvas();
+        this.setFrameSize();
+        this.renderCanvas();
     }
 
     private loadInitalProperties() {
@@ -265,86 +227,40 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         }
     }
 
-    private loadIPRMCdata() {
-        let accessions: string = "";
-        if (this.sssDataObj != undefined) {
-            this.iprmcDataObj = objCache.get(
-                "IPRMCResultModel"
-            ) as IPRMCResultModel;
-            if (!this.iprmcDataObj) {
-                // Temporarily to avoid hitting Dbfetch
-                if (this.data === "./src/testdata/ncbiblast.json") {
-                    const json = getDataFromURLorFile(
-                        "./src/testdata/iprmc.json"
-                    ).then((data) => data);
-                    json.then((data) => {
-                        if (typeof this.iprmcDataObj === "undefined") {
-                            this.iprmcDataObj = data as IPRMCResultModel;
-                            objCache.put("IPRMCResultModel", this.iprmcDataObj);
-                            this.render();
-                        }
-                    }).catch((error) => console.log(error));
-                } else {
-                    for (const hit of this.sssDataObj.hits.slice(
-                        0,
-                        this.numberHits
-                    )) {
-                        if (accessions === "") accessions += `${hit.hit_acc}`;
-                        else accessions += `,${hit.hit_acc}`;
-                    }
-                    const xmlURL = getIPRMCDbfetchURL(accessions);
-                    const xml = getXMLDataFromURL(xmlURL).then((data) => data);
-                    xml.then((data) => {
-                        if (typeof this.iprmcDataObj === "undefined") {
-                            this.iprmcDataObj = parseXMLData(data);
-                            objCache.put("IPRMCResultModel", this.iprmcDataObj);
-                            this.render();
-                        }
-                    }).catch((error) => console.log(error));
-                }
-            }
-        }
-    }
-
-    private loadIPRMCFlatData() {
+    private loadIPRMCProperties() {
         if (this.sssDataObj != undefined) {
             // disable domain checkboxes that have no predictions
-            // and get 'workable' IPRMC data structure
-            if ("interpromatch" in this.iprmcDataObj) {
-                this.uniqueDomainDatabases = objCache.get(
-                    "uniqueDomainDatabases"
-                ) as string[];
-                if (!this.uniqueDomainDatabases) {
-                    this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
-                        this.iprmcDataObj as IPRMCResultModel
-                    );
-                    objCache.put(
-                        "uniqueDomainDatabases",
-                        this.uniqueDomainDatabases
-                    );
+            this.uniqueDomainDatabases = objCache.get(
+                "uniqueDomainDatabases"
+            ) as string[];
+            if (!this.uniqueDomainDatabases) {
+                let proteinIdList: string[] = [];
+                for (const hit of this.sssDataObj.hits.slice(
+                    0,
+                    this.numberHits
+                )) {
+                    proteinIdList.push(hit.hit_acc);
                 }
-                // remove domainDatabases not in the set of unique domainDatabases
-                for (const db of this.domainDatabaseList) {
-                    if (
-                        !this.uniqueDomainDatabases.includes(
-                            domainDatabaseNameToString(db)
-                        )
-                    ) {
-                        const indx = this.domainDatabaseList.indexOf(db);
-                        if (indx > -1) {
-                            this.domainDatabaseList.splice(indx, 1);
-                        }
+                this.uniqueDomainDatabases = getUniqueIPRMCDomainDatabases(
+                    this.iprmcDataObj,
+                    proteinIdList
+                );
+                objCache.put(
+                    "uniqueDomainDatabases",
+                    this.uniqueDomainDatabases
+                );
+            }
+            // remove domainDatabases not in the set of unique domainDatabases
+            for (const db of this.domainDatabaseList) {
+                if (
+                    !this.uniqueDomainDatabases.includes(
+                        domainDatabaseNameToString(db)
+                    )
+                ) {
+                    const indx = this.domainDatabaseList.indexOf(db);
+                    if (indx > -1) {
+                        this.domainDatabaseList.splice(indx, 1);
                     }
-                }
-                this.iprmcDataFlatObj = objCache.get(
-                    "iprmcDataFlatObj"
-                ) as IPRMCResultModelFlat;
-                if (!this.iprmcDataFlatObj) {
-                    this.iprmcDataFlatObj = getFlattenIPRMCDataModel(
-                        this.iprmcDataObj as IPRMCResultModel,
-                        this.numberHits
-                    );
-                    objCache.put("iprmcDataFlatObj", this.iprmcDataFlatObj);
                 }
             }
         }
@@ -725,18 +641,17 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 // unique domain predictions && selected domain Databases
                 let boxHeight = 0;
                 let tmpTopPadding = this.topPadding - 15;
-                if (hit.hit_acc in this.iprmcDataFlatObj) {
+                if (hit.hit_acc in this.iprmcDataObj) {
                     if (
-                        this.iprmcDataFlatObj[hit.hit_acc]["matches"] !==
-                        undefined
+                        this.iprmcDataObj[hit.hit_acc]["matches"] !== undefined
                     ) {
-                        for (const did of this.iprmcDataFlatObj[hit.hit_acc][
+                        for (const did of this.iprmcDataObj[hit.hit_acc][
                             "matches"
                         ]) {
                             const domain = domainDatabaseNameToString(
-                                this.iprmcDataFlatObj[hit.hit_acc]["match"][
-                                    did
-                                ][0]["dbname"] as string
+                                this.iprmcDataObj[hit.hit_acc]["match"][did][0][
+                                    "dbname"
+                                ] as string
                             );
                             if (this.domainDatabaseList.includes(domain)) {
                                 this.topPadding += 15;
@@ -786,9 +701,9 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                                 }
 
                                 // draw domain Predictions (loop over each prediction)
-                                for (const dp of this.iprmcDataFlatObj[
-                                    hit.hit_acc
-                                ]["match"][did]) {
+                                for (const dp of this.iprmcDataObj[hit.hit_acc][
+                                    "match"
+                                ][did]) {
                                     // domain coordinates
                                     let domainStart = dp.start as number;
                                     let domainEnd = dp.end as number;

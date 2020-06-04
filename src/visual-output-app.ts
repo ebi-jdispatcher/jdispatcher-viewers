@@ -10,12 +10,7 @@ import {
     getRgbColorFixed,
     getGradientSteps,
 } from "./color-utilities";
-import {
-    BasicCanvasRenderer,
-    ObjectCache,
-    getDataFromURLorFile,
-    validateSubmittedInput,
-} from "./other-utilities";
+import { BasicCanvasRenderer, ObjectCache } from "./other-utilities";
 import { RenderOptions, ColorSchemeEnum, TextType } from "./custom-types";
 import {
     mouseDownText,
@@ -63,13 +58,12 @@ export class VisualOutput extends BasicCanvasRenderer {
     private startSubjPixels: number;
     private endSubjPixels: number;
     private gradientSteps: number[] = [];
-    private dataObj: SSSResultModel;
     private queryFactor: number = 1.0;
     private subjFactor: number = 1.0;
 
     constructor(
         element: string | HTMLCanvasElement,
-        private data: string,
+        private dataObj: SSSResultModel,
         renderOptions: RenderOptions
     ) {
         super(element);
@@ -126,45 +120,23 @@ export class VisualOutput extends BasicCanvasRenderer {
             ? (this.staticCanvas = renderOptions.staticCanvas)
             : (this.staticCanvas = false);
 
-        this.validateInput();
         this.getFabricCanvas();
     }
     public render() {
-        this.loadData();
-        if (typeof this.dataObj !== "undefined") {
-            this.loadInitalProperties();
-            this.loadInitialCoords();
-            // clear the canvas
-            this.canvas.clear();
-            // canvas header
-            this.drawHeaderGroup();
-            // canvas content
-            this.drawContentGroup();
-            // canvas footer
-            this.drawFooterGroup();
-            // finishing off
-            this.wrapCanvas();
-            this.setFrameSize();
-            this.renderCanvas();
-        }
-    }
-
-    private validateInput() {
-        this.data = validateSubmittedInput(this.data);
-    }
-
-    private loadData() {
-        this.dataObj = objCache.get("sssDataObj") as SSSResultModel;
-        if (!this.dataObj) {
-            const json = getDataFromURLorFile(this.data).then((data) => data);
-            json.then((data) => {
-                if (typeof this.dataObj === "undefined") {
-                    this.dataObj = data as SSSResultModel;
-                    objCache.put("sssDataObj", this.dataObj);
-                    this.render();
-                }
-            }).catch((error) => console.log(error));
-        }
+        this.loadInitalProperties();
+        this.loadInitialCoords();
+        // clear the canvas
+        this.canvas.clear();
+        // canvas header
+        this.drawHeaderGroup();
+        // canvas content
+        this.drawContentGroup();
+        // canvas footer
+        this.drawFooterGroup();
+        // finishing off
+        this.wrapCanvas();
+        this.setFrameSize();
+        this.renderCanvas();
     }
 
     private loadInitalProperties() {
@@ -257,7 +229,10 @@ export class VisualOutput extends BasicCanvasRenderer {
         }
         this.canvas.add(textHeaderLink);
         if (!this.staticCanvas) {
-            if (this.dataObj.query_url !== null && this.dataObj.query_url !== "") {
+            if (
+                this.dataObj.query_url !== null &&
+                this.dataObj.query_url !== ""
+            ) {
                 mouseOverText(
                     textHeaderLink,
                     textSeqObj,
@@ -722,7 +697,11 @@ export class VisualOutput extends BasicCanvasRenderer {
                 ColorSchemeEnum.ncbiblast,
                 this
             );
-            mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
+            mouseDownCheckbox(
+                ncbiblastBoxText,
+                ColorSchemeEnum.ncbiblast,
+                this
+            );
         }
         // E-value/Bit Score Text
         this.topPadding += 25;
