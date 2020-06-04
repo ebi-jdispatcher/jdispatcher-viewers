@@ -51,6 +51,12 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
+**0.0.3**
+
+- Added option to generate static visualisations
+- Data fetching and loading was extracted from the visualisation classes
+- Added PNG and SVG download buttons to `index.html`
+
 **0.0.2**
 
 - Improved load times with basic in-memory caching
