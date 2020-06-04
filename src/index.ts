@@ -1,3 +1,4 @@
+import svgToMiniDataURI from "mini-svg-data-uri";
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
 import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
@@ -9,7 +10,6 @@ import {
     dataAsType,
     getIPRMCDataModelFlatFromXML,
 } from "./other-utilities";
-import svgToMiniDataURI from "mini-svg-data-uri";
 
 interface InstanceObjType {
     jobId: string;

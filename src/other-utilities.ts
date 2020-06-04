@@ -180,11 +180,11 @@ export function validateSubmittedJobIdInput(data: string): string {
 }
 
 // InterPro Match Complete XML data (via Dbfetch)
-export function getIPRMCDbfetchURL(accessions: string) {
+function getIPRMCDbfetchURL(accessions: string) {
     return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
 }
 
-export function getIPRMCDbfetchAccessions(
+function getIPRMCDbfetchAccessions(
     sssDataObj: SSSResultModel,
     numberHits: number = 30
 ): string {
@@ -212,7 +212,7 @@ export function getIPRMCDataModelFlatFromXML(
     return getFlattenIPRMCDataModel(iprmcDataObj, numberHits);
 }
 
-export function parseXMLData(data: string): IPRMCResultModel | object {
+function parseXMLData(data: string): IPRMCResultModel | object {
     try {
         return JSON.parse(
             xml2json(data, {
@@ -292,7 +292,7 @@ export function getUniqueIPRMCDomainDatabases(
     return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
 }
 
-export function getFlattenIPRMCDataModel(
+function getFlattenIPRMCDataModel(
     dataObj: IPRMCResultModel,
     numberHits: number
 ): IPRMCResultModelFlat {

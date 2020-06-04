@@ -1,3 +1,4 @@
+import svgToMiniDataURI from "mini-svg-data-uri";
 import { VisualOutput } from "./visual-output-app";
 import { FunctionalPredictions } from "./functional-predictions-app";
 import {
@@ -9,7 +10,6 @@ import {
     validateSubmittedDbfetchInput,
     getIPRMCDataModelFlatFromXML,
 } from "./other-utilities";
-import svgToMiniDataURI from "mini-svg-data-uri";
 
 // plugin support
 (window as any).VisualOutput = VisualOutput;
