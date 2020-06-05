@@ -6,23 +6,23 @@ module.exports = {
     output: {
         filename: "jd_viewers_bundle.js",
         path: path.resolve(__dirname, "dist"),
-        publicPath: "dist"
+        publicPath: "dist",
     },
     devtool: "inline-source-map",
     devServer: {
         port: 8080,
-        compress: false
+        compress: false,
     },
     module: {
         rules: [
             {
                 test: /\.ts$/,
-                use: "ts-loader",
-                exclude: /node_modules/
-            }
-        ]
+                loader: "ts-loader",
+                exclude: /node_modules/,
+            },
+        ],
     },
     resolve: {
-        extensions: [".ts", ".js", ".json"]
-    }
+        extensions: [".ts", ".js", ".json"],
+    },
 };

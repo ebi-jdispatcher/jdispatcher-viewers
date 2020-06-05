@@ -8,20 +8,20 @@ module.exports = {
     output: {
         // filename: "jd_viewers_bundle_[hash].js",
         filename: `jd_viewers_bundle_${packageJson.version}.min.js`,
-        path: path.resolve(__dirname, "dist")
+        path: path.resolve(__dirname, "dist"),
     },
     devtool: "none",
     module: {
         rules: [
             {
                 test: /\.ts$/,
-                use: "ts-loader",
-                exclude: /node_modules/
-            }
-        ]
+                loader: "ts-loader",
+                exclude: /node_modules/,
+            },
+        ],
     },
     resolve: {
-        extensions: [".ts", ".js"]
+        extensions: [".ts", ".js"],
     },
-    plugins: [new cleanPlugin.CleanWebpackPlugin()]
+    plugins: [new cleanPlugin.CleanWebpackPlugin()],
 };
