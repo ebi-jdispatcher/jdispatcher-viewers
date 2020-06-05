@@ -1,20 +1,32 @@
 {
     "name": "jdispatcher-viewers",
     "description": "Interactive Visual Output and Functional Prediction visualizations",
-    "main": "app.js",
     "version": "0.0.3",
+    "module": "./dist/jd_viewers_bundle.js",
+    "main": "./bin/jd-viewers-cli.js",
+    "files": [
+        "./dist/",
+        "./bin/"
+    ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
         "dev": "webpack-dev-server --config webpack.config.js",
         "build": "webpack --config webpack.config.prod.js",
-        "tsc": "tsc -w -p ./tsconfig.json"
+        "tsc": "tsc -w -p ./tsconfig.json",
+        "dev:cli": "tsc -w -p ./tsconfig.cli.json",
+        "build:cli": "webpack --config webpack.config.cli.js",
+        "tsc:cli": "tsc -w -p ./tsconfig.cli.json"
+    },
+    "browser": {
+        "child_process": false
     },
     "keywords": [
         "visual-output",
         "functional-predictions",
         "jdispatcher-viewers",
-        "jdispatcher-parsers"
+        "jdispatcher-parsers",
+        "jdispatcher-viewers-cli"
     ],
     "author": "Fábio Madeira",
     "repository": "https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers",
