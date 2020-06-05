@@ -1,7 +1,7 @@
 {
     "name": "jdispatcher-viewers",
     "description": "Interactive Visual Output and Functional Prediction visualizations",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "module": "./dist/jd_viewers_bundle.js",
     "main": "./bin/jd-viewers-cli.js",
     "files": [

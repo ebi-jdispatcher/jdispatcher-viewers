@@ -105,6 +105,12 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
+**0.0.4**
+
+- Building as node CLI application (via `node-canvas`_)
+- CLI implemented with `commander.js`_
+- Update IPRMCResultModel arrays are used by default even when one object is present
+
 **0.0.3**
 
 - Added option to generate static visualisations
@@ -150,4 +156,5 @@ Apache License 2.0. See `license`_ for details.
 .. _issue tracker: ../../issues
 .. _license: LICENSE
 .. _webpack: https://webpack.js.org/
-.. _jdispatcher-viewers-cli: https://gitlab.ebi.ac.uk/ebi-biows/jdispatcher-viewers-cli
+.. _node-canvas: https://github.com/Automattic/node-canvas
+.. _commander.js: https://github.com/tj/commander.js/
