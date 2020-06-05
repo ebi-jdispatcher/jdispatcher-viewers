@@ -1,12 +1,14 @@
 {
     "name": "jdispatcher-viewers",
-    "description": "Viewers for Job Dispatcher tool outputs",
+    "description": "Interactive Visual Output and Functional Prediction visualizations",
     "main": "app.js",
     "version": "0.0.3",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
+        "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
         "dev": "webpack-dev-server --config webpack.config.js",
-        "build": "webpack --config webpack.config.prod.js"
+        "build": "webpack --config webpack.config.prod.js",
+        "tsc": "tsc -w -p ./tsconfig.json"
     },
     "keywords": [
         "visual-output",
