@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import figlet from "figlet";
-import { program } from "commander";
 import fetch from "node-fetch";
+import { program, Command } from "commander";
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
@@ -51,28 +51,24 @@ async function cliHandler() {
             console.log("Your options were:");
             console.log(process.argv);
         }
-
-        if (!program.visout && !program.funcpred) {
-            console.log("'--funcpred' or '--visout' is required!");
-            process.exit();
+        let cmd = "";
+        let cmdIndx = 0;
+        if (program.args[0] === "vo" || program.args[0] === "visual-output") {
+            cmd = "vo";
+        } else if (
+            program.args[0] === "fp" ||
+            program.args[0] === "functional-predictions"
+        ) {
+            cmd = "fp";
+            cmdIndx = 1;
         }
-
-        if (program.visout || program.funcpred) {
-            if (!program.in) {
-                console.log("Input data required!");
-                process.exit();
-            }
-            if (!program.out) {
-                console.log("Output file required!");
-                process.exit();
-            }
-        }
+        let command = program.commands[cmdIndx];
 
         // Process input JobID
         let jsonFile: string;
-        let sssJsonResponse;
-        let sssDataObj;
-        if (program.in === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+        let sssJsonResponse: any;
+        let sssDataObj: any;
+        if (command.in === "mock_jobid-I20200317-103136-0485-5599422-np2") {
             // local file
             jsonFile = path.join(
                 process.cwd(),
@@ -81,19 +77,19 @@ async function cliHandler() {
         } else {
             // validate input as a valid JobID, as a file path or URL
             // if JobID, full service URL is returned
-            const sssJsonData = validateSubmittedJobIdInput(program.in);
+            const sssJsonData = validateSubmittedJobIdInput(command.in);
             if (sssJsonData.startsWith("http")) {
                 // download the JSON file
-                jsonFile = path.join(process.cwd(), `${program.in}.json`);
+                jsonFile = path.join(process.cwd(), `${command.in}.json`);
                 await fetchDataToFile(sssJsonData, jsonFile);
                 console.log(sssJsonData);
                 console.log(jsonFile);
             } else {
                 // assumes is a valid file
-                if (!path.isAbsolute(program.in)) {
-                    jsonFile = path.join(process.cwd(), program.in);
+                if (!path.isAbsolute(command.in)) {
+                    jsonFile = path.join(process.cwd(), command.in);
                 } else {
-                    jsonFile = program.in;
+                    jsonFile = command.in;
                 }
             }
         }
@@ -110,8 +106,8 @@ async function cliHandler() {
         }
 
         let fabricjs: VisualOutput | FunctionalPredictions;
-        if (program.visout) {
-            if (program.verbose) console.log("Generating Visual Output...");
+        if (cmd === "vo") {
+            if (command.verbose) console.log("Generating Visual Output...");
 
             // Render Options
             let options = {
@@ -126,26 +122,26 @@ async function cliHandler() {
             // Call render method to display the viz
             fabricjs = new VisualOutput("canvas", sssDataObj, options);
             fabricjs.render();
-        } else if (program.funcpred) {
-            if (program.verbose)
+        } else if (cmd === "fp") {
+            if (command.verbose)
                 console.log("Generating Functional Predictions...");
 
             let iprmcXmlFile;
             let iprmcXmlResponse;
             let iprmcJSONResponse;
             let iprmcDataObj;
-            if (program.in === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+            if (command.in === "mock_jobid-I20200317-103136-0485-5599422-np2") {
                 iprmcXmlFile = path.join(
                     process.cwd(),
                     "./src/testdata/iprmc.xml"
                 );
             } else {
-                if (program.inx) {
+                if (command.inx) {
                     // assumes is a valid file
-                    if (!path.isAbsolute(program.in)) {
-                        iprmcXmlFile = path.join(process.cwd(), program.inx);
+                    if (!path.isAbsolute(command.in)) {
+                        iprmcXmlFile = path.join(process.cwd(), command.inx);
                     } else {
-                        iprmcXmlFile = program.inx;
+                        iprmcXmlFile = command.inx;
                     }
                 } else {
                     const iprmcXmlData = validateSubmittedDbfetchInput(
@@ -154,8 +150,9 @@ async function cliHandler() {
                     // download the JSON file
                     iprmcXmlFile = path.join(
                         process.cwd(),
-                        `${program.in}.xml`
+                        `${command.in}.xml`
                     );
+                    console.log(iprmcXmlData);
                     await fetchDataToFile(iprmcXmlData, iprmcXmlFile);
                 }
             }
@@ -197,17 +194,17 @@ async function cliHandler() {
         }
 
         // Save figure to file
-        if (program.verbose)
+        if (command.verbose)
             console.log(
-                `Generating ${program.outformat.toUpperCase()} output...`
+                `Generating ${command.outformat.toUpperCase()} output...`
             );
-        let output;
-        if (!path.isAbsolute(program.out)) {
-            output = path.join(process.cwd(), program.out);
+        let output: any;
+        if (!path.isAbsolute(command.out)) {
+            output = path.join(process.cwd(), command.out);
         } else {
-            output = program.out;
+            output = command.out;
         }
-        if (program.outformat.toString().toLowerCase() === "png") {
+        if (command.outformat.toString().toLowerCase() === "png") {
             fs.writeFileSync(
                 output,
                 fabricjs!.canvas
@@ -215,24 +212,41 @@ async function cliHandler() {
                     .replace("data:image/png;base64,", ""),
                 "base64"
             );
-        } else if (program.outformat.toString().toLowerCase() === "svg") {
+        } else if (command.outformat.toString().toLowerCase() === "svg") {
             fs.writeFileSync(output, fabricjs!.canvas.toSVG().toString());
         }
+        if (command.verbose) console.log(`Generated...\n${output}`);
     }
 }
 
-// TODO: add options for renderering
-// TODO: add sub-commands for VO and FP
-// TODO: add notice for expired JobIDs
+function makeCommand(cmd: string, description: string, alias: string) {
+    const command = new Command(cmd);
+    command
+        .description(description)
+        .alias(alias)
+        .requiredOption(
+            "-i, --in <data>",
+            "JobID or URL/URI path to JSON (for VO and FP)"
+        );
+    if (cmd === "fp")
+        command.option("-ix, --inx <xml>", "URL/URI path to XML (for FP)");
+    command
+        .requiredOption("-o, --out <file>", "File name used for output")
+        .requiredOption("-of, --outformat <format>", "Output format [png]")
+        .option("-v, --verbose", "Verbose [false]")
+        .action(cliHandler);
+    return command;
+}
+
 program
-    .version("0.0.1")
-    .description("Generate Static Images with jdispatcher-viewers-cli")
-    .option("-vo, --visout", "generate Visual Output")
-    .option("-fp, --funcpred", "generate Functional Predictions")
-    .option("-i, --in <data>", "jobID or URL/URI path to JSON (for VO and FP)")
-    .option("-ix, --inx <xml>", "URL/URI path to XML (for FP)")
-    .option("-o, --out <file>", "file name used for output")
-    .option("-of, --outformat <format>", "output format [png]")
-    .option("-v, --verbose", "Verbose [false]")
-    .action(cliHandler)
+    .version("0.0.4")
+    .description("Generate Static Figures with jdispatcher-viewers")
+    .addCommand(makeCommand("vo", "Generate Visual Output", "visual-output"))
+    .addCommand(
+        makeCommand(
+            "fp",
+            "Generate Functional Predictions",
+            "functional-predictions"
+        )
+    )
     .parseAsync(process.argv);

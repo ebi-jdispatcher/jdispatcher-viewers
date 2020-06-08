@@ -79,14 +79,14 @@ Testing the CLI using a `mock` jobId, which loads data from files under `./src/t
 
 .. code-block:: bash
 
-  node bin/jd-viewers-cli.js -vo -i mock_jobid-I20200317-103136-0485-5599422-np2 -o test.png -of png -v
+  node bin/jd-viewers-cli.js vo -i mock_jobid-I20200317-103136-0485-5599422-np2 -o test.png -of png -v
 
 
 Passing the same local files:
 
 .. code-block:: bash
 
-  node bin/jd-viewers-cli.js -fp -i ./src/testdata/ncbiblast.json -ix ./src/testdata/iprmc.xml -o test.svg -of svg -v
+  node bin/jd-viewers-cli.js fp -i ./src/testdata/ncbiblast.json -ix ./src/testdata/iprmc.xml -o test.svg -of svg -v
 
 
 Passing a valid JobId (replace with a current JobId, as this one might have expired), where the 
@@ -94,7 +94,7 @@ data will be fetched and stored locally:
 
 .. code-block:: bash
 
-  node bin/jd-viewers-cli.js -fp -i ncbiblast-R20200602-114955-0302-11398737-np2 -o test.svg -of svg -v
+  node bin/jd-viewers-cli.js fp -i ncbiblast-R20200602-114955-0302-11398737-np2 -o test.svg -of svg -v
 
 
 Bug Tracking
