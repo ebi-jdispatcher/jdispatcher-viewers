@@ -113,6 +113,11 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
+**0.0.5**
+
+- jdispatcher-viewers CLI takes two main commands: `vo` and `fp`
+- Added selected rendering options to the CLI
+
 **0.0.4**
 
 - Building as node CLI application (via `node-canvas`_)

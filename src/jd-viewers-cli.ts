@@ -261,7 +261,7 @@ function makeCommand(cmd: string, description: string, alias: string) {
 }
 
 program
-    .version("0.0.4")
+    .version("0.0.5")
     .description("Generate Static Figures with jdispatcher-viewers")
     .addCommand(makeCommand("vo", "Generate Visual Output", "visual-output"))
     .addCommand(
