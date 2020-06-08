@@ -97,6 +97,14 @@ data will be fetched and stored locally:
   node bin/jd-viewers-cli.js fp -i ncbiblast-R20200602-114955-0302-11398737-np2 -o test.svg -of svg -v
 
 
+Some rendering options can be optionally passed to the CLI, including: `-hits`, number of hits; 
+`-hsps`, number of HSPs; and `-color`, color scheme. For example:
+
+.. code-block:: bash
+
+  node bin/jd-viewers-cli.js fp -i ncbiblast-R20200602-114955-0302-11398737-np2 -o test.svg -of svg -color 'ncbiblast' -hits 50 -v
+
+
 Bug Tracking
 ============
 
