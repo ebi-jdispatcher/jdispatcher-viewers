@@ -2,6 +2,7 @@ import clear from "clear";
 import chalk from "chalk";
 import figlet from "figlet";
 import { program } from "commander";
+import fetch from "node-fetch";
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
