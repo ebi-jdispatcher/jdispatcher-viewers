@@ -33,7 +33,6 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@types/browser-or-node": "^1.2.0",
-        "@types/clear": "^0.1.0",
         "@types/fabric": "3.6.2",
         "@types/figlet": "^1.2.0",
         "@types/node": "13.9.0",
@@ -42,7 +41,6 @@
         "browser-or-node": "^1.2.1",
         "canvas": "^2.6.1",
         "chalk": "^4.0.0",
-        "clear": "^0.1.0",
         "commander": "^5.1.0",
         "commonjs": "0.0.1",
         "fabric": "3.6.2",

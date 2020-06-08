@@ -1,4 +1,3 @@
-import clear from "clear";
 import chalk from "chalk";
 import figlet from "figlet";
 import { program } from "commander";
@@ -222,7 +221,6 @@ async function cliHandler() {
     }
 }
 
-clear();
 // TODO: add options for renderering
 // TODO: add sub-commands for VO and FP
 // TODO: add notice for expired JobIDs
