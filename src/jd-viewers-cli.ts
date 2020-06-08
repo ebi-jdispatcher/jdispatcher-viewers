@@ -119,10 +119,9 @@ async function cliHandler() {
 
             // Render Options
             let options = {
-                // colorScheme: "dynamic",
-                colorScheme: ColorSchemeEnum.dynamic,
-                numberHits: 100,
-                numberHsps: 10,
+                colorScheme: command.colorscheme as ColorSchemeEnum,
+                numberHits: command.numbhits,
+                numberHsps: command.numbhsps,
                 logSkippedHsps: true,
                 canvasWrapperStroke: true,
                 staticCanvas: true,
@@ -185,9 +184,8 @@ async function cliHandler() {
 
             // Render Options
             let options = {
-                // colorScheme: "dynamic",
-                colorScheme: ColorSchemeEnum.dynamic,
-                numberHits: 30,
+                colorScheme: command.colorscheme as ColorSchemeEnum,
+                numberHits: command.numbhits,
                 canvasWrapperStroke: true,
                 staticCanvas: true,
             };
@@ -229,6 +227,7 @@ async function cliHandler() {
 
 function makeCommand(cmd: string, description: string, alias: string) {
     const command = new Command(cmd);
+    // inputs & outputs
     command
         .description(description)
         .alias(alias)
@@ -241,6 +240,21 @@ function makeCommand(cmd: string, description: string, alias: string) {
     command
         .requiredOption("-o, --out <file>", "File name used for output")
         .requiredOption("-of, --outformat <format>", "Output format [png]")
+
+    // render Options
+    command
+        .option("-color, --colorscheme [scheme]", "Color scheme to use [dynamic]")
+    if (cmd === "vo")
+        command
+            .option("-hits, --numbhits [hits]", "Number of hits to display [100]")
+            .option("-hsps, --numbhsps [hsps]", "Number of HSPs to display [10]")
+    else if (cmd === "fp")
+        command
+            .option("-hits, --numbhits [hits]", "Number of Hits to display [30]");
+    command
+    
+    // finally
+    command
         .option("-v, --verbose", "Verbose [false]")
         .action(cliHandler);
     return command;
