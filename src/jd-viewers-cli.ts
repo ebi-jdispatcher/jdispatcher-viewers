@@ -28,7 +28,15 @@ async function fetchDataToFile(url: string, outfile: string) {
 
 function loadDataFromFile(file: string, format: string) {
     if (format === "json") {
-        return JSON.parse(fs.readFileSync(file, "utf8"));
+        try {
+            return JSON.parse(fs.readFileSync(file, "utf8"));
+        } catch {
+            console.log(
+                `Unable to load the JSON file\n${file}\n` +
+                    "The jobId might be 'not found' " +
+                    "(jobs data are only available for 7 days)!"
+            );
+        }
     } else {
         return fs.readFileSync(file, "utf8");
     }
