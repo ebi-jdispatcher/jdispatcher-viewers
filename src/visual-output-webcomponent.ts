@@ -54,3 +54,9 @@ export class CanvasRendererComponent extends LitElement {
         return html``;
     }
 }
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "jd-visual-output": CanvasRendererComponent;
+    }
+}

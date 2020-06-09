@@ -69,3 +69,9 @@ export class CanvasRendererComponent extends LitElement {
         return html``;
     }
 }
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "jd-functional-predictions": CanvasRendererComponent;
+    }
+}
