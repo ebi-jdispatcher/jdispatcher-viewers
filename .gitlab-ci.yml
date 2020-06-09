@@ -1,0 +1,25 @@
+# Author: Fábio Madeira <fmadeira@ebi.ac.uk>, 2020
+# test/run locally with
+# gitlab-runner exec docker build_module
+# gitlab-runner exec docker build_nodecli
+
+# node 12.18 LTS
+image: node:lts-alpine3.12
+
+before_script:
+    # installing dependencies for node-canvas (https://github.com/Automattic/node-canvas)
+    - apk add --no-cache build-base g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+    # installing project dependencies
+    - npm install
+
+stages:
+    # building the ES module and node CLI
+    - build
+
+build_module:
+    stage: build
+    script: npm run build
+
+build_nodecli:
+    stage: build
+    script: npm run build:cli
