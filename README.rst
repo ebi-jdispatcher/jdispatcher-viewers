@@ -113,7 +113,7 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
-See `changelog.md`_
+See `CHANGELOG.rst`_.
 
 Credits
 =======
@@ -132,4 +132,4 @@ Apache License 2.0. See `license`_ for details.
 .. _package.json: ./package.json
 .. _issue tracker: ../../issues
 .. _license: LICENSE
-.. _changelog.md: CHANGELOG.md
+.. _CHANGELOG.rst: CHANGELOG.rst
