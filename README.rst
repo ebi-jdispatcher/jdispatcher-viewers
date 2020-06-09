@@ -113,43 +113,7 @@ If you find any bugs or issues please log them in the `issue tracker`_.
 Changelog
 =========
 
-**0.0.5**
-
-- jdispatcher-viewers CLI takes two main commands: `vo` and `fp`
-- Added selected rendering options to the CLI
-
-**0.0.4**
-
-- Building as node CLI application (via `node-canvas`_)
-- CLI implemented with `commander.js`_
-- Update IPRMCResultModel arrays are used by default even when one object is present
-
-**0.0.3**
-
-- Added option to generate static visualisations
-- Data fetching and loading was extracted from the visualisation classes
-- Added PNG and SVG download buttons to `index.html`
-
-**0.0.2**
-
-- Improved load times with basic in-memory caching
-- Save Visualisation as PNG and SVG
-
-**0.0.1-alpha**
-
-- Build with `webpack`_
-- Development with webpack-dev-server
-- Canvas-based visualisations with `Fabric.js`_
-- Visual Output Visualisation
-- Functional Predictions Visualisation
-- Loads SSSResultModel from the SSS JSON
-- Converts Dbfetch IPRMC XML output into a flat JSON
-- E-value (dynamic and fixed) scale colouring
-- NCBI BLAST+ bit-score colouring
-- Domain tooltip information (e-value/bit-score, start and end)
-- Sequence tooltip information (description and resource URL)
-- Webcomponent and plugin support for both visualisations
-
+See `changelog.md`_
 
 Credits
 =======
@@ -168,6 +132,4 @@ Apache License 2.0. See `license`_ for details.
 .. _package.json: ./package.json
 .. _issue tracker: ../../issues
 .. _license: LICENSE
-.. _webpack: https://webpack.js.org/
-.. _node-canvas: https://github.com/Automattic/node-canvas
-.. _commander.js: https://github.com/tj/commander.js/
+.. _changelog.md: CHANGELOG.md
