@@ -7,6 +7,16 @@ Job Dispatcher viewers is a TypeScript module that uses `Fabric.js`_
 Visual Output and SSS Functional Predictions. A `Node.js`_ CLI application 
 is also provided to generate static figures in SVG and PNG formats.
 
+Visual Output
+
+.. image:: VO.gif
+   :width: 1022
+
+Functional Predictions
+
+.. image:: FP.gif
+   :width: 1022
+
 
 .. contents:: **Table of Contents**
    :depth: 3
@@ -115,13 +125,10 @@ Changelog
 
 See `CHANGELOG.rst`_.
 
-Credits
-=======
-
-* Fábio Madeira <fmadeira@ebi.ac.uk>
 
 Licensing
 =========
+The European Bioinformatics Institute - `EMBL-EBI`_, is an Intergovernmental Organization which, as part of the European Molecular Biology Laboratory family, focuses on research and services in bioinformatics.
 
 Apache License 2.0. See `license`_ for details.
 
@@ -133,3 +140,4 @@ Apache License 2.0. See `license`_ for details.
 .. _issue tracker: ../../issues
 .. _license: LICENSE
 .. _CHANGELOG.rst: CHANGELOG.rst
+.. _EMBL-EBI: https://www.ebi.ac.uk/
