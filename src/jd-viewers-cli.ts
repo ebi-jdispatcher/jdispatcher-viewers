@@ -54,7 +54,7 @@ async function cliHandler() {
         console.log("");
         program.outputHelp();
     } else {
-        if (program.verbose) {
+        if (program.opts().verbose) {
             console.log("Running jdispatcher-viewers-cli...");
             console.log("Your options were:");
             console.log(process.argv);
@@ -70,7 +70,7 @@ async function cliHandler() {
             cmd = "fp";
             cmdIndx = 1;
         }
-        let command = program.commands[cmdIndx];
+        let command = program.commands[cmdIndx].opts();
 
         // Process input JobID
         let jsonFile: string;
