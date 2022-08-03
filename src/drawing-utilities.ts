@@ -403,7 +403,7 @@ export function drawHspNoticeText(
     textObj.fill = "red";
     const hspTextNotice = new fabric.Text(
         `This hit contains ${totalNumberHsps} alignments, ` +
-            `but only the first ${numberHsps} are displayed!`,
+        `but only the first ${numberHsps} are displayed!`,
         textObj
     );
     return hspTextNotice;
@@ -537,16 +537,16 @@ export function drawCheckBoxText(
     renderOptions: RenderOptions,
     topPadding: number
 ): [
-    fabric.Text,
-    fabric.Text,
-    TextType,
-    fabric.Text,
-    fabric.Text,
-    TextType,
-    fabric.Text,
-    fabric.Text,
-    TextType
-] {
+        fabric.Text,
+        fabric.Text,
+        TextType,
+        fabric.Text,
+        fabric.Text,
+        TextType,
+        fabric.Text,
+        fabric.Text,
+        TextType
+    ] {
     // Scale Type selection
     const textSelObj = { ...textDefaults };
     textSelObj.fontSize = renderOptions.fontSize! + 1;

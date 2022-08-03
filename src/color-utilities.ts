@@ -31,17 +31,17 @@ export function getRgbColorGradient(
             h =
                 1.0 +
                 (Math.log10(score) - Math.log10(step1)) /
-                    (Math.log10(step2) - Math.log10(step1));
+                (Math.log10(step2) - Math.log10(step1));
         } else if (score < step3) {
             h =
                 2.0 +
                 (Math.log10(score) - Math.log10(step2)) /
-                    (Math.log10(step3) - Math.log10(step2));
+                (Math.log10(step3) - Math.log10(step2));
         } else if (score < end) {
             h =
                 3.0 +
                 (Math.log10(score) - Math.log10(step3)) /
-                    (Math.log10(end) - Math.log10(step3));
+                (Math.log10(end) - Math.log10(step3));
         } else {
             h = 4.0;
         }

@@ -28,11 +28,11 @@ interface SubmitEvent {
 class CanvasState {
     private canvasInstance: InstanceObjType;
     private static instance: CanvasState;
-    private listener: Listener = () => {};
+    private listener: Listener = () => { };
     private jobIds: string[] = [];
     private submitterName: string = "";
 
-    private constructor() {}
+    private constructor() { }
 
     static getInstance() {
         if (this.instance) {

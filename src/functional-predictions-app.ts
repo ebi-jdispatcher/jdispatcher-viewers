@@ -650,7 +650,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                         ]) {
                             const domain = domainDatabaseNameToString(
                                 this.iprmcDataObj[hit.hit_acc]["match"][did][0][
-                                    "dbname"
+                                "dbname"
                                 ] as string
                             );
                             if (this.domainDatabaseList.includes(domain)) {

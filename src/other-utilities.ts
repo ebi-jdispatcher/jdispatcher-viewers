@@ -30,7 +30,7 @@ export class BasicCanvasRenderer {
     protected canvasWrapperStroke: boolean;
     protected staticCanvas: boolean;
 
-    constructor(private element: string | HTMLCanvasElement) {}
+    constructor(private element: string | HTMLCanvasElement) { }
 
     protected getFabricCanvas() {
         const startupDef = {
@@ -224,7 +224,7 @@ function parseXMLData(data: string): IPRMCResultModel | object {
     } catch (error) {
         console.log(
             "Cannot parse the resulting " +
-                "Dbfetch response (likely not formatted XML)!"
+            "Dbfetch response (likely not formatted XML)!"
         );
         return {};
     }

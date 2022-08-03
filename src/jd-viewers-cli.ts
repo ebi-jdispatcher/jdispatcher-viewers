@@ -33,8 +33,8 @@ function loadDataFromFile(file: string, format: string) {
         } catch {
             console.log(
                 `Unable to load the JSON file\n${file}\n` +
-                    "The jobId might be 'not found' " +
-                    "(jobs data are only available for 7 days)!"
+                "The jobId might be 'not found' " +
+                "(jobs data are only available for 7 days)!"
             );
         }
     } else {
@@ -252,7 +252,7 @@ function makeCommand(cmd: string, description: string, alias: string) {
         command
             .option("-hits, --numbhits [hits]", "Number of Hits to display [30]");
     command
-    
+
     // finally
     command
         .option("-v, --verbose", "Verbose [false]")
