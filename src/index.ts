@@ -210,7 +210,7 @@ class FabricjsRenderer {
             const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
             // convert XML into Flattened JSON
             const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(
-                iprmcXmlResponse
+                iprmcXmlResponse as string
             );
             const iprmcDataObj = dataAsType(
                 iprmcJSONResponse,
