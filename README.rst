@@ -115,6 +115,21 @@ Some rendering options can be optionally passed to the CLI, including: `-hits`, 
   node bin/jd-viewers-cli.js fp -i ncbiblast-R20200602-114955-0302-11398737-np2 -o test.svg -of svg -color 'ncbiblast' -hits 50 -v
 
 
+Publishing NPM package
+----------------------
+
+This package has been published to NPM at `@ebi-jdispatcher/jdispatcher-viewers`_.
+
+.. code-block:: bash
+
+	# npm package under ebi-jdispatcher org
+	npm init --scope=@ebi-jdispatcher
+	# testing building the package
+	npm install ../jdispatcher-viewers
+	# publish to npm
+	npm publish --access public
+
+
 Bug Tracking
 ============
 
@@ -141,3 +156,4 @@ Apache License 2.0. See `license`_ for details.
 .. _license: LICENSE
 .. _CHANGELOG.rst: CHANGELOG.rst
 .. _EMBL-EBI: https://www.ebi.ac.uk/
+.. _@ebi-jdispatcher/jdispatcher-viewers: https://www.npmjs.com/settings/ebi-jdispatcher/jdispatcher-viewers
