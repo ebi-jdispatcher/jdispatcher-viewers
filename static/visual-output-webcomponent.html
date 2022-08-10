@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>jdistpatcher-viewers</title>
+        <title>Visual Output - webcomponent</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/webcomponents-bundle.min.js" charset="utf-8"></script>
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/custom-elements-es5-adapter.min.js" charset="utf-8"></script>
@@ -12,11 +12,10 @@
     </head>
     <body>
         <!-- JD Visual Output Web-component -->
-        <!-- data attibute can be a valid jobId or the SSS JSON url -->
-        <!-- data="https://www.ebi.ac.uk/~fmadeira/lib/jd-viewers/ncbiblast.json" -->
-        <!-- data="data="https://wwwdev.ebi.ac.uk/Tools/services/rest/ncbiblast/result/ncbiblast-I20200414-162608-0243-21784862-np2/jdp?format=json"" -->
+        <!-- data attribute should be a valid jobId -->
+        <!-- data="ncbiblast-I20220810-095736-0608-24881701-np2"-->
         <jd-visual-output
-            data="ncbiblast-I20200529-100702-0318-54003026-np2"
+            data="mock_jobid-I20200317-103136-0485-5599422-np2"
             colorScheme="ncbiblast"
             numberHits="100"
             numberHsps="10"

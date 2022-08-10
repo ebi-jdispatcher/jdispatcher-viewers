@@ -6,17 +6,16 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>jdistpatcher-viewers</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all">
-        <script type="module" src="../dist/jd_viewers_bundle.js"></script>
     </head>
     <body>
-        <p>This page is handled by index.ts</p>
+        <!-- <p>This page is handled by index.ts</p>-->
         <div id="jd-viewers-app">
             <template id="input-jobid">
                 <form>
                     <div class="form-control">
                         <label for="jobid">JobId:</label>
                         <input type="text" size="60" id="jobid" required="true"
-                        value="mock_jobid-I20200317-103136-0485-5599422-np2" /> 
+                        value="mock_jobid-I20200317-103136-0485-5599422-np2" />
                         </br>
                         <button type="submit" name="visual-output">Generate Visual Output</button>
                         <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
@@ -36,5 +35,6 @@
                 <img id="png"></img>
             </p>
         </div>
+        <script type="module" src="../dist/jd_viewers.bundle.js"></script>
     </body>
 </html>

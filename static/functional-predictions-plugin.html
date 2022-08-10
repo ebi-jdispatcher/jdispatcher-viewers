@@ -4,9 +4,9 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>jdistpatcher-viewers</title>
+        <title>Functional Predictions - plugin</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-        <script type="text/javascript" src="../dist/jd_viewers_bundle.js" defer></script>
+        <script type="text/javascript" src="../dist/jd_viewers.bundle.js" defer></script>
     </head>
     <body>
         <div id="canvas-wrapper">
@@ -15,8 +15,10 @@
     </body>
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            // Get Sequence Similirity Search JSON URL
-            const jobId = "ncbiblast-I20200529-100702-0318-54003026-np2";
+            // Get Sequence Similarity Search JSON URL
+            // jobId should be a valid jobId
+            // const jobId = "ncbiblast-I20220810-095736-0608-24881701-np2";
+            const jobId = "mock_jobid-I20200317-103136-0485-5599422-np2";
             const data = getJdispatcherJsonURL(jobId);
             const sssJsonResponse = await fetchData(data);
             const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
