@@ -54,7 +54,8 @@ async function cliHandler() {
         console.log("");
         program.outputHelp();
     } else {
-        if (program.opts().verbose) {
+        const programopts = program.opts();
+        if (programopts.verbose) {
             console.log("Running jdispatcher-viewers-cli...");
             console.log("Your options were:");
             console.log(process.argv);
@@ -167,7 +168,7 @@ async function cliHandler() {
                 iprmcXmlResponse = loadDataFromFile(iprmcXmlFile, "xml");
                 // convert XML into Flattened JSON
                 iprmcJSONResponse = getIPRMCDataModelFlatFromXML(
-                    iprmcXmlResponse
+                    iprmcXmlResponse as string
                 );
                 iprmcDataObj = dataAsType(
                     iprmcJSONResponse,
@@ -260,6 +261,7 @@ function makeCommand(cmd: string, description: string, alias: string) {
     return command;
 }
 
+const program = new Command();
 program
     .version("0.0.5")
     .description("Generate Static Figures with jdispatcher-viewers")
