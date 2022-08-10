@@ -2,8 +2,13 @@
     "name": "jdispatcher-viewers",
     "description": "Interactive Visual Output and Functional Prediction visualizations",
     "version": "0.0.5",
-    "module": "./dist/jd_viewers_bundle.js",
+    "module": "./dist/jd_viewers.bundle.js",
+    "exports": "./bin/jd-viewers-cli.js",
     "main": "./bin/jd-viewers-cli.js",
+    "type": "module",
+    "engines": {
+        "node": ">=18.7"
+    },
     "files": [
         "./dist/",
         "./bin/"
@@ -11,11 +16,12 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
-        "dev": "webpack-dev-server --config webpack.config.js",
-        "build": "webpack --config webpack.config.prod.js",
+        "dev": "npx webpack serve --config webpack.config.js",
+        "dev2": "npx webpack --watch --config webpack.config.js",
+        "build": "npx webpack --config webpack.config.prod.js",
         "tsc": "tsc -w -p ./tsconfig.json",
         "dev:cli": "tsc -w -p ./tsconfig.cli.json",
-        "build:cli": "webpack --config webpack.config.cli.js",
+        "build:cli": "tsc -p ./tsconfig.cli.json",
         "tsc:cli": "tsc -w -p ./tsconfig.cli.json"
     },
     "browser": {

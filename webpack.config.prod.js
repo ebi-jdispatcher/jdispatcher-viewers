@@ -1,16 +1,19 @@
-const path = require("path");
-const cleanPlugin = require("clean-webpack-plugin");
-const packageJson = require(path.join(process.cwd(), "package.json"));
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import fs from 'node:fs/promises';
+import cleanPlugin from "clean-webpack-plugin";
 
-module.exports = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(await fs.readFile('package.json'));
+
+export default {
     mode: "production",
     entry: "./src/app.ts",
     output: {
-        // filename: "jd_viewers_bundle_[hash].js",
-        filename: `jd_viewers_bundle_${packageJson.version}.min.js`,
+        filename: `jd_viewers_${packageJson.version}.bundle.min.js`,
         path: path.resolve(__dirname, "dist"),
     },
-    devtool: "none",
+    devtool: false,
     module: {
         rules: [
             {
