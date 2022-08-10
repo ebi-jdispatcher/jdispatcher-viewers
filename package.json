@@ -22,7 +22,8 @@
         "tsc": "tsc -w -p ./tsconfig.json",
         "dev:cli": "tsc -w -p ./tsconfig.cli.json",
         "build:cli": "tsc -p ./tsconfig.cli.json",
-        "tsc:cli": "tsc -w -p ./tsconfig.cli.json"
+        "tsc:cli": "tsc -w -p ./tsconfig.cli.json",
+        "release": "standard-version"
     },
     "browser": {
         "child_process": false
