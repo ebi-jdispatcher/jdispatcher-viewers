@@ -133,7 +133,16 @@ export function dataAsType(data: any, dtype: string) {
 
 export function getJdispatcherJsonURL(jobId: string) {
     const toolName = jobId.split("-")[0];
-    return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/jdp?format=json`;
+    if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+        // mock jobId
+        return "https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json";
+    } else if (jobId.endsWith("-np2")) {
+        // wwwdev server (-np2$)
+        return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
+    } else {
+        // production servers (-p1m$ and -p2m$)
+        return `https://www.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
+    }
 }
 
 export function validateJobId(

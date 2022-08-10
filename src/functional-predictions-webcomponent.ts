@@ -44,8 +44,15 @@ export class CanvasRendererComponent extends LitElement {
         const sssJsonData = validateSubmittedJobIdInput(this.data);
         const sssJsonResponse = await fetchData(sssJsonData);
         const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
-
-        const iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj);
+        // jobID has been validated
+        let iprmcXmlData;
+        if (this.data ===
+            "mock_jobid-I20200317-103136-0485-5599422-np2"
+        ) {
+            iprmcXmlData = "https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/iprmc.xml";
+        } else {
+            iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj);
+        }
         const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
         // convert XML into Flattened JSON
         const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(

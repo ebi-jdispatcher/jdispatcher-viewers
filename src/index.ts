@@ -134,7 +134,7 @@ class JobIdInputForm {
             if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
                 canvasInstance.addCanvas(
                     jobId,
-                    "../src/testdata/ncbiblast.json",
+                    "testdata/ncbiblast.json",
                     submittedEvent.submitter.name.trim()
                 );
             } else {
@@ -203,7 +203,7 @@ class FabricjsRenderer {
                 this.canvasInstance.jobId ===
                 "mock_jobid-I20200317-103136-0485-5599422-np2"
             ) {
-                iprmcXmlData = "../src/testdata/iprmc.xml";
+                iprmcXmlData = "testdata/iprmc.xml";
             } else {
                 iprmcXmlData = validateSubmittedDbfetchInput(dataObj);
             }
