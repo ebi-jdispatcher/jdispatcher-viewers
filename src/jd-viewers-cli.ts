@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import figlet from "figlet";
 import fetch from "node-fetch";
-import { program, Command } from "commander";
-import { promisify } from "util";
+import {Command} from "commander";
+import {promisify} from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VisualOutput } from "./visual-output-app";
-import { FunctionalPredictions } from "./functional-predictions-app";
-import { ColorSchemeEnum } from "./custom-types";
+import {VisualOutput} from "./visual-output-app";
+import {FunctionalPredictions} from "./functional-predictions-app";
+import {ColorSchemeEnum} from "./custom-types";
 import {
     dataAsType,
     validateSubmittedJobIdInput,

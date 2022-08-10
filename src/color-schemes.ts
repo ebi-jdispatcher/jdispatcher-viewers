@@ -1,6 +1,5 @@
-import { fabric } from "fabric";
-import { Gradient } from "fabric";
-import { ColorType } from "./custom-types";
+import {fabric} from "fabric";
+import {ColorType} from "./custom-types";
 
 export const defaultGradient: ColorType = {
     0.0: [255, 64, 64],
@@ -16,7 +15,7 @@ export function colorDefaultGradient(
     start: number,
     end: number
 ) {
-    canvasObj.set("fill", new Gradient({
+    canvasObj.set("fill", new fabric.Gradient({
         type: "linear",
         coords: {
             x1: start,
@@ -25,11 +24,11 @@ export function colorDefaultGradient(
             y2: 0
         },
         colorStops: [
-            { offset: 0.0, color: `rgb(${defaultGradient[0.0].join(",")})` },
-            { offset: 0.25, color: `rgb(${defaultGradient[0.25].join(",")})` },
-            { offset: 0.5, color: `rgb(${defaultGradient[0.5].join(",")})` },
-            { offset: 0.75, color: `rgb(${defaultGradient[0.75].join(",")})` },
-            { offset: 1.0, color: `rgb(${defaultGradient[1.0].join(",")})` }
+            {offset: 0.0, color: `rgb(${defaultGradient[0.0].join(",")})`},
+            {offset: 0.25, color: `rgb(${defaultGradient[0.25].join(",")})`},
+            {offset: 0.5, color: `rgb(${defaultGradient[0.5].join(",")})`},
+            {offset: 0.75, color: `rgb(${defaultGradient[0.75].join(",")})`},
+            {offset: 1.0, color: `rgb(${defaultGradient[1.0].join(",")})`}
         ]
     }));
 }
@@ -48,7 +47,7 @@ export function colorNcbiBlastGradient(
     start: number,
     end: number
 ) {
-    canvasObj.set("fill", new Gradient({
+    canvasObj.set("fill", new fabric.Gradient({
         type: "linear",
         coords: {
             x1: start,
@@ -57,16 +56,16 @@ export function colorNcbiBlastGradient(
             y2: 0
         },
         colorStops: [
-            { offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(",")})` },
-            { offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(",")})` },
-            { offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(",")})` },
-            { offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(",")})` },
-            { offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(",")})` },
-            { offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(",")})` },
-            { offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(",")})` },
-            { offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(",")})` },
-            { offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(",")})` },
-            { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(",")})` },
+            {offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(",")})`},
+            {offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(",")})`},
+            {offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(",")})`},
+            {offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(",")})`},
+            {offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(",")})`},
+            {offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(",")})`},
+            {offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(",")})`},
+            {offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(",")})`},
+            {offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(",")})`},
+            {offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(",")})`},
         ]
     }));
 }

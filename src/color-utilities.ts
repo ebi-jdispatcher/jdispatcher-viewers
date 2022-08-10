@@ -1,4 +1,4 @@
-import { ColorType, ColorSchemeEnum } from "./custom-types";
+import {ColorType, ColorSchemeEnum} from "./custom-types";
 
 export function getRgbColorGradient(
     score: number,
@@ -259,6 +259,7 @@ export function colorByDatabaseName(domainName: string): string {
     else color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
     return color;
 }
+
 // Using coloring scheme from https://www.ebi.ac.uk/interpro/entry/InterPro/#table
 // if (domainName == "InterPro") color = "rgb(45,174,193)";
 // else if (domainName == "Pfam") color = "rgb(98,135,177)";

@@ -67,6 +67,7 @@ export interface TextType {
     angle?: number;
     stroke?: string;
     fill?: string;
+
     [key: string]: any;
 }
 
@@ -79,6 +80,7 @@ interface LineType {
     right?: number;
     center?: number;
     angle?: number;
+
     [key: string]: any;
 }
 
@@ -91,6 +93,7 @@ export interface RectType {
     width?: number;
     height?: number;
     fill?: string;
+
     [key: string]: any;
 }
 
@@ -98,11 +101,13 @@ interface ObjectType {
     selectable: boolean;
     evented: boolean;
     objectCaching: boolean;
+
     [key: string]: any;
 }
 
 export interface ColorType {
     keys: number[];
+
     [key: number]: [number, number, number];
 }
 
@@ -112,9 +117,9 @@ export const objectDefaults: ObjectType = {
     objectCaching: false,
 };
 
-export const textDefaults: TextType = { ...objectDefaults };
-export const rectDefaults: RectType = { ...objectDefaults };
-export const lineDefaults: LineType = { ...objectDefaults };
+export const textDefaults: TextType = {...objectDefaults};
+export const rectDefaults: RectType = {...objectDefaults};
+export const lineDefaults: LineType = {...objectDefaults};
 
 export interface CoordsValues {
     queryLen?: number;

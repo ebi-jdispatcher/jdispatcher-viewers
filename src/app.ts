@@ -1,7 +1,7 @@
 import svgToMiniDataURI from "mini-svg-data-uri";
-import { isBrowser, isNode } from "browser-or-node";
-import { VisualOutput } from "./visual-output-app";
-import { FunctionalPredictions } from "./functional-predictions-app";
+import {isBrowser, isNode} from "browser-or-node";
+import {VisualOutput} from "./visual-output-app";
+import {FunctionalPredictions} from "./functional-predictions-app";
 import {
     validateJobId,
     fetchData,
@@ -11,7 +11,7 @@ import {
     validateSubmittedDbfetchInput,
     getIPRMCDataModelFlatFromXML,
 } from "./other-utilities";
-import { ColorSchemeEnum } from "./custom-types";
+import {ColorSchemeEnum} from "./custom-types";
 
 // plugin support & module support
 // if (typeof window === "undefined") {

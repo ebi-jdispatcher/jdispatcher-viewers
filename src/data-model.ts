@@ -123,6 +123,7 @@ interface MatchAttributes {
     id: string;
     name: string;
     model: string;
+
     [key: string]: string;
 }
 
@@ -133,6 +134,7 @@ interface Ipr {
 interface IprAttributes {
     id: string;
     name: string;
+
     [key: string]: string;
 }
 

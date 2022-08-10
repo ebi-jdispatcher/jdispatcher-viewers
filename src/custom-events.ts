@@ -1,13 +1,13 @@
-import { fabric } from "fabric";
+import {fabric} from "fabric";
 import {
     TextType,
     RectType,
     ColorSchemeEnum,
     RenderOptions,
 } from "./custom-types";
-import { VisualOutput } from "./visual-output-app";
-import { Hsp, IprMatchFlat } from "./data-model";
-import { FunctionalPredictions } from "./functional-predictions-app";
+import {VisualOutput} from "./visual-output-app";
+import {Hsp, IprMatchFlat} from "./data-model";
+import {FunctionalPredictions} from "./functional-predictions-app";
 import {
     drawURLInfoTooltip,
     drawDomainTooltips,
@@ -26,7 +26,7 @@ export function mouseOverText(
         if (e.target) {
             e.target.set("hoverCursor", "pointer");
             e.target.setOptions(textObj);
-            e.target.setOptions({ underline: true });
+            e.target.setOptions({underline: true});
             // add tooltip (on the flight)
             const urlTooltip = drawURLInfoTooltip(
                 +fabricObj.left!,
@@ -63,7 +63,7 @@ export function mouseOutText(
     fabricObj.on("mouseout", (e: fabric.IEvent) => {
         if (e.target) {
             e.target.setOptions(textObj);
-            e.target.setOptions({ underline: false });
+            e.target.setOptions({underline: false});
             _this.canvas.renderAll();
         }
     });
@@ -111,11 +111,11 @@ export function mouseOverDomain(
                 );
             }
             _this.canvas.add(tooltipGroup);
-            tooltipGroup.set({ visible: true });
+            tooltipGroup.set({visible: true});
             fabricObj.bringToFront();
             tooltipGroup.bringToFront();
             _this.canvas.renderAll();
-            tooltipGroup.set({ visible: false });
+            tooltipGroup.set({visible: false});
         }
     });
 }
@@ -140,7 +140,7 @@ export function mouseOverCheckbox(
         if (e.target) {
             e.target.set("hoverCursor", "pointer");
             e.target.setOptions(textObj);
-            e.target.setOptions({ fill: "black" });
+            e.target.setOptions({fill: "black"});
             _this.canvas.renderAll();
         }
     });
@@ -195,15 +195,15 @@ export function mouseOverDomainCheckbox(
                 currentDomainDatabaseDisabled = true;
             }
             if (currentDomainDatabaseDisabled) {
-                e.target.setOptions({ fill: "white", stroke: "grey" });
+                e.target.setOptions({fill: "white", stroke: "grey"});
                 e.target.set("hoverCursor", "default");
             } else if (
                 !_this.domainDatabaseList.includes(currentDomainDatabase)
             ) {
-                e.target.setOptions({ stroke: "black" });
+                e.target.setOptions({stroke: "black"});
                 e.target.set("hoverCursor", "pointer");
             } else {
-                e.target.setOptions({ opacity: 0.5, stroke: "grey" });
+                e.target.setOptions({opacity: 0.5, stroke: "grey"});
                 e.target.set("hoverCursor", "pointer");
             }
             _this.canvas.renderAll();
@@ -254,12 +254,12 @@ export function mouseOutDomainCheckbox(
                 currentDomainDatabaseDisabled = true;
             }
             if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
-                e.target.setOptions({ stroke: "grey", fill: "white" });
+                e.target.setOptions({stroke: "grey", fill: "white"});
             } else if (currentDomainDatabaseDisabled) {
-                e.target.setOptions({ stroke: "grey", fill: "white" });
+                e.target.setOptions({stroke: "grey", fill: "white"});
             } else {
                 e.target.setOptions(rectObj);
-                e.target.setOptions({ opacity: 1.0, stroke: "black" });
+                e.target.setOptions({opacity: 1.0, stroke: "black"});
             }
             _this.canvas.renderAll();
         }

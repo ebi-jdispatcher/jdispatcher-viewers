@@ -1,5 +1,5 @@
-import { fabric } from "fabric";
-import { xml2json } from "xml-js";
+import {fabric} from "fabric";
+import {xml2json} from "xml-js";
 import {
     SSSResultModel,
     IPRMCResultModel,
@@ -7,7 +7,7 @@ import {
     IprMatchesFlat,
     IprMatchFlat,
 } from "./data-model";
-import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from "./custom-types";
+import {JobIdValitable, ColorSchemeEnum, jobIdDefaults} from "./custom-types";
 
 export class BasicCanvasRenderer {
     public canvas: fabric.Canvas | fabric.StaticCanvas;
@@ -30,7 +30,8 @@ export class BasicCanvasRenderer {
     protected canvasWrapperStroke: boolean;
     protected staticCanvas: boolean;
 
-    constructor(private element: string | HTMLCanvasElement) { }
+    constructor(private element: string | HTMLCanvasElement) {
+    }
 
     protected getFabricCanvas() {
         const startupDef = {
@@ -174,7 +175,7 @@ export function validateJobId(
 
 export function validateSubmittedJobIdInput(data: string): string {
     // check if input is a jobId
-    const jobId = { ...jobIdDefaults };
+    const jobId = {...jobIdDefaults};
     jobId.value = data;
     // if so, get the service URL, else use as is
     if (

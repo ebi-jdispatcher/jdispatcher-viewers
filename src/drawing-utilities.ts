@@ -1,8 +1,8 @@
-import { fabric } from "fabric";
-import { numberToString } from "./other-utilities";
-import { SSSResultModel, Hit, Hsp, IprMatchFlat } from "./data-model";
-import { getTotalPixels, getTextLegendPaddingFactor } from "./coords-utilities";
-import { colorDefaultGradient, colorNcbiBlastGradient } from "./color-schemes";
+import {fabric} from "fabric";
+import {numberToString} from "./other-utilities";
+import {SSSResultModel, Hit, Hsp, IprMatchFlat} from "./data-model";
+import {getTotalPixels, getTextLegendPaddingFactor} from "./coords-utilities";
+import {colorDefaultGradient, colorNcbiBlastGradient} from "./color-schemes";
 import {
     objectDefaults,
     textDefaults,
@@ -14,7 +14,7 @@ import {
     TextType,
     RectType,
 } from "./custom-types";
-import { colorByDatabaseName } from "./color-utilities";
+import {colorByDatabaseName} from "./color-utilities";
 
 export function drawHeaderTextGroup(
     dataObj: SSSResultModel,
@@ -22,7 +22,7 @@ export function drawHeaderTextGroup(
     topPadding: number
 ): fabric.Group {
     const origTopPadding = topPadding;
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 1;
     textObj.top = topPadding;
@@ -85,7 +85,7 @@ export function drawHeaderLinkText(
 ): [fabric.Text, TextType] {
     // Sequence
     const sequence = dataObj.query_def;
-    const textSeqObj = { ...textDefaults };
+    const textSeqObj = {...textDefaults};
     textSeqObj.fontFamily = "Menlo";
     textSeqObj.fontSize = renderOptions.fontSize! - 2;
     textSeqObj.evented = true;
@@ -100,7 +100,7 @@ export function drawContentHeaderTextGroup(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 1;
     textObj.top = topPadding + 2;
@@ -148,7 +148,7 @@ export function drawLineTracksQuerySubject(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const lineObj = { ...lineDefaults };
+    const lineObj = {...lineDefaults};
     lineObj.top = topPadding;
     lineObj.stroke = "black";
     lineObj.strokeWidth = renderOptions.strokeWidth;
@@ -229,7 +229,7 @@ export function drawLineTracks(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const lineObj = { ...lineDefaults };
+    const lineObj = {...lineDefaults};
     lineObj.top = topPadding;
     lineObj.stroke = "black";
     lineObj.strokeWidth = renderOptions.strokeWidth;
@@ -274,7 +274,7 @@ export function drawDomainLineTracks(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Line {
-    const lineObj = { ...lineDefaults };
+    const lineObj = {...lineDefaults};
     lineObj.top = topPadding;
     lineObj.stroke = "black";
     lineObj.strokeWidth = renderOptions.strokeWidth;
@@ -295,7 +295,7 @@ export function drawContentFooterTextGroup(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize;
     textObj.top = topPadding;
     // Start Query/Subject
@@ -316,7 +316,7 @@ export function drawContentQuerySubjFooterTextGroup(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize;
     textObj.top = topPadding;
     // Start Query
@@ -346,7 +346,7 @@ export function drawNoHitsFoundText(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Text {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 1;
     textObj.top = topPadding;
@@ -366,7 +366,7 @@ export function drawContentSequenceInfoText(
     topPadding: number
 ): [fabric.Text, fabric.Text, TextType] {
     // Hit ID + Hit Description text tracks
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontFamily = "Menlo";
     textObj.fontSize = renderOptions.fontSize! - 2;
     textObj.top = topPadding - 2;
@@ -396,7 +396,7 @@ export function drawHspNoticeText(
     topPadding: number
 ): fabric.Text {
     // notice about not all HSPs being displayed
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize!;
     textObj.top = topPadding;
     textObj.left = renderOptions.contentWidth! / 2;
@@ -416,7 +416,7 @@ export function drawScoreText(
     topPadding: number
 ): fabric.Text {
     // E-value text tracks
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize;
     textObj.top = topPadding - 15;
     textObj.textAlign = "center";
@@ -445,7 +445,7 @@ export function drawDomainQueySubject(
     topPadding: number,
     fill: string
 ): [fabric.Rect, fabric.Rect] {
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.evented = true;
     rectObj.top = topPadding;
     rectObj.fill = fill;
@@ -477,7 +477,7 @@ export function drawDomainTooltips(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const floatTextObj = { ...textDefaults };
+    const floatTextObj = {...textDefaults};
     floatTextObj.fontSize = renderOptions.fontSize! + 1;
     floatTextObj.textAlign = "left";
     floatTextObj.originX = "top";
@@ -494,7 +494,7 @@ export function drawDomainTooltips(
         )}`;
     }
     const tooltipText = new fabric.Text(tooltip, floatTextObj);
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.fill = "white";
     rectObj.stroke = "lightseagreen";
     rectObj.rx = 5;
@@ -524,7 +524,7 @@ export function drawScaleTypeText(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Text {
-    const textSelObj = { ...textDefaults };
+    const textSelObj = {...textDefaults};
     textSelObj.fontSize = renderOptions.fontSize! + 1;
     textSelObj.fontWeight = "bold";
     textSelObj.top = topPadding;
@@ -537,30 +537,30 @@ export function drawCheckBoxText(
     renderOptions: RenderOptions,
     topPadding: number
 ): [
-        fabric.Text,
-        fabric.Text,
-        TextType,
-        fabric.Text,
-        fabric.Text,
-        TextType,
-        fabric.Text,
-        fabric.Text,
-        TextType
-    ] {
+    fabric.Text,
+    fabric.Text,
+    TextType,
+    fabric.Text,
+    fabric.Text,
+    TextType,
+    fabric.Text,
+    fabric.Text,
+    TextType
+] {
     // Scale Type selection
-    const textSelObj = { ...textDefaults };
+    const textSelObj = {...textDefaults};
     textSelObj.fontSize = renderOptions.fontSize! + 1;
     textSelObj.top = topPadding;
     textSelObj.left = renderOptions.scaleLabelWidth!;
 
-    const textCheckDynObj = { ...textDefaults };
+    const textCheckDynObj = {...textDefaults};
     textCheckDynObj.fontSize = renderOptions.fontSize! + 12;
     textCheckDynObj.fill = "grey";
     textCheckDynObj.evented = true;
     textCheckDynObj.top = topPadding - 8;
     textCheckDynObj.left = renderOptions.scaleLabelWidth!;
-    const textCheckFixObj = { ...textCheckDynObj };
-    const textCheckNcbiObj = { ...textCheckDynObj };
+    const textCheckFixObj = {...textCheckDynObj};
+    const textCheckNcbiObj = {...textCheckDynObj};
 
     let checkSym: string;
     renderOptions.colorScheme === ColorSchemeEnum.dynamic
@@ -619,7 +619,7 @@ export function drawScaleScoreText(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Text {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize! + 1;
     textObj.top = topPadding;
     let scaleTypeLabel: string;
@@ -637,7 +637,7 @@ export function drawScaleColorGradient(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Rect {
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.top = topPadding;
     rectObj.left = renderOptions.scaleLabelWidth!;
     rectObj.width = renderOptions.scaleWidth!;
@@ -661,7 +661,7 @@ export function drawLineAxis5Buckets(
     topPadding: number
 ): fabric.Group {
     // Axis
-    const lineObj = { ...lineDefaults };
+    const lineObj = {...lineDefaults};
     lineObj.top = topPadding;
     lineObj.stroke = "black";
     lineObj.strokeWidth = renderOptions.strokeWidth!;
@@ -749,7 +749,7 @@ export function drawLineAxis6Buckets(
     topPadding: number
 ): fabric.Group {
     // Axis
-    const lineObj = { ...lineDefaults };
+    const lineObj = {...lineDefaults};
     lineObj.top = topPadding;
     lineObj.stroke = "black";
     lineObj.strokeWidth = renderOptions.strokeWidth!;
@@ -843,7 +843,7 @@ export function drawScaleTick5LabelsGroup(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.top = topPadding;
     textObj.fontSize = renderOptions.fontSize!;
     // 20% Tick Label
@@ -897,7 +897,7 @@ export function drawScaleTick4LabelsGroup(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.top = topPadding;
     textObj.fontSize = renderOptions.fontSize!;
     // Start Tick Label
@@ -962,7 +962,7 @@ export function drawFooterText(
     renderOptions: RenderOptions,
     topPadding: number
 ): [fabric.Text, TextType] {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize;
     textObj.evented = true;
     textObj.top = topPadding;
@@ -994,7 +994,7 @@ export function drawContentTitleText(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Text {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontWeight = "bold";
     textObj.fontSize = renderOptions.fontSize! + 2;
     textObj.top = topPadding;
@@ -1008,7 +1008,7 @@ export function drawContentSupressText(
     topPadding: number,
     numberHits: number
 ): fabric.Text {
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize!;
     textObj.top = topPadding;
     textObj.left = renderOptions.contentWidth! / 2;
@@ -1023,7 +1023,7 @@ export function drawProteinFeaturesText(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Text {
-    const textSelObj = { ...textDefaults };
+    const textSelObj = {...textDefaults};
     textSelObj.fontSize = renderOptions.fontSize! + 1;
     textSelObj.fontWeight = "bold";
     textSelObj.top = topPadding;
@@ -1038,13 +1038,13 @@ export function drawDomainCheckbox(
     leftPadding: number,
     currentDomainDatabase: string
 ): [fabric.Rect, fabric.Text, RectType, TextType] {
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.top = topPadding;
     rectObj.left = leftPadding;
     rectObj.height = 15;
     rectObj.width = 15;
     rectObj.evented = true;
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontSize = renderOptions.fontSize! + 1;
     textObj.top = topPadding;
     textObj.left = leftPadding + 20;
@@ -1073,7 +1073,7 @@ export function drawHitTransparentBox(
     fill: string,
     height: number
 ): fabric.Rect {
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.fill = fill;
     rectObj.opacity = 0.5;
     rectObj.rx = 5;
@@ -1092,7 +1092,7 @@ export function drawContentDomainInfoText(
     topPadding: number
 ): [fabric.Text, fabric.Text, TextType] {
     // Domain ID text tracks
-    const textObj = { ...textDefaults };
+    const textObj = {...textDefaults};
     textObj.fontFamily = "Menlo";
     textObj.fontSize = renderOptions.fontSize! - 2;
     textObj.top = topPadding - 5;
@@ -1117,7 +1117,7 @@ export function drawDomains(
     topPadding: number,
     color: string
 ): fabric.Rect {
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.evented = true;
     rectObj.top = topPadding;
     rectObj.fill = color;
@@ -1142,7 +1142,7 @@ export function drawDomainInfoTooltips(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const floatTextObj = { ...textDefaults };
+    const floatTextObj = {...textDefaults};
     floatTextObj.fontSize = renderOptions.fontSize! + 1;
     floatTextObj.textAlign = "left";
     floatTextObj.originX = "top";
@@ -1169,7 +1169,7 @@ export function drawDomainInfoTooltips(
     }
     const tooltipText = new fabric.Textbox(tooltip, floatTextObj);
 
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.fill = "white";
     rectObj.stroke = "lightseagreen";
     rectObj.rx = 5;
@@ -1202,7 +1202,7 @@ export function drawURLInfoTooltip(
     renderOptions: RenderOptions,
     topPadding: number
 ): fabric.Group {
-    const floatTextObj = { ...textDefaults };
+    const floatTextObj = {...textDefaults};
     floatTextObj.fontSize = renderOptions.fontSize! + 1;
     floatTextObj.originX = "left";
     floatTextObj.originY = "top";
@@ -1226,7 +1226,7 @@ export function drawURLInfoTooltip(
         floatTextObj.width = urlLabel + 5;
         tooltipText = new fabric.Text(`${URL}`, floatTextObj);
     }
-    const rectObj = { ...rectDefaults };
+    const rectObj = {...rectDefaults};
     rectObj.fill = "white";
     rectObj.stroke = "lightseagreen";
     rectObj.strokeWidth = 0.5;

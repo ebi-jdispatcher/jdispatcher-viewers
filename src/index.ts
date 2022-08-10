@@ -1,7 +1,7 @@
 import svgToMiniDataURI from "mini-svg-data-uri";
-import { VisualOutput } from "./visual-output-app";
-import { FunctionalPredictions } from "./functional-predictions-app";
-import { ColorSchemeEnum, jobIdDefaults } from "./custom-types";
+import {VisualOutput} from "./visual-output-app";
+import {FunctionalPredictions} from "./functional-predictions-app";
+import {ColorSchemeEnum, jobIdDefaults} from "./custom-types";
 import {
     validateJobId,
     validateSubmittedJobIdInput,
@@ -28,11 +28,13 @@ interface SubmitEvent {
 class CanvasState {
     private canvasInstance: InstanceObjType;
     private static instance: CanvasState;
-    private listener: Listener = () => { };
+    private listener: Listener = () => {
+    };
     private jobIds: string[] = [];
     private submitterName: string = "";
 
-    private constructor() { }
+    private constructor() {
+    }
 
     static getInstance() {
         if (this.instance) {
@@ -127,7 +129,7 @@ class JobIdInputForm {
         event.preventDefault();
         const submittedEvent = (event as unknown) as SubmitEvent;
         const jobId = this.jobIdElement.value.trim();
-        let formValidatable = { ...jobIdDefaults };
+        let formValidatable = {...jobIdDefaults};
         formValidatable.value = jobId;
 
         if (validateJobId(formValidatable)) {

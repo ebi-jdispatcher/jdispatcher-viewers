@@ -1,6 +1,6 @@
-import { fabric } from "fabric";
-import { SSSResultModel } from "./data-model";
-import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
+import {fabric} from "fabric";
+import {SSSResultModel} from "./data-model";
+import {defaultGradient, ncbiBlastGradient} from "./color-schemes";
 import {
     getQuerySubjPixelCoords,
     getDomainPixelCoords,
@@ -10,8 +10,8 @@ import {
     getRgbColorFixed,
     getGradientSteps,
 } from "./color-utilities";
-import { BasicCanvasRenderer, ObjectCache } from "./other-utilities";
-import { RenderOptions, ColorSchemeEnum, TextType } from "./custom-types";
+import {BasicCanvasRenderer, ObjectCache} from "./other-utilities";
+import {RenderOptions, ColorSchemeEnum, TextType} from "./custom-types";
 import {
     mouseDownText,
     mouseOverText,
@@ -122,6 +122,7 @@ export class VisualOutput extends BasicCanvasRenderer {
 
         this.getFabricCanvas();
     }
+
     public render() {
         this.loadInitalProperties();
         this.loadInitialCoords();
@@ -221,7 +222,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         if (!textHeaderLink) {
             [textHeaderLink, textSeqObj] = drawHeaderLinkText(
                 this.dataObj,
-                { fontSize: this.fontSize },
+                {fontSize: this.fontSize},
                 this.topPadding
             );
             objCache.put("textHeaderLink", textHeaderLink);
@@ -238,7 +239,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                     textSeqObj,
                     this.dataObj.query_def!,
                     this.dataObj.query_url!,
-                    { fontSize: this.fontSize },
+                    {fontSize: this.fontSize},
                     this
                 );
                 mouseDownText(textHeaderLink, this.dataObj.query_url!, this);
@@ -288,7 +289,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         startSubjPixels: this.startSubjPixels,
                         endSubjPixels: this.endSubjPixels,
                     },
-                    { strokeWidth: 2 },
+                    {strokeWidth: 2},
                     this.topPadding
                 );
                 objCache.put("lineTrackGroup", lineTrackGroup);
@@ -405,7 +406,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 [spaceText, hitText, textObj] = drawContentSequenceInfoText(
                     maxIDLen,
                     hit,
-                    { fontSize: this.fontSize },
+                    {fontSize: this.fontSize},
                     this.topPadding
                 );
                 this.canvas.add(spaceText);
@@ -416,7 +417,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         textObj,
                         hit.hit_def,
                         hit.hit_url,
-                        { fontSize: this.fontSize },
+                        {fontSize: this.fontSize},
                         this
                     );
                     mouseDownText(hitText, hit.hit_url, this);
@@ -454,7 +455,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                                 startSubjPixels: startSubjPixels,
                                 endSubjPixels: endSubjPixels,
                             },
-                            { strokeWidth: 1 },
+                            {strokeWidth: 1},
                             this.topPadding
                         );
                         this.canvas.add(linesGroup);
@@ -742,7 +743,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 this.scaleLabelWidth + oneFifthGradPixels * 3,
                 this.scaleLabelWidth + oneFifthGradPixels * 4,
                 this.scaleLabelWidth + this.scaleWidth,
-                { strokeWidth: 1 },
+                {strokeWidth: 1},
                 this.topPadding
             );
             this.canvas.add(axisGroup);
@@ -773,7 +774,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 this.scaleLabelWidth + oneForthGradPixels * 2,
                 this.scaleLabelWidth + oneForthGradPixels * 3,
                 this.scaleLabelWidth + this.scaleWidth,
-                { strokeWidth: 1 },
+                {strokeWidth: 1},
                 this.topPadding
             );
             this.canvas.add(axisGroup);

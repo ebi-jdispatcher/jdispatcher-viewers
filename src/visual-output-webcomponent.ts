@@ -1,24 +1,26 @@
-import { LitElement, html, property, customElement } from "lit-element";
-import { RenderOptions, ColorSchemeEnum } from "./custom-types";
+import {LitElement, html} from "lit-element/lit-element.js";
+import {property, customElement} from "lit/decorators.js";
+import {RenderOptions, ColorSchemeEnum} from "./custom-types";
 import {
     validateSubmittedJobIdInput,
     fetchData,
-    dataAsType,
+    dataAsType, validateSubmittedDbfetchInput,
 } from "./other-utilities";
-import { VisualOutput } from "./visual-output-app";
+import {VisualOutput} from "./visual-output-app";
 
 @customElement("jd-visual-output")
 export class CanvasRendererComponent extends LitElement {
-    @property({ type: String }) data = "";
-    @property({ type: String }) colorScheme = "dynamic";
-    @property({ type: Number }) numberHits = 100;
-    @property({ type: Number }) numberHsps = 10;
-    @property({ type: Boolean }) logSkippedHsps = true;
-    @property({ type: Boolean }) canvasWrapperStroke = true;
+    @property({type: String}) data = "";
+    @property({type: String}) colorScheme = "dynamic";
+    @property({type: Number}) numberHits = 100;
+    @property({type: Number}) numberHsps = 10;
+    @property({type: Boolean}) logSkippedHsps = true;
+    @property({type: Boolean}) canvasWrapperStroke = true;
 
     constructor() {
         super();
     }
+
     async render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
@@ -50,6 +52,7 @@ export class CanvasRendererComponent extends LitElement {
         new VisualOutput("canvas", sssDataObj, renderOptions).render();
         return html`${this.canvasDivTemplate}`;
     }
+
     get canvasDivTemplate() {
         return html``;
     }

@@ -1,5 +1,6 @@
-import { LitElement, html, property, customElement } from "lit-element";
-import { RenderOptions, ColorSchemeEnum } from "./custom-types";
+import {LitElement, html} from "lit-element/lit-element.js";
+import {property, customElement} from "lit/decorators.js";
+import {RenderOptions, ColorSchemeEnum} from "./custom-types";
 import {
     validateSubmittedJobIdInput,
     validateSubmittedDbfetchInput,
@@ -7,18 +8,19 @@ import {
     fetchData,
     dataAsType,
 } from "./other-utilities";
-import { FunctionalPredictions } from "./functional-predictions-app";
+import {FunctionalPredictions} from "./functional-predictions-app";
 
 @customElement("jd-functional-predictions")
 export class CanvasRendererComponent extends LitElement {
-    @property({ type: String }) data = "";
-    @property({ type: String }) colorScheme = "dynamic";
-    @property({ type: Number }) numberHits = 30;
-    @property({ type: Boolean }) canvasWrapperStroke = true;
+    @property({type: String}) data = "";
+    @property({type: String}) colorScheme = "dynamic";
+    @property({type: Number}) numberHits = 30;
+    @property({type: Boolean}) canvasWrapperStroke = true;
 
     constructor() {
         super();
     }
+
     async render() {
         const renderOptions: RenderOptions = {
             colorScheme: this.colorScheme as ColorSchemeEnum,
@@ -72,6 +74,7 @@ export class CanvasRendererComponent extends LitElement {
         ).render();
         return html` ${this.canvasDivTemplate} `;
     }
+
     get canvasDivTemplate() {
         return html``;
     }
