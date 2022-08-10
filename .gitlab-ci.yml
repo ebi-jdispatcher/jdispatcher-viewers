@@ -3,8 +3,8 @@
 # gitlab-runner exec docker build_module
 # gitlab-runner exec docker build_nodecli
 
-# node 12.18 LTS
-image: node:lts-alpine3.12
+# node 18.7
+image: node:18.7-alpine3.16
 
 before_script:
     # installing dependencies for node-canvas (https://github.com/Automattic/node-canvas)
@@ -13,7 +13,7 @@ before_script:
     - npm install
 
 stages:
-    # building the ES module and node CLI
+    # building the ES modules and node CLI (also ES module now, from commonJS)
     - build
 
 build_module:
