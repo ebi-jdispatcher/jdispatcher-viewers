@@ -7,7 +7,7 @@
     "main": "./bin/jd-viewers-cli.js",
     "type": "module",
     "engines": {
-        "node": ">=18.7"
+        "node": ">=16.16"
     },
     "files": [
         "./dist/",
