@@ -107,7 +107,7 @@ export function getJdispatcherJsonURL(jobId) {
     const toolName = jobId.split("-")[0];
     if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
         // mock jobId
-        return "https://raw.githubusercontent.com/ebi-wp/jdispatcher-viewers/master/src/testdata/ncbiblast.json";
+        return "https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json";
     }
     else if (jobId.endsWith("-np2")) {
         // wwwdev server (-np2$)

@@ -140,7 +140,7 @@ This package has been published to NPM at
 # npm package under ebi-jdispatcher org
 npm init --scope=@ebi-jdispatcher
 # testing building the package
-npm install ../jdispatcher-viewers
+npm install
 # publish to npm
 npm publish --access public
 ```

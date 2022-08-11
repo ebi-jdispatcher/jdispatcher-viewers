@@ -691,7 +691,7 @@ export function drawFooterText(renderOptions, topPadding) {
     textObj.evented = true;
     textObj.top = topPadding;
     textObj.left = 225;
-    const copyright = `European Bioinformatics Institute 2006-2020. ` +
+    const copyright = `European Bioinformatics Institute 2006-2022. ` +
         `EBI is an Outstation of the European Molecular Biology Laboratory.`;
     const copyrightText = new fabric.Text(`${copyright}`, textObj);
     return [copyrightText, textObj];
