@@ -1,49 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>jdistpatcher-viewers</title>
-        <link rel="stylesheet" href="style.css" type="text/css" media="all">
+        <script type="text/javascript" src="../dist/jd_viewers_0.0.6.bundle.min.js" defer></script>
+        <link rel="stylesheet" href="../assets/style.css" type="text/css" media="all" />
     </head>
     <body>
-        <!-- <p>This page is handled by index.ts</p>-->
-        <div id="navbar">
-            <p><a href="./functional-predictions-plugin.html">Functional Predictions Plugin</a></p>
-            |
-            <p><a href="./functional-predictions-webcomponent.html">Functional Predictions Web Component</a></p>
-            |
-            <p><a href="./visual-output-plugin.html">Visual Output Plugin</a></p>
-            |
-            <p><a href="./visual-output-webcomponent.html">Visual Output Plugin</a></p>
-        </div>
         <div id="jd-viewers-app">
-            <template id="input-jobid">
-                <form>
-                    <div class="form-control">
-                        <label for="jobid">JobId:</label>
-                        <input type="text" size="60" id="jobid" required="true"
-                        value="mock_jobid-I20200317-103136-0485-5599422-np2" />
-                        </br>
-                        <button type="submit" name="visual-output">Generate Visual Output</button>
-                        <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
-                    </div>
-                </form>    
-            </template>
-            </br>
-            <template id="jd-viewers-output">
-                <div id="canvas-wrapper">
-                    <canvas id="canvas"/>
-                </div>
-            </template>
-            <input type='button' id='btn-png' value='Save to PNG' />
-            <input type='button' id='btn-svg' value='Save to SVG' />
+            <form id="jd-viewers-form">
+                <label for="jobid">JobId:</label>
+                <input type="text" size="60" id="jobid" required="true"
+                value="mock_jobid-I20200317-103136-0485-5599422-np2" />
+                </br>
+                <button type="submit" name="visual-output">Generate Visual Output</button>
+                <button type="submit" name="functional-predictions">Generate Functional Predictions</button>
+            </form>
+            <input type='button' id='btn-png' value='Display as PNG' />
+            <input type='button' id='btn-png-download' value='Save as PNG' />
+            <input type='button' id='btn-svg' value='Display as SVG' />
+            <input type='button' id='btn-svg-download' value='Save as SVG' />
             <p>
+                <div id="canvas-wrapper">
+                    <canvas id="canvas" />
+                </div>
                 <img id="svg"></img>
                 <img id="png"></img>
             </p>
         </div>
-        <script type="module" src="https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/dist/jd_viewers_0.0.6.bundle.min.js"></script>
     </body>
+    <script>
+        async function eventHandler(event){
+            event.preventDefault();
+            // remove canvas-wrapper (if some available)
+            const el = document.getElementById("canvas-wrapper");
+            if (el !== null) el.parentNode.removeChild(el);
+            // create new canvas-wrapper
+            const canvasElement = document.getElementById("canvas");
+            if (canvasElement === null) {
+                const newDiv = document.createElement("div");
+                newDiv.id = "canvas-wrapper";
+                const newCanvas = document.createElement("canvas");
+                newCanvas.id = "canvas";
+                newDiv.appendChild(newCanvas);
+                document.body.appendChild(newDiv);
+            }
+            // reset images if not empty
+            const png = document.getElementById("png");
+            png.src = ""
+            const svg = document.getElementById("svg");
+            svg.src = ""
+
+            const submitter = event.submitter.name.trim();
+            const jobId = event.target.querySelector("#jobid").value.trim();
+            const jobIdObj = {
+                value: jobId,
+                required: true,
+                minLength: 35,
+                maxLength: 60,
+                pattern: /([a-z_])*-([A-Z0-9])*-\d*-\d*-\d*-(np2|p1m|p2m)$/,
+            }
+
+            if (validateJobId(jobIdObj)) {
+                let sssJsonData;
+                if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+                    sssJsonData = "./src/testdata/ncbiblast.json";
+                } else {
+                    sssJsonData = validateSubmittedJobIdInput(jobId);
+                }
+                const sssJsonResponse = await fetchData(sssJsonData);
+                const sssDataObj = dataAsType(sssJsonResponse, "SSSResultModel");
+
+                let iprmcXmlData;
+                if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+                    iprmcXmlData = "./src/testdata/iprmc.xml"; 
+                } else {
+                    iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj)
+                }
+                const iprmcXmlResponse = await fetchData(iprmcXmlData, "xml");
+                // convert XML into Flattened JSON
+                const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(iprmcXmlResponse);
+                const iprmcDataObj = dataAsType(iprmcJSONResponse, "IPRMCResultModelFlat");
+                
+                // viz app
+                let fabricjs;
+                let submitterShort = ";" 
+                if (submitter == "visual-output") {
+                    submitterShort = "vo";
+                    // Render Options
+                    const options = {
+                        colorScheme: "dynamic",
+                        numberHits: 100,
+                        numberHsps: 10,
+                        logSkippedHsps: true,
+                        canvasWrapperStroke: true,
+                        staticCanvas: false
+                    };
+                    // Call render method to display the viz
+                    fabricjs = new VisualOutput("canvas", sssDataObj, options);
+                    fabricjs.render();
+                } else if (submitter == "functional-predictions"){
+                    submitterShort = "fp";
+                    // Render Options
+                    const options = {
+                        colorScheme: "dynamic",
+                        numberHits: 30,
+                        canvasWrapperStroke: true,
+                        staticCanvas: false
+                    };
+                    // Call render method to display the viz
+                    fabricjs = new FunctionalPredictions("canvas", sssDataObj, iprmcDataObj, options);
+                    fabricjs.render();
+                }
+
+                // export as SVG and PNG
+                document.getElementById("btn-svg").onclick = function () {
+                    const img = document.getElementById(
+                        "svg"
+                    );
+                    img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
+                    // remove canvas-wrapper
+                    const el = document.getElementById("canvas-wrapper");
+                    el.parentNode?.removeChild(el);
+                };
+                document.getElementById("btn-png").onclick = function () {
+                    const img = document.getElementById(
+                        "png"
+                    );
+                    img.src = fabricjs.canvas
+                        .toDataURL({
+                            format: "png",
+                            enableRetinaScaling: true,
+                            withoutTransform: true,
+                        })
+                        .toString();
+                    img.width = fabricjs.canvas.getWidth();
+                    // remove canvas-wrapper
+                    const el = document.getElementById("canvas-wrapper");
+                    el.parentNode?.removeChild(el);
+                };
+
+                // download as SVG and PNG
+                document.getElementById("btn-svg-download").onclick = function () {
+                    const img = document.getElementById(
+                        "svg"
+                    );
+                    img.src = svgToMiniDataURI(fabricjs.canvas.toSVG().toString());
+                    const a = document.createElement('a');
+                    a.href = img.src;
+                    a.download = `${jobId}-${submitterShort}.svg`;
+                    a.target = '_blank';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                };
+                document.getElementById("btn-png-download").onclick = function () {
+                    const img = document.getElementById(
+                        "png"
+                    );
+                    img.src = fabricjs.canvas
+                        .toDataURL({
+                            format: "png",
+                            enableRetinaScaling: true,
+                            withoutTransform: true,
+                        })
+                        .toString();
+                    img.width = fabricjs.canvas.getWidth();
+                    const a = document.createElement('a');
+                    a.href = img.src;
+                    a.download = `${jobId}-${submitterShort}.png`;
+                    a.target = '_blank';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                };
+
+            } else {
+                alert("The jobId provided is not valid!");
+                return;
+            }
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            // Form submit handler
+            const element = document.getElementById("jd-viewers-form");
+            const jobIdElement = element.querySelector("#jobid");
+            element.addEventListener("submit", eventHandler);
+        });
+    </script>
 </html>
