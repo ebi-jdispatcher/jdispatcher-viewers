@@ -25,7 +25,7 @@ Visual Output is a diagram visualisation for the hit sequences of sequence simil
 is matching the query sequence and provides corresponding E-values. 
 This currently works only with Job Dispatcher JobIDs, as it depends on the JSON output provided by the service. 
 
-![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/VO.gif)
+![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/assets/VO.gif)
 
 ## Functional Predictions
 
@@ -37,7 +37,7 @@ location vs hit/query sequence matching. Predictions are obtained from
 [InterPro](https://www.ebi.ac.uk/interpro/) and cover several domain databases/resources, including:
 Pfam, SUPERFAMILY, SMART, CATH-Gene3D, CDD, etc.
 
-![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/FP.gif)
+![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/assets/FP.gif)
 
 ### Colouring Schemes
 Three colouring schemes are provided. 
