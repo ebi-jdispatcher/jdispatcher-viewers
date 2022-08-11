@@ -35,11 +35,11 @@ export default {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./src/index.html"
+            template: "./static/index.html"
         }),
         new CopyPlugin({
             patterns: [
-                { from: path.join(__dirname, 'docs', "style.css"),
+                { from: path.join(__dirname, 'static', "style.css"),
                     to: path.join(__dirname, 'dist', "style.css")},
                 { from: path.join(__dirname, 'src', "testdata"),
                     to: path.join(__dirname, 'dist', "testdata")},
