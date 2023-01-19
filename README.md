@@ -134,7 +134,7 @@ node --es-module-specifier-resolution=nodebin/jd-viewers-cli.js fp -i ncbiblast-
 ### Publishing NPM package
 
 This package has been published to NPM at 
-[@ebi-jdispatcher/jdispatcher-viewers](https://www.npmjs.com/settings/ebi-jdispatcher/jdispatcher-viewers).
+[@ebi-jdispatcher/jdispatcher-viewers](https://www.npmjs.com/package/@ebi-jdispatcher/jdispatcher-viewers).
 
 ```bash
 # npm package under ebi-jdispatcher org
