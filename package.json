@@ -51,7 +51,7 @@
         "assert": "^2.0.0",
         "browser-or-node": "^2.0.0",
         "buffer": "^6.0.3",
-        "canvas": "^2.9.3",
+        "canvas": "^2.11.0",
         "chalk": "^5.0.1",
         "commander": "^9.4.0",
         "commonjs": "0.0.1",
