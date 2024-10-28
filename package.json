@@ -23,7 +23,9 @@
         "dev:cli": "tsc -w -p ./tsconfig.cli.json",
         "build:cli": "tsc -p ./tsconfig.cli.json",
         "tsc:cli": "tsc -w -p ./tsconfig.cli.json",
-        "release": "standard-version"
+        "release": "standard-version",
+        "format": "npx prettier '**/*.ts' --check",
+        "format:write": "npx prettier '**/*.ts' --write"
     },
     "browser": {
         "child_process": false
