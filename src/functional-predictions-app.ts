@@ -538,6 +538,32 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         // unique domain predictions && selected domain Databases
         let boxHeight = 0;
         let tmpTopPadding = this.topPadding - 15;
+
+        // draw domain transparent box
+        boxHeight += 15;
+        if (hit.hit_acc in this.iprmcDataObj) {
+          if (this.iprmcDataObj[hit.hit_acc]['matches'] !== undefined) {
+            for (const did of this.iprmcDataObj[hit.hit_acc]['matches']) {
+              const domain = domainDatabaseNameToString(
+                this.iprmcDataObj[hit.hit_acc]['match'][did][0]['dbname'] as string
+              );
+              if (this.domainDatabaseList.includes(domain)) {
+                boxHeight += 15;
+              }
+            }
+          }
+        }
+        const hitTransparentBox = drawHitTransparentBox(
+          startDomainPixels,
+          endDomainPixels,
+          tmpTopPadding,
+          boxColor,
+          boxHeight
+        );
+        this.canvas.add(hitTransparentBox);
+        // FIXME
+        // hitTransparentBox.sendObjectToBack();
+
         if (hit.hit_acc in this.iprmcDataObj) {
           if (this.iprmcDataObj[hit.hit_acc]['matches'] !== undefined) {
             for (const did of this.iprmcDataObj[hit.hit_acc]['matches']) {
@@ -623,17 +649,6 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             }
           }
         }
-        // draw domain transparent box
-        boxHeight += 15;
-        const hitTransparentBox = drawHitTransparentBox(
-          startDomainPixels,
-          endDomainPixels,
-          tmpTopPadding,
-          boxColor,
-          boxHeight
-        );
-        this.canvas.add(hitTransparentBox);
-        hitTransparentBox.sendObjectToBack();
 
         // final padding
         this.topPadding += 40;
