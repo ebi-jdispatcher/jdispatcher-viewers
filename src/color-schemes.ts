@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Gradient, FabricObject } from 'fabric';
 import { ColorType } from './custom-types';
 
 export const defaultGradient: ColorType = {
@@ -10,10 +10,10 @@ export const defaultGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
-export function colorDefaultGradient(canvasObj: fabric.Object, start: number, end: number) {
+export function colorDefaultGradient(canvasObj: FabricObject, start: number, end: number) {
   canvasObj.set(
     'fill',
-    new fabric.Gradient({
+    new Gradient({
       type: 'linear',
       coords: {
         x1: start,
@@ -41,10 +41,10 @@ export const ncbiBlastGradient: ColorType = {
   keys: [0, 40, 50, 80, 200],
 };
 
-export function colorNcbiBlastGradient(canvasObj: fabric.Object, start: number, end: number) {
+export function colorNcbiBlastGradient(canvasObj: FabricObject, start: number, end: number) {
   canvasObj.set(
     'fill',
-    new fabric.Gradient({
+    new Gradient({
       type: 'linear',
       coords: {
         x1: start,

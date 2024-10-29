@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { FabricObject, Rect, FabricText } from 'fabric';
 import { SSSResultModel, IPRMCResultModelFlat } from './data-model';
 import { getPixelCoords, getDomainPixelCoords } from './coords-utilities';
 import { getGradientSteps, getRgbColorFixed, getRgbColorGradient, colorByDatabaseName } from './color-utilities';
@@ -89,8 +89,8 @@ function createDomainCheckbox(
 
   let rectObj: RectType;
   let textObj: TextType;
-  let rect: fabric.Rect;
-  let text: fabric.Text;
+  let rect: Rect;
+  let text: FabricText;
   [rect, text, rectObj, textObj] = drawDomainCheckbox(
     {
       currentDomainDatabase: _this.currentDomainDatabase,
@@ -233,8 +233,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
   private drawHeaderGroup() {
     // canvas header
     this.topPadding = 2;
-    let textHeaderGroup: fabric.Object;
-    textHeaderGroup = objCache.get('textHeaderGroup') as fabric.Object;
+    let textHeaderGroup: FabricObject;
+    textHeaderGroup = objCache.get('textHeaderGroup') as FabricObject;
     if (!textHeaderGroup) {
       textHeaderGroup = drawHeaderTextGroup(
         this.sssDataObj,
@@ -250,9 +250,9 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     // canvas header (sequence info)
     this.topPadding += 45;
-    let textHeaderLink: fabric.Text;
+    let textHeaderLink: FabricText;
     let textSeqObj: TextType;
-    textHeaderLink = objCache.get('textHeaderLink') as fabric.Text;
+    textHeaderLink = objCache.get('textHeaderLink') as FabricText;
     textSeqObj = objCache.get('textHeaderLink_textSeqObj') as TextType;
     if (!textHeaderLink) {
       [textHeaderLink, textSeqObj] = drawHeaderLinkText(this.sssDataObj, { fontSize: this.fontSize }, this.topPadding);
@@ -279,8 +279,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
   private drawContentGroup() {
     // canvas content title
     this.topPadding += 25;
-    let titleText: fabric.Text;
-    titleText = objCache.get('titleText') as fabric.Text;
+    let titleText: FabricText;
+    titleText = objCache.get('titleText') as FabricText;
     if (!titleText) {
       titleText = drawContentTitleText(
         {
@@ -320,8 +320,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
   private drawPredictionsGroup() {
     // Protein Features - Database Selection
-    let pfLabelText: fabric.Text;
-    pfLabelText = objCache.get('pfLabelText') as fabric.Text;
+    let pfLabelText: FabricText;
+    pfLabelText = objCache.get('pfLabelText') as FabricText;
     if (!pfLabelText) {
       pfLabelText = drawProteinFeaturesText(
         {
@@ -462,7 +462,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       if (tmpNumberHits <= this.numberHits) {
         // Hit ID + Hit Description text tracks
         let textObj: TextType;
-        let spaceText, hitText: fabric.Text;
+        let spaceText, hitText: FabricText;
         [spaceText, hitText, textObj] = drawContentSequenceInfoText(
           maxIDLen,
           hit,
@@ -557,11 +557,12 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                   this.topPadding
                 );
                 this.canvas.add(dashedLineTrackGroup);
-                dashedLineTrackGroup.sendObjectToBack();
+                // FIXME
+                // dashedLineTrackGroup.sendObjectToBack();
 
                 // draw domain ID text
                 let textObj: TextType;
-                let spaceText, hitText: fabric.Text;
+                let spaceText, hitText: FabricText;
                 [spaceText, hitText, textObj] = drawContentDomainInfoText(
                   did.split('_')[1] + ' ►',
                   { fontSize: this.fontSize },
@@ -638,8 +639,8 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         this.topPadding += 40;
       } else {
         // canvas content suppressed output
-        let supressText: fabric.Text;
-        supressText = objCache.get('supressText') as fabric.Text;
+        let supressText: FabricText;
+        supressText = objCache.get('supressText') as FabricText;
         if (!supressText) {
           supressText = drawContentSupressText(
             {
@@ -672,7 +673,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
     // Scale Type selection
     let textCheckDynObj, textCheckFixObj, textCheckNcbiObj: TextType;
-    let dynamicBoxText, dynamicText, fixedBoxText, fixedText, ncbiblastBoxText, ncbiblastText: fabric.Text;
+    let dynamicBoxText, dynamicText, fixedBoxText, fixedText, ncbiblastBoxText, ncbiblastText: FabricText;
     [
       dynamicBoxText,
       dynamicText,
@@ -800,7 +801,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
   private drawFooterGroup() {
     this.topPadding += 30;
-    let copyrightText: fabric.Text;
+    let copyrightText: FabricText;
     let textFooterObj: TextType;
     [copyrightText, textFooterObj] = drawFooterText(
       {
