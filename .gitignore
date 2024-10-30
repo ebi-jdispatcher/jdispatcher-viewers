@@ -2,3 +2,4 @@
 node_modules
 tmpdev
 src/testdata
+.history/
