@@ -1,4 +1,4 @@
-import { FabricObject, Group } from 'fabric';
+import { fabric } from 'fabric';
 import { TextType, RectType, ColorSchemeEnum, RenderOptions } from './custom-types';
 import { VisualOutput } from './visual-output-app';
 import { Hsp, IprMatchFlat } from './data-model';
@@ -6,14 +6,14 @@ import { FunctionalPredictions } from './functional-predictions-app';
 import { drawURLInfoTooltip, drawDomainTooltips, drawDomainInfoTooltips } from './drawing-utilities';
 
 export function mouseOverText(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   textObj: TextType,
   sequence: string,
   URL: string,
   renderOptions: RenderOptions,
   _this: VisualOutput | FunctionalPredictions
 ) {
-  fabricObj.on('mouseover', (e: any) => {
+  fabricObj.on('mouseover', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.set('hoverCursor', 'pointer');
       e.target.setOptions(textObj);
@@ -27,8 +27,8 @@ export function mouseOverText(
   });
 }
 
-export function mouseDownText(fabricObj: FabricObject, href: string, _this: VisualOutput | FunctionalPredictions) {
-  fabricObj.on('mousedown', (e: any) => {
+export function mouseDownText(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions) {
+  fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
       window.open(href, '_blank');
       _this.canvas.renderAll();
@@ -36,8 +36,8 @@ export function mouseDownText(fabricObj: FabricObject, href: string, _this: Visu
   });
 }
 
-export function mouseOutText(fabricObj: FabricObject, textObj: TextType, _this: VisualOutput | FunctionalPredictions) {
-  fabricObj.on('mouseout', (e: any) => {
+export function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions) {
+  fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.setOptions(textObj);
       e.target.setOptions({ underline: false });
@@ -51,7 +51,7 @@ function isHsp(object: any): object is Hsp {
 }
 
 export function mouseOverDomain(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   startPixels: number,
   endPixels: number,
   seq_from: number,
@@ -60,10 +60,10 @@ export function mouseOverDomain(
   renderOptions: RenderOptions,
   _this: VisualOutput | FunctionalPredictions
 ) {
-  fabricObj.on('mouseover', (e: any) => {
+  fabricObj.on('mouseover', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.set('hoverCursor', 'pointer');
-      let tooltipGroup: Group;
+      let tooltipGroup: fabric.Group;
       if (isHsp(domain)) {
         // Query/Subject tooltip
         tooltipGroup = drawDomainTooltips(
@@ -89,17 +89,16 @@ export function mouseOverDomain(
       }
       _this.canvas.add(tooltipGroup);
       tooltipGroup.set({ visible: true });
-      // FIXME
-      // fabricObj.bringToFront();
-      // tooltipGroup.bringToFront();
+      fabricObj.bringToFront();
+      tooltipGroup.bringToFront();
       _this.canvas.renderAll();
       tooltipGroup.set({ visible: false });
     }
   });
 }
 
-export function mouseOutDomain(fabricObj: FabricObject, _this: VisualOutput | FunctionalPredictions) {
-  fabricObj.on('mouseout', (e: any) => {
+export function mouseOutDomain(fabricObj: fabric.Object, _this: VisualOutput | FunctionalPredictions) {
+  fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
       _this.canvas.renderAll();
     }
@@ -107,11 +106,11 @@ export function mouseOutDomain(fabricObj: FabricObject, _this: VisualOutput | Fu
 }
 
 export function mouseOverCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   textObj: TextType,
   _this: VisualOutput | FunctionalPredictions
 ) {
-  fabricObj.on('mouseover', (e: any) => {
+  fabricObj.on('mouseover', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.set('hoverCursor', 'pointer');
       e.target.setOptions(textObj);
@@ -122,11 +121,11 @@ export function mouseOverCheckbox(
 }
 
 export function mouseDownCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   value: ColorSchemeEnum,
   _this: VisualOutput | FunctionalPredictions
 ) {
-  fabricObj.on('mousedown', (e: any) => {
+  fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
       if (_this.colorScheme != value) {
         _this.colorScheme = value;
@@ -137,12 +136,12 @@ export function mouseDownCheckbox(
 }
 
 export function mouseOutCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   textObj: TextType,
   value: ColorSchemeEnum,
   _this: VisualOutput | FunctionalPredictions
 ) {
-  fabricObj.on('mouseout', (e: any) => {
+  fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.setOptions(textObj);
       if (_this.colorScheme != value) {
@@ -156,12 +155,12 @@ export function mouseOutCheckbox(
 }
 
 export function mouseOverDomainCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   rectObj: RectType,
   currentDomainDatabase: string,
   _this: FunctionalPredictions
 ) {
-  fabricObj.on('mouseover', (e: any) => {
+  fabricObj.on('mouseover', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.set('hoverCursor', 'pointer');
       e.target.setOptions(rectObj);
@@ -185,11 +184,11 @@ export function mouseOverDomainCheckbox(
 }
 
 export function mouseDownDomainCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   currentDomainDatabase: string,
   _this: FunctionalPredictions
 ) {
-  fabricObj.on('mousedown', (e: any) => {
+  fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
       if (
         !_this.domainDatabaseList.includes(currentDomainDatabase) &&
@@ -211,12 +210,12 @@ export function mouseDownDomainCheckbox(
 }
 
 export function mouseOutDomainCheckbox(
-  fabricObj: FabricObject,
+  fabricObj: fabric.Object,
   rectObj: RectType,
   currentDomainDatabase: string,
   _this: FunctionalPredictions
 ) {
-  fabricObj.on('mouseout', (e: any) => {
+  fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
       let currentDomainDatabaseDisabled = false;
       if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
