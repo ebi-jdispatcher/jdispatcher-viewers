@@ -1,440 +1,390 @@
-import {fabric} from "fabric";
-import {xml2json} from "xml-js";
-import {
-    SSSResultModel,
-    IPRMCResultModel,
-    IPRMCResultModelFlat,
-    IprMatchesFlat,
-    IprMatchFlat,
-} from "./data-model";
-import {JobIdValitable, ColorSchemeEnum, jobIdDefaults} from "./custom-types";
+import { Canvas, StaticCanvas } from 'fabric';
+import { xml2json } from 'xml-js';
+import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
+import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
 
 export class BasicCanvasRenderer {
-    public canvas: fabric.Canvas | fabric.StaticCanvas;
-    protected canvasWidth: number;
-    protected canvasHeight: number;
-    protected contentWidth: number;
-    protected contentScoringWidth: number;
-    protected contentLabelWidth: number;
-    protected contentLabelLeftWidth: number;
-    protected scaleWidth: number;
-    protected scaleLabelWidth: number;
-    protected marginWidth: number;
-    public colorScheme: ColorSchemeEnum;
-    protected numberHits: number;
-    protected numberHsps: number;
-    protected logSkippedHsps: boolean;
-    protected fontSize: number;
-    protected fontWeigth: string;
-    protected fontFamily: string;
-    protected canvasWrapperStroke: boolean;
-    protected staticCanvas: boolean;
+  public canvas: Canvas | StaticCanvas;
+  protected canvasWidth: number;
+  protected canvasHeight: number;
+  protected contentWidth: number;
+  protected contentScoringWidth: number;
+  protected contentLabelWidth: number;
+  protected contentLabelLeftWidth: number;
+  protected scaleWidth: number;
+  protected scaleLabelWidth: number;
+  protected marginWidth: number;
+  public colorScheme: ColorSchemeEnum;
+  protected numberHits: number;
+  protected numberHsps: number;
+  protected logSkippedHsps: boolean;
+  protected fontSize: number;
+  protected fontWeigth: string;
+  protected fontFamily: string;
+  protected canvasWrapperStroke: boolean;
+  protected staticCanvas: boolean;
 
-    constructor(private element: string | HTMLCanvasElement) {
-    }
+  constructor(private element: string | HTMLCanvasElement) {}
 
-    protected getFabricCanvas() {
-        const startupDef = {
-            defaultCursor: "default",
-            moveCursor: "default",
-            hoverCursor: "default",
-        };
-        if (this.staticCanvas) {
-            this.canvas = new fabric.StaticCanvas(this.element, startupDef);
-        } else {
-            this.canvas = new fabric.Canvas(this.element, startupDef);
-        }
+  protected getFabricCanvas() {
+    const startupDef = {
+      defaultCursor: 'default',
+      moveCursor: 'default',
+      hoverCursor: 'default',
+    };
+    if (this.staticCanvas) {
+      this.canvas = new StaticCanvas(this.element, startupDef);
+    } else {
+      this.canvas = new Canvas(this.element, startupDef);
     }
+  }
 
-    protected setFrameSize() {
-        this.canvas.setWidth(this.canvasWidth);
-        this.canvas.setHeight(this.canvasHeight);
-    }
+  protected setFrameSize() {
+    this.canvas.setWidth(this.canvasWidth);
+    this.canvas.setHeight(this.canvasHeight);
+  }
 
-    protected renderCanvas() {
-        this.canvas.renderAll();
-    }
+  protected renderCanvas() {
+    this.canvas.renderAll();
+  }
 }
 
 export class ObjectCache<T> {
-    private values: Map<string, T> = new Map<string, T>();
+  private values: Map<string, T> = new Map<string, T>();
 
-    public get(key: string): T | undefined {
-        const hasKey = this.values.has(key);
-        if (hasKey) {
-            return this.values.get(key) as T;
-        }
-        return;
+  public get(key: string): T | undefined {
+    const hasKey = this.values.has(key);
+    if (hasKey) {
+      return this.values.get(key) as T;
     }
+    return;
+  }
 
-    public put(key: string, value: T) {
-        const hasKey = this.values.has(key);
-        if (!hasKey) {
-            this.values.set(key, value);
-        }
+  public put(key: string, value: T) {
+    const hasKey = this.values.has(key);
+    if (!hasKey) {
+      this.values.set(key, value);
     }
+  }
 
-    public delete(key: string) {
-        const hasKey = this.values.has(key);
-        if (hasKey) {
-            this.values.delete(key);
-        }
+  public delete(key: string) {
+    const hasKey = this.values.has(key);
+    if (hasKey) {
+      this.values.delete(key);
     }
+  }
 }
 
 function countDecimals(n: number) {
-    if (Math.floor(n) === n) return 0;
-    return n.toString().split(".")[1].length || 0;
+  if (Math.floor(n) === n) return 0;
+  return n.toString().split('.')[1].length || 0;
 }
 
 export function numberToString(n: number) {
-    if (Number.isInteger(n)) {
-        return n + ".0";
-    } else if (n < 0.0001 || n > 10000) {
-        return n.toExponential(2);
-    } else if (countDecimals(n) > 3) {
-        return n.toFixed(3).toString();
-    } else {
-        return n.toString();
-    }
+  if (Number.isInteger(n)) {
+    return n + '.0';
+  } else if (n < 0.0001 || n > 10000) {
+    return n.toExponential(2);
+  } else if (countDecimals(n) > 3) {
+    return n.toFixed(3).toString();
+  } else {
+    return n.toString();
+  }
 }
 
-export async function fetchData(dataLoc: string, format: string = "json") {
-    return await fetch(dataLoc)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`Could not retrieve data from ${dataLoc}`);
-            }
-            if (format === "json") {
-                try {
-                    return response.json();
-                } catch (error) {
-                    throw new Error(
-                        `Could not decode JSON data from ${dataLoc}`
-                    );
-                }
-            } else {
-                return response.text();
-            }
-        })
-        .catch((error) => console.log(error));
+export async function fetchData(dataLoc: string, format: string = 'json') {
+  return await fetch(dataLoc)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Could not retrieve data from ${dataLoc}`);
+      }
+      if (format === 'json') {
+        try {
+          return response.json();
+        } catch (error) {
+          throw new Error(`Could not decode JSON data from ${dataLoc}`);
+        }
+      } else {
+        return response.text();
+      }
+    })
+    .catch(error => console.log(error));
 }
 
 export function dataAsType(data: any, dtype: string) {
-    if (dtype === "SSSResultModel") {
-        return data as SSSResultModel;
-    } else if (dtype === "IPRMCResultModel") {
-        return data as IPRMCResultModel;
-    } else if (dtype === "IPRMCResultModelFlat") {
-        return data as IPRMCResultModelFlat;
-    } else {
-        return data;
-    }
+  if (dtype === 'SSSResultModel') {
+    return data as SSSResultModel;
+  } else if (dtype === 'IPRMCResultModel') {
+    return data as IPRMCResultModel;
+  } else if (dtype === 'IPRMCResultModelFlat') {
+    return data as IPRMCResultModelFlat;
+  } else {
+    return data;
+  }
 }
 
 export function getJdispatcherJsonURL(jobId: string) {
-    const toolName = jobId.split("-")[0];
-    if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
-        // mock jobId
-        return "https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json";
-    } else if (jobId.endsWith("-np2")) {
-        // wwwdev server (-np2$)
-        return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
-    } else {
-        // production servers (-p1m$ and -p2m$)
-        return `https://www.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
-    }
+  const toolName = jobId.split('-')[0];
+  if (jobId === 'mock_jobid-I20200317-103136-0485-5599422-np2') {
+    // mock jobId
+    return 'https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json';
+  } else if (jobId.endsWith('-np2')) {
+    // wwwdev server (-np2$)
+    return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
+  } else {
+    // production servers (-p1m$ and -p2m$)
+    return `https://www.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
+  }
 }
 
-export function validateJobId(
-    jobIdObj: JobIdValitable,
-    verbose: boolean = false
-) {
-    let isValid = true;
-    if (jobIdObj.required) {
-        isValid = isValid && jobIdObj.value.trim().length !== 0;
+export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false) {
+  let isValid = true;
+  if (jobIdObj.required) {
+    isValid = isValid && jobIdObj.value.trim().length !== 0;
+  }
+  if (jobIdObj.minLength) {
+    isValid = isValid && jobIdObj.value.trim().length >= jobIdObj.minLength;
+  }
+  if (jobIdObj.maxLength) {
+    isValid = isValid && jobIdObj.value.trim().length <= jobIdObj.maxLength;
+  }
+  if (jobIdObj.pattern) {
+    isValid = isValid && jobIdObj.pattern.test(jobIdObj.value.trim());
+  }
+  if (verbose) {
+    if (isValid) {
+      console.log(`JobId "${jobIdObj.value}" is valid!`);
+    } else {
+      console.log(`JobId "${jobIdObj.value}" is not valid!`);
     }
-    if (jobIdObj.minLength) {
-        isValid = isValid && jobIdObj.value.trim().length >= jobIdObj.minLength;
-    }
-    if (jobIdObj.maxLength) {
-        isValid = isValid && jobIdObj.value.trim().length <= jobIdObj.maxLength;
-    }
-    if (jobIdObj.pattern) {
-        isValid = isValid && jobIdObj.pattern.test(jobIdObj.value.trim());
-    }
-    if (verbose) {
-        if (isValid) {
-            console.log(`JobId "${jobIdObj.value}" is valid!`);
-        } else {
-            console.log(`JobId "${jobIdObj.value}" is not valid!`);
-        }
-    }
-    return isValid;
+  }
+  return isValid;
 }
 
 export function validateSubmittedJobIdInput(data: string): string {
-    // check if input is a jobId
-    const jobId = {...jobIdDefaults};
-    jobId.value = data;
-    // if so, get the service URL, else use as is
-    if (
-        !jobId.value.startsWith("http") &&
-        !jobId.value.includes("/") &&
-        !jobId.value.includes("./") &&
-        validateJobId(jobId)
-    ) {
-        data = getJdispatcherJsonURL(data);
-    }
-    return data;
+  // check if input is a jobId
+  const jobId = { ...jobIdDefaults };
+  jobId.value = data;
+  // if so, get the service URL, else use as is
+  if (
+    !jobId.value.startsWith('http') &&
+    !jobId.value.includes('/') &&
+    !jobId.value.includes('./') &&
+    validateJobId(jobId)
+  ) {
+    data = getJdispatcherJsonURL(data);
+  }
+  return data;
 }
 
 // InterPro Match Complete XML data (via Dbfetch)
 function getIPRMCDbfetchURL(accessions: string) {
-    return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
+  return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
 }
 
-function getIPRMCDbfetchAccessions(
-    sssDataObj: SSSResultModel,
-    numberHits: number = 30
-): string {
-    let accessions: string = "";
-    for (const hit of sssDataObj.hits.slice(0, numberHits)) {
-        if (accessions === "") accessions += `${hit.hit_acc}`;
-        else accessions += `,${hit.hit_acc}`;
-    }
-    return accessions;
+function getIPRMCDbfetchAccessions(sssDataObj: SSSResultModel, numberHits: number = 30): string {
+  let accessions: string = '';
+  for (const hit of sssDataObj.hits.slice(0, numberHits)) {
+    if (accessions === '') accessions += `${hit.hit_acc}`;
+    else accessions += `,${hit.hit_acc}`;
+  }
+  return accessions;
 }
 
-export function validateSubmittedDbfetchInput(
-    sssDataObj: SSSResultModel,
-    numberHits: number = 30
-): string {
-    const accessions = getIPRMCDbfetchAccessions(sssDataObj, numberHits);
-    return getIPRMCDbfetchURL(accessions);
+export function validateSubmittedDbfetchInput(sssDataObj: SSSResultModel, numberHits: number = 30): string {
+  const accessions = getIPRMCDbfetchAccessions(sssDataObj, numberHits);
+  return getIPRMCDbfetchURL(accessions);
 }
 
-export function getIPRMCDataModelFlatFromXML(
-    iprmcXML: string,
-    numberHits: number = 30
-) {
-    const iprmcDataObj = parseXMLData(iprmcXML) as IPRMCResultModel;
-    return getFlattenIPRMCDataModel(iprmcDataObj, numberHits);
+export function getIPRMCDataModelFlatFromXML(iprmcXML: string, numberHits: number = 30) {
+  const iprmcDataObj = parseXMLData(iprmcXML) as IPRMCResultModel;
+  return getFlattenIPRMCDataModel(iprmcDataObj, numberHits);
 }
 
 function parseXMLData(data: string): IPRMCResultModel | object {
-    try {
-        return JSON.parse(
-            xml2json(data, {
-                compact: true,
-                spaces: 2,
-                alwaysArray: true,
-            })
-        );
-    } catch (error) {
-        console.log(
-            "Cannot parse the resulting " +
-            "Dbfetch response (likely not formatted XML)!"
-        );
-        return {};
-    }
+  try {
+    return JSON.parse(
+      xml2json(data, {
+        compact: true,
+        spaces: 2,
+        alwaysArray: true,
+      })
+    );
+  } catch (error) {
+    console.log('Cannot parse the resulting ' + 'Dbfetch response (likely not formatted XML)!');
+    return {};
+  }
 }
 
 export function domainDatabaseNameToString(domainName: string): string {
-    domainName = domainName.toUpperCase();
-    let domainNameEnum = "Unclassified";
-    if (domainName === "IPR" || domainName === "INTERPRO") {
-        domainNameEnum = "InterPro";
-    } else if (
-        domainName === "CATHGENE3D" ||
-        domainName === "CATH-GENE3D" ||
-        domainName === "GENE3D"
-    ) {
-        domainNameEnum = "CATH-Gene3D";
-    } else if (domainName === "CDD") {
-        domainNameEnum = "CDD";
-    } else if (domainName === "PANTHER") {
-        domainNameEnum = "PANTHER";
-    } else if (domainName === "HAMAP") {
-        domainNameEnum = "HAMAP";
-    } else if (domainName === "PFAM") {
-        domainNameEnum = "Pfam";
-    } else if (domainName === "PIRSF") {
-        domainNameEnum = "PIRSF";
-    } else if (domainName === "PRINTS") {
-        domainNameEnum = "PRINTS";
-    } else if (
-        domainName === "PROSITE PROFILES" ||
-        domainName === "PROSITE_PROFILES" ||
-        domainName === "PROFILE"
-    ) {
-        domainNameEnum = "PROSITE profiles";
-    } else if (
-        domainName === "PROSITE PATTERNS" ||
-        domainName === "PROSITE_PATTERNS" ||
-        domainName === "PROSITE"
-    ) {
-        domainNameEnum = "PROSITE patterns";
-    } else if (domainName === "SFLD") {
-        domainNameEnum = "SFLD";
-    } else if (domainName === "SMART") {
-        domainNameEnum = "SMART";
-    } else if (domainName === "SUPERFAMILY" || domainName === "SSF") {
-        domainNameEnum = "SUPERFAMILY";
-    } else if (domainName === "TIGERFAMS") {
-        domainNameEnum = "TIGRFAMs";
-    } else if (domainName === "PRODOM") {
-        domainNameEnum = "PRODOM";
-    }
-    return domainNameEnum;
+  domainName = domainName.toUpperCase();
+  let domainNameEnum = 'Unclassified';
+  if (domainName === 'IPR' || domainName === 'INTERPRO') {
+    domainNameEnum = 'InterPro';
+  } else if (domainName === 'CATHGENE3D' || domainName === 'CATH-GENE3D' || domainName === 'GENE3D') {
+    domainNameEnum = 'CATH-Gene3D';
+  } else if (domainName === 'CDD') {
+    domainNameEnum = 'CDD';
+  } else if (domainName === 'PANTHER') {
+    domainNameEnum = 'PANTHER';
+  } else if (domainName === 'HAMAP') {
+    domainNameEnum = 'HAMAP';
+  } else if (domainName === 'PFAM') {
+    domainNameEnum = 'Pfam';
+  } else if (domainName === 'PIRSF') {
+    domainNameEnum = 'PIRSF';
+  } else if (domainName === 'PRINTS') {
+    domainNameEnum = 'PRINTS';
+  } else if (domainName === 'PROSITE PROFILES' || domainName === 'PROSITE_PROFILES' || domainName === 'PROFILE') {
+    domainNameEnum = 'PROSITE profiles';
+  } else if (domainName === 'PROSITE PATTERNS' || domainName === 'PROSITE_PATTERNS' || domainName === 'PROSITE') {
+    domainNameEnum = 'PROSITE patterns';
+  } else if (domainName === 'SFLD') {
+    domainNameEnum = 'SFLD';
+  } else if (domainName === 'SMART') {
+    domainNameEnum = 'SMART';
+  } else if (domainName === 'SUPERFAMILY' || domainName === 'SSF') {
+    domainNameEnum = 'SUPERFAMILY';
+  } else if (domainName === 'TIGERFAMS') {
+    domainNameEnum = 'TIGRFAMs';
+  } else if (domainName === 'PRODOM') {
+    domainNameEnum = 'PRODOM';
+  }
+  return domainNameEnum;
 }
 
-export function getUniqueIPRMCDomainDatabases(
-    dataObj: IPRMCResultModelFlat,
-    proteinIdList: string[]
-) {
-    const domainPredictions: string[] = [];
-    for (const protein of proteinIdList) {
-        for (const match of dataObj[`${protein}`]["matches"]) {
-            domainPredictions.push(match.split("_")[0]);
-        }
+export function getUniqueIPRMCDomainDatabases(dataObj: IPRMCResultModelFlat, proteinIdList: string[]) {
+  const domainPredictions: string[] = [];
+  for (const protein of proteinIdList) {
+    for (const match of dataObj[`${protein}`]['matches']) {
+      domainPredictions.push(match.split('_')[0]);
     }
-    return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
+  }
+  return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
 }
 
-function getFlattenIPRMCDataModel(
-    dataObj: IPRMCResultModel,
-    numberHits: number
-): IPRMCResultModelFlat {
-    let tmpNumberHits = 0;
-    let iprmcDataFlatObj: IPRMCResultModelFlat = {};
-    for (const protein of dataObj["interpromatch"][0]["protein"]) {
-        tmpNumberHits++;
-        if (tmpNumberHits <= numberHits) {
-            let matches: string[] = [];
-            let matchObjs: IprMatchesFlat = {};
-            for (const match of protein["match"]) {
-                let matchObj: IprMatchFlat = {};
-                if (match.ipr !== undefined) {
-                    const iprdomain = `${domainDatabaseNameToString(
-                        match._attributes.dbname
-                    )}_${match.ipr[0]._attributes.id}`;
-                    if (!matches.includes(iprdomain)) {
-                        matches.push(iprdomain);
-                    }
-                    if (!(iprdomain in matchObjs)) {
-                        matchObjs[iprdomain] = [];
-                    }
-                    matchObj = {
-                        id: match.ipr[0]._attributes.id,
-                        name: match.ipr[0]._attributes.name,
-                        dbname: domainDatabaseNameToString(
-                            match._attributes.dbname
-                        ),
-                        type: match.ipr[0]._attributes.type,
-                        altid: match._attributes.id,
-                        altname: match._attributes.name,
-                        // altdbname: "InterPro",
-                        status: match._attributes.status,
-                        model: match._attributes.model,
-                        evd: match._attributes.evd,
-                        start: Number(match.lcn[0]._attributes.start),
-                        end: Number(match.lcn[0]._attributes.end),
-                        fragments: match.lcn[0]._attributes.fragments,
-                        score: match.lcn[0]._attributes.fragments,
-                    };
-                    matchObjs[iprdomain].push(matchObj);
-                } else {
-                    const iprdomain = `${domainDatabaseNameToString(
-                        match._attributes.dbname
-                    )}_${match._attributes.id}`;
-                    if (!matches.includes(iprdomain)) {
-                        matches.push(iprdomain);
-                    }
-                    if (!(iprdomain in matchObjs)) {
-                        matchObjs[iprdomain] = [];
-                    }
-                    matchObj = {
-                        id: match._attributes.id,
-                        name: match._attributes.name,
-                        dbname: domainDatabaseNameToString(
-                            match._attributes.dbname
-                        ),
-                        status: match._attributes.status,
-                        model: match._attributes.model,
-                        evd: match._attributes.evd,
-                        type: "Unclassified",
-                        start: Number(match.lcn[0]._attributes.start),
-                        end: Number(match.lcn[0]._attributes.end),
-                        fragments: match.lcn[0]._attributes.fragments,
-                        score: match.lcn[0]._attributes.fragments,
-                    };
-                    matchObjs[iprdomain].push(matchObj);
-                }
-            }
-            iprmcDataFlatObj[protein._attributes.id] = {
-                id: protein._attributes.id,
-                name: protein._attributes.name,
-                length: Number(protein._attributes.length),
-                matches: matches.sort(),
-                match: matchObjs,
-            };
+function getFlattenIPRMCDataModel(dataObj: IPRMCResultModel, numberHits: number): IPRMCResultModelFlat {
+  let tmpNumberHits = 0;
+  let iprmcDataFlatObj: IPRMCResultModelFlat = {};
+  for (const protein of dataObj['interpromatch'][0]['protein']) {
+    tmpNumberHits++;
+    if (tmpNumberHits <= numberHits) {
+      let matches: string[] = [];
+      let matchObjs: IprMatchesFlat = {};
+      for (const match of protein['match']) {
+        let matchObj: IprMatchFlat = {};
+        if (match.ipr !== undefined) {
+          const iprdomain = `${domainDatabaseNameToString(match._attributes.dbname)}_${match.ipr[0]._attributes.id}`;
+          if (!matches.includes(iprdomain)) {
+            matches.push(iprdomain);
+          }
+          if (!(iprdomain in matchObjs)) {
+            matchObjs[iprdomain] = [];
+          }
+          matchObj = {
+            id: match.ipr[0]._attributes.id,
+            name: match.ipr[0]._attributes.name,
+            dbname: domainDatabaseNameToString(match._attributes.dbname),
+            type: match.ipr[0]._attributes.type,
+            altid: match._attributes.id,
+            altname: match._attributes.name,
+            // altdbname: "InterPro",
+            status: match._attributes.status,
+            model: match._attributes.model,
+            evd: match._attributes.evd,
+            start: Number(match.lcn[0]._attributes.start),
+            end: Number(match.lcn[0]._attributes.end),
+            fragments: match.lcn[0]._attributes.fragments,
+            score: match.lcn[0]._attributes.fragments,
+          };
+          matchObjs[iprdomain].push(matchObj);
+        } else {
+          const iprdomain = `${domainDatabaseNameToString(match._attributes.dbname)}_${match._attributes.id}`;
+          if (!matches.includes(iprdomain)) {
+            matches.push(iprdomain);
+          }
+          if (!(iprdomain in matchObjs)) {
+            matchObjs[iprdomain] = [];
+          }
+          matchObj = {
+            id: match._attributes.id,
+            name: match._attributes.name,
+            dbname: domainDatabaseNameToString(match._attributes.dbname),
+            status: match._attributes.status,
+            model: match._attributes.model,
+            evd: match._attributes.evd,
+            type: 'Unclassified',
+            start: Number(match.lcn[0]._attributes.start),
+            end: Number(match.lcn[0]._attributes.end),
+            fragments: match.lcn[0]._attributes.fragments,
+            score: match.lcn[0]._attributes.fragments,
+          };
+          matchObjs[iprdomain].push(matchObj);
         }
-        // else {
-        //     console.log(
-        //         `Skipping protein as number of hits has reached ${numberHits}`
-        //     );
-        // }
+      }
+      iprmcDataFlatObj[protein._attributes.id] = {
+        id: protein._attributes.id,
+        name: protein._attributes.name,
+        length: Number(protein._attributes.length),
+        matches: matches.sort(),
+        match: matchObjs,
+      };
     }
-    return iprmcDataFlatObj;
+    // else {
+    //     console.log(
+    //         `Skipping protein as number of hits has reached ${numberHits}`
+    //     );
+    // }
+  }
+  return iprmcDataFlatObj;
 }
 
 export function getDomainURLbyDatabase(domainID: string, domainName: string) {
-    let domainURL = "";
-    if (domainID.startsWith("IPR")) {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/InterPro/${domainID}`;
-    } else if (domainName === "CATH-Gene3D") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/cathgene3d/${domainID}`;
-        // domainURL = `http://www.cathdb.info/version/latest/superfamily/${domainID}`;
-    } else if (domainName === "CDD") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/cdd/${domainID}`;
-        // domainURL = `https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?uid=${domainID}`;
-    } else if (domainName === "PANTHER") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/panther/${domainID}`;
-        // domainURL = `http://www.pantherdb.org/panther/family.do?clsAccession=${domainID}`;
-    } else if (domainName === "HAMAP") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/hamap/${domainID}`;
-        // domainURL = `https://hamap.expasy.org/signature/${domainID}`;
-    } else if (domainName === "Pfam") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/pfam/${domainID}`;
-        // domainURL = `https://pfam.xfam.org/family/${domainID}`;
-    } else if (domainName === "PIRSF") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/pirsf/${domainID}`;
-        // domainURL = `https://pir.georgetown.edu/cgi-bin/ipcSF?id=${domainID}`;
-    } else if (domainName === "PRINTS") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/prints/${domainID}`;
-        // domainURL = `http://www.bioinf.manchester.ac.uk/cgi-bin/dbbrowser/sprint/searchprintss.cgi?prints_accn=${domainID}&display_opts=Prints&category=None&queryform=false&regexpr=off`;
-    } else if (domainName === "PROSITE profiles") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/profile/${domainID}`;
-        // domainURL = `https://www.expasy.org/prosite/${domainID}`;
-    } else if (domainName === "PROSITE patterns") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/prosite/${domainID}`;
-        // domainURL = `https://www.expasy.org/prosite/${domainID}`;
-    } else if (domainName === "SFLD") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/sfld/${domainID}`;
-        // domainURL = `http://sfld.rbvi.ucsf.edu/django/family/${domainID}`;
-    } else if (domainName === "SMART") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/smart/${domainID}`;
-        // domainURL = `https://smart.embl-heidelberg.de/smart/do_annotation.pl?BLAST=DUMMY&amp;ACC=${domainID}`;
-    } else if (domainName === "SUPERFAMILY") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/ssf/${domainID}`;
-        // domainURL = `https://supfam.org/SUPERFAMILY/cgi-bin/scop.cgi?ipid=${domainID}`;
-    } else if (domainName === "TIGRFAMs") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/tigrfams/${domainID}`;
-        // domainURL = `https://cmr.tigr.org/tigr-scripts/CMR/HmmReport.cgi?hmm_acc=${domainID}`;
-    } else if (domainName === "PRODOM") {
-        domainURL = `https://www.ebi.ac.uk/interpro/entry/prodom/${domainID}`;
-        // domainURL = `https://prodom.prabi.fr/prodom/current/cgi-bin/request.pl?SSID=1289309949_1085&amp;db_ent1=${domainID}`;
-    }
-    return domainURL;
+  let domainURL = '';
+  if (domainID.startsWith('IPR')) {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/InterPro/${domainID}`;
+  } else if (domainName === 'CATH-Gene3D') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/cathgene3d/${domainID}`;
+    // domainURL = `http://www.cathdb.info/version/latest/superfamily/${domainID}`;
+  } else if (domainName === 'CDD') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/cdd/${domainID}`;
+    // domainURL = `https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?uid=${domainID}`;
+  } else if (domainName === 'PANTHER') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/panther/${domainID}`;
+    // domainURL = `http://www.pantherdb.org/panther/family.do?clsAccession=${domainID}`;
+  } else if (domainName === 'HAMAP') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/hamap/${domainID}`;
+    // domainURL = `https://hamap.expasy.org/signature/${domainID}`;
+  } else if (domainName === 'Pfam') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/pfam/${domainID}`;
+    // domainURL = `https://pfam.xfam.org/family/${domainID}`;
+  } else if (domainName === 'PIRSF') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/pirsf/${domainID}`;
+    // domainURL = `https://pir.georgetown.edu/cgi-bin/ipcSF?id=${domainID}`;
+  } else if (domainName === 'PRINTS') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/prints/${domainID}`;
+    // domainURL = `http://www.bioinf.manchester.ac.uk/cgi-bin/dbbrowser/sprint/searchprintss.cgi?prints_accn=${domainID}&display_opts=Prints&category=None&queryform=false&regexpr=off`;
+  } else if (domainName === 'PROSITE profiles') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/profile/${domainID}`;
+    // domainURL = `https://www.expasy.org/prosite/${domainID}`;
+  } else if (domainName === 'PROSITE patterns') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/prosite/${domainID}`;
+    // domainURL = `https://www.expasy.org/prosite/${domainID}`;
+  } else if (domainName === 'SFLD') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/sfld/${domainID}`;
+    // domainURL = `http://sfld.rbvi.ucsf.edu/django/family/${domainID}`;
+  } else if (domainName === 'SMART') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/smart/${domainID}`;
+    // domainURL = `https://smart.embl-heidelberg.de/smart/do_annotation.pl?BLAST=DUMMY&amp;ACC=${domainID}`;
+  } else if (domainName === 'SUPERFAMILY') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/ssf/${domainID}`;
+    // domainURL = `https://supfam.org/SUPERFAMILY/cgi-bin/scop.cgi?ipid=${domainID}`;
+  } else if (domainName === 'TIGRFAMs') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/tigrfams/${domainID}`;
+    // domainURL = `https://cmr.tigr.org/tigr-scripts/CMR/HmmReport.cgi?hmm_acc=${domainID}`;
+  } else if (domainName === 'PRODOM') {
+    domainURL = `https://www.ebi.ac.uk/interpro/entry/prodom/${domainID}`;
+    // domainURL = `https://prodom.prabi.fr/prodom/current/cgi-bin/request.pl?SSID=1289309949_1085&amp;db_ent1=${domainID}`;
+  }
+  return domainURL;
 }

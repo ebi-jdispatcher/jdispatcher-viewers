@@ -66,8 +66,7 @@
 
         /* Advanced Options */
         "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
-        "resolveJsonModule": true /* Json support. */,
-        "watch": false /* tsc command in watch mode. */
+        "resolveJsonModule": true /* Json support. */
     },
     "exclude": ["node_modules", "**/*spec.ts", "src/jd-viewers-cli.ts"],
     "include": ["**/*", "src/*", "*.ts"]
