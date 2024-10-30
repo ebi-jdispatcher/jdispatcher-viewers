@@ -45,8 +45,8 @@ if (isNode) {
 }
 
 // web-component support
-import './visual-output-webcomponent.ts';
-import './functional-predictions-webcomponent.ts';
+import './visual-output-webcomponent';
+import './functional-predictions-webcomponent';
 
 // demo index page with JobId input form (implemented in TypeScript)
-import './index.ts';
+import '.';

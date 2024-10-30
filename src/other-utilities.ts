@@ -1,10 +1,10 @@
-import { Canvas, StaticCanvas } from 'fabric';
+import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
 import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
 
 export class BasicCanvasRenderer {
-  public canvas: Canvas | StaticCanvas;
+  public canvas: fabric.Canvas | fabric.StaticCanvas;
   protected canvasWidth: number;
   protected canvasHeight: number;
   protected contentWidth: number;
@@ -33,9 +33,9 @@ export class BasicCanvasRenderer {
       hoverCursor: 'default',
     };
     if (this.staticCanvas) {
-      this.canvas = new StaticCanvas(this.element, startupDef);
+      this.canvas = new fabric.StaticCanvas(this.element, startupDef);
     } else {
-      this.canvas = new Canvas(this.element, startupDef);
+      this.canvas = new fabric.Canvas(this.element, startupDef);
     }
   }
 

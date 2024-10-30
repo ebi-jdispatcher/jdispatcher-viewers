@@ -1,4 +1,4 @@
-import { FabricText, Group, Rect } from 'fabric';
+import { fabric } from 'fabric';
 import { SSSResultModel } from './data-model';
 import { defaultGradient, ncbiBlastGradient } from './color-schemes';
 import { getQuerySubjPixelCoords, getDomainPixelCoords } from './coords-utilities';
@@ -54,7 +54,11 @@ export class VisualOutput extends BasicCanvasRenderer {
   private queryFactor: number = 1.0;
   private subjFactor: number = 1.0;
 
-  constructor(element: string | HTMLCanvasElement, private dataObj: SSSResultModel, renderOptions: RenderOptions) {
+  constructor(
+    element: string | HTMLCanvasElement,
+    private dataObj: SSSResultModel,
+    renderOptions: RenderOptions
+  ) {
     super(element);
 
     renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1000);
@@ -172,8 +176,8 @@ export class VisualOutput extends BasicCanvasRenderer {
   private drawHeaderGroup() {
     // canvas header
     this.topPadding = 2;
-    let textHeaderGroup: Group;
-    textHeaderGroup = objCache.get('textHeaderGroup') as Group;
+    let textHeaderGroup: fabric.Object;
+    textHeaderGroup = objCache.get('textHeaderGroup') as fabric.Object;
     if (!textHeaderGroup) {
       textHeaderGroup = drawHeaderTextGroup(
         this.dataObj,
@@ -189,9 +193,9 @@ export class VisualOutput extends BasicCanvasRenderer {
 
     // canvas header (sequence info)
     this.topPadding += 45;
-    let textHeaderLink: FabricText;
+    let textHeaderLink: fabric.Text;
     let textSeqObj: TextType;
-    textHeaderLink = objCache.get('textHeaderLink') as FabricText;
+    textHeaderLink = objCache.get('textHeaderLink') as fabric.Text;
     textSeqObj = objCache.get('textHeaderLink_textSeqObj') as TextType;
     if (!textHeaderLink) {
       [textHeaderLink, textSeqObj] = drawHeaderLinkText(this.dataObj, { fontSize: this.fontSize }, this.topPadding);
@@ -219,8 +223,8 @@ export class VisualOutput extends BasicCanvasRenderer {
     if (this.dataObj.hits.length > 0) {
       // content header
       this.topPadding += 25;
-      let textContentHeaderGroup: Group;
-      textContentHeaderGroup = objCache.get('textContentHeaderGroup') as Group;
+      let textContentHeaderGroup: fabric.Group;
+      textContentHeaderGroup = objCache.get('textContentHeaderGroup') as fabric.Group;
       if (!textContentHeaderGroup) {
         textContentHeaderGroup = drawContentHeaderTextGroup(
           {
@@ -244,8 +248,8 @@ export class VisualOutput extends BasicCanvasRenderer {
 
       // content header line tracks
       this.topPadding += 20;
-      let lineTrackGroup: Group;
-      lineTrackGroup = objCache.get('lineTrackGroup') as Group;
+      let lineTrackGroup: fabric.Group;
+      lineTrackGroup = objCache.get('lineTrackGroup') as fabric.Group;
       if (!lineTrackGroup) {
         lineTrackGroup = drawLineTracksQuerySubject(
           {
@@ -262,8 +266,8 @@ export class VisualOutput extends BasicCanvasRenderer {
       this.canvas.add(lineTrackGroup);
 
       this.topPadding += 5;
-      let textContentFooterGroup: Group;
-      textContentFooterGroup = objCache.get('textContentFooterGroup') as Group;
+      let textContentFooterGroup: fabric.Group;
+      textContentFooterGroup = objCache.get('textContentFooterGroup') as fabric.Group;
       if (!textContentFooterGroup) {
         textContentFooterGroup = drawContentQuerySubjFooterTextGroup(
           {
@@ -344,7 +348,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         const totalNumberHsps: number = hit.hit_hsps.length;
         // Hit ID + Hit Description text tracks
         let textObj: TextType;
-        let spaceText, hitText: FabricText;
+        let spaceText, hitText: fabric.Text;
         [spaceText, hitText, textObj] = drawContentSequenceInfoText(
           maxIDLen,
           hit,
@@ -436,7 +440,7 @@ export class VisualOutput extends BasicCanvasRenderer {
               color = getRgbColorGradient(hsp.hsp_expect!, this.gradientSteps, defaultGradient);
             }
             this.topPadding += 10;
-            let queryDomain, subjDomain: Rect;
+            let queryDomain, subjDomain: fabric.Rect;
             [queryDomain, subjDomain] = drawDomainQueySubject(
               startQueryHspPixels,
               endQueryHspPixels,
@@ -495,8 +499,8 @@ export class VisualOutput extends BasicCanvasRenderer {
             }
           } else {
             if (this.logSkippedHsps === true) {
-              let hspTextNotice: FabricText;
-              hspTextNotice = objCache.get('hspTextNotice') as FabricText;
+              let hspTextNotice: fabric.Text;
+              hspTextNotice = objCache.get('hspTextNotice') as fabric.Text;
               if (!hspTextNotice) {
                 hspTextNotice = drawHspNoticeText(
                   totalNumberHsps,
@@ -518,8 +522,8 @@ export class VisualOutput extends BasicCanvasRenderer {
       } else {
         // canvas content suppressed output
         this.topPadding += 20;
-        let supressText: FabricText;
-        supressText = objCache.get('supressText') as FabricText;
+        let supressText: fabric.Text;
+        supressText = objCache.get('supressText') as fabric.Text;
         if (!supressText) {
           supressText = drawContentSupressText(
             {
@@ -552,7 +556,7 @@ export class VisualOutput extends BasicCanvasRenderer {
 
     // Scale Type selection
     let textCheckDynObj, textCheckFixObj, textCheckNcbiObj: TextType;
-    let dynamicBoxText, dynamicText, fixedBoxText, fixedText, ncbiblastBoxText, ncbiblastText: FabricText;
+    let dynamicBoxText, dynamicText, fixedBoxText, fixedText, ncbiblastBoxText, ncbiblastText: fabric.Text;
     [
       dynamicBoxText,
       dynamicText,
@@ -679,9 +683,9 @@ export class VisualOutput extends BasicCanvasRenderer {
 
   private drawFooterGroup() {
     this.topPadding += 30;
-    let copyrightText: FabricText;
+    let copyrightText: fabric.Text;
     let textFooterObj: TextType;
-    copyrightText = objCache.get('copyrightText') as FabricText;
+    copyrightText = objCache.get('copyrightText') as fabric.Text;
     textFooterObj = objCache.get('copyrightText_textFooterObj') as TextType;
     if (!copyrightText && !textFooterObj) {
       [copyrightText, textFooterObj] = drawFooterText(

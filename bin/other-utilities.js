@@ -1,15 +1,15 @@
-import { fabric } from "fabric";
-import { xml2json } from "xml-js";
-import { jobIdDefaults } from "./custom-types";
+import { fabric } from 'fabric';
+import { xml2json } from 'xml-js';
+import { jobIdDefaults } from './custom-types';
 export class BasicCanvasRenderer {
     constructor(element) {
         this.element = element;
     }
     getFabricCanvas() {
         const startupDef = {
-            defaultCursor: "default",
-            moveCursor: "default",
-            hoverCursor: "default",
+            defaultCursor: 'default',
+            moveCursor: 'default',
+            hoverCursor: 'default',
         };
         if (this.staticCanvas) {
             this.canvas = new fabric.StaticCanvas(this.element, startupDef);
@@ -53,11 +53,11 @@ export class ObjectCache {
 function countDecimals(n) {
     if (Math.floor(n) === n)
         return 0;
-    return n.toString().split(".")[1].length || 0;
+    return n.toString().split('.')[1].length || 0;
 }
 export function numberToString(n) {
     if (Number.isInteger(n)) {
-        return n + ".0";
+        return n + '.0';
     }
     else if (n < 0.0001 || n > 10000) {
         return n.toExponential(2);
@@ -69,13 +69,13 @@ export function numberToString(n) {
         return n.toString();
     }
 }
-export async function fetchData(dataLoc, format = "json") {
+export async function fetchData(dataLoc, format = 'json') {
     return await fetch(dataLoc)
-        .then((response) => {
+        .then(response => {
         if (!response.ok) {
             throw new Error(`Could not retrieve data from ${dataLoc}`);
         }
-        if (format === "json") {
+        if (format === 'json') {
             try {
                 return response.json();
             }
@@ -87,16 +87,16 @@ export async function fetchData(dataLoc, format = "json") {
             return response.text();
         }
     })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
 }
 export function dataAsType(data, dtype) {
-    if (dtype === "SSSResultModel") {
+    if (dtype === 'SSSResultModel') {
         return data;
     }
-    else if (dtype === "IPRMCResultModel") {
+    else if (dtype === 'IPRMCResultModel') {
         return data;
     }
-    else if (dtype === "IPRMCResultModelFlat") {
+    else if (dtype === 'IPRMCResultModelFlat') {
         return data;
     }
     else {
@@ -104,12 +104,12 @@ export function dataAsType(data, dtype) {
     }
 }
 export function getJdispatcherJsonURL(jobId) {
-    const toolName = jobId.split("-")[0];
-    if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
+    const toolName = jobId.split('-')[0];
+    if (jobId === 'mock_jobid-I20200317-103136-0485-5599422-np2') {
         // mock jobId
-        return "https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json";
+        return 'https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/src/testdata/ncbiblast.json';
     }
-    else if (jobId.endsWith("-np2")) {
+    else if (jobId.endsWith('-np2')) {
         // wwwdev server (-np2$)
         return `https://wwwdev.ebi.ac.uk/Tools/services/rest/${toolName}/result/${jobId}/json`;
     }
@@ -147,9 +147,9 @@ export function validateSubmittedJobIdInput(data) {
     const jobId = { ...jobIdDefaults };
     jobId.value = data;
     // if so, get the service URL, else use as is
-    if (!jobId.value.startsWith("http") &&
-        !jobId.value.includes("/") &&
-        !jobId.value.includes("./") &&
+    if (!jobId.value.startsWith('http') &&
+        !jobId.value.includes('/') &&
+        !jobId.value.includes('./') &&
         validateJobId(jobId)) {
         data = getJdispatcherJsonURL(data);
     }
@@ -160,9 +160,9 @@ function getIPRMCDbfetchURL(accessions) {
     return `https://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=iprmc;id=${accessions};format=iprmcxml;style=raw`;
 }
 function getIPRMCDbfetchAccessions(sssDataObj, numberHits = 30) {
-    let accessions = "";
+    let accessions = '';
     for (const hit of sssDataObj.hits.slice(0, numberHits)) {
-        if (accessions === "")
+        if (accessions === '')
             accessions += `${hit.hit_acc}`;
         else
             accessions += `,${hit.hit_acc}`;
@@ -186,72 +186,65 @@ function parseXMLData(data) {
         }));
     }
     catch (error) {
-        console.log("Cannot parse the resulting " +
-            "Dbfetch response (likely not formatted XML)!");
+        console.log('Cannot parse the resulting ' + 'Dbfetch response (likely not formatted XML)!');
         return {};
     }
 }
 export function domainDatabaseNameToString(domainName) {
     domainName = domainName.toUpperCase();
-    let domainNameEnum = "Unclassified";
-    if (domainName === "IPR" || domainName === "INTERPRO") {
-        domainNameEnum = "InterPro";
+    let domainNameEnum = 'Unclassified';
+    if (domainName === 'IPR' || domainName === 'INTERPRO') {
+        domainNameEnum = 'InterPro';
     }
-    else if (domainName === "CATHGENE3D" ||
-        domainName === "CATH-GENE3D" ||
-        domainName === "GENE3D") {
-        domainNameEnum = "CATH-Gene3D";
+    else if (domainName === 'CATHGENE3D' || domainName === 'CATH-GENE3D' || domainName === 'GENE3D') {
+        domainNameEnum = 'CATH-Gene3D';
     }
-    else if (domainName === "CDD") {
-        domainNameEnum = "CDD";
+    else if (domainName === 'CDD') {
+        domainNameEnum = 'CDD';
     }
-    else if (domainName === "PANTHER") {
-        domainNameEnum = "PANTHER";
+    else if (domainName === 'PANTHER') {
+        domainNameEnum = 'PANTHER';
     }
-    else if (domainName === "HAMAP") {
-        domainNameEnum = "HAMAP";
+    else if (domainName === 'HAMAP') {
+        domainNameEnum = 'HAMAP';
     }
-    else if (domainName === "PFAM") {
-        domainNameEnum = "Pfam";
+    else if (domainName === 'PFAM') {
+        domainNameEnum = 'Pfam';
     }
-    else if (domainName === "PIRSF") {
-        domainNameEnum = "PIRSF";
+    else if (domainName === 'PIRSF') {
+        domainNameEnum = 'PIRSF';
     }
-    else if (domainName === "PRINTS") {
-        domainNameEnum = "PRINTS";
+    else if (domainName === 'PRINTS') {
+        domainNameEnum = 'PRINTS';
     }
-    else if (domainName === "PROSITE PROFILES" ||
-        domainName === "PROSITE_PROFILES" ||
-        domainName === "PROFILE") {
-        domainNameEnum = "PROSITE profiles";
+    else if (domainName === 'PROSITE PROFILES' || domainName === 'PROSITE_PROFILES' || domainName === 'PROFILE') {
+        domainNameEnum = 'PROSITE profiles';
     }
-    else if (domainName === "PROSITE PATTERNS" ||
-        domainName === "PROSITE_PATTERNS" ||
-        domainName === "PROSITE") {
-        domainNameEnum = "PROSITE patterns";
+    else if (domainName === 'PROSITE PATTERNS' || domainName === 'PROSITE_PATTERNS' || domainName === 'PROSITE') {
+        domainNameEnum = 'PROSITE patterns';
     }
-    else if (domainName === "SFLD") {
-        domainNameEnum = "SFLD";
+    else if (domainName === 'SFLD') {
+        domainNameEnum = 'SFLD';
     }
-    else if (domainName === "SMART") {
-        domainNameEnum = "SMART";
+    else if (domainName === 'SMART') {
+        domainNameEnum = 'SMART';
     }
-    else if (domainName === "SUPERFAMILY" || domainName === "SSF") {
-        domainNameEnum = "SUPERFAMILY";
+    else if (domainName === 'SUPERFAMILY' || domainName === 'SSF') {
+        domainNameEnum = 'SUPERFAMILY';
     }
-    else if (domainName === "TIGERFAMS") {
-        domainNameEnum = "TIGRFAMs";
+    else if (domainName === 'TIGERFAMS') {
+        domainNameEnum = 'TIGRFAMs';
     }
-    else if (domainName === "PRODOM") {
-        domainNameEnum = "PRODOM";
+    else if (domainName === 'PRODOM') {
+        domainNameEnum = 'PRODOM';
     }
     return domainNameEnum;
 }
 export function getUniqueIPRMCDomainDatabases(dataObj, proteinIdList) {
     const domainPredictions = [];
     for (const protein of proteinIdList) {
-        for (const match of dataObj[`${protein}`]["matches"]) {
-            domainPredictions.push(match.split("_")[0]);
+        for (const match of dataObj[`${protein}`]['matches']) {
+            domainPredictions.push(match.split('_')[0]);
         }
     }
     return domainPredictions.filter((v, i, x) => x.indexOf(v) === i);
@@ -259,12 +252,12 @@ export function getUniqueIPRMCDomainDatabases(dataObj, proteinIdList) {
 function getFlattenIPRMCDataModel(dataObj, numberHits) {
     let tmpNumberHits = 0;
     let iprmcDataFlatObj = {};
-    for (const protein of dataObj["interpromatch"][0]["protein"]) {
+    for (const protein of dataObj['interpromatch'][0]['protein']) {
         tmpNumberHits++;
         if (tmpNumberHits <= numberHits) {
             let matches = [];
             let matchObjs = {};
-            for (const match of protein["match"]) {
+            for (const match of protein['match']) {
                 let matchObj = {};
                 if (match.ipr !== undefined) {
                     const iprdomain = `${domainDatabaseNameToString(match._attributes.dbname)}_${match.ipr[0]._attributes.id}`;
@@ -307,7 +300,7 @@ function getFlattenIPRMCDataModel(dataObj, numberHits) {
                         status: match._attributes.status,
                         model: match._attributes.model,
                         evd: match._attributes.evd,
-                        type: "Unclassified",
+                        type: 'Unclassified',
                         start: Number(match.lcn[0]._attributes.start),
                         end: Number(match.lcn[0]._attributes.end),
                         fragments: match.lcn[0]._attributes.fragments,
@@ -333,63 +326,63 @@ function getFlattenIPRMCDataModel(dataObj, numberHits) {
     return iprmcDataFlatObj;
 }
 export function getDomainURLbyDatabase(domainID, domainName) {
-    let domainURL = "";
-    if (domainID.startsWith("IPR")) {
+    let domainURL = '';
+    if (domainID.startsWith('IPR')) {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/InterPro/${domainID}`;
     }
-    else if (domainName === "CATH-Gene3D") {
+    else if (domainName === 'CATH-Gene3D') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/cathgene3d/${domainID}`;
         // domainURL = `http://www.cathdb.info/version/latest/superfamily/${domainID}`;
     }
-    else if (domainName === "CDD") {
+    else if (domainName === 'CDD') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/cdd/${domainID}`;
         // domainURL = `https://www.ncbi.nlm.nih.gov/Structure/cdd/cddsrv.cgi?uid=${domainID}`;
     }
-    else if (domainName === "PANTHER") {
+    else if (domainName === 'PANTHER') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/panther/${domainID}`;
         // domainURL = `http://www.pantherdb.org/panther/family.do?clsAccession=${domainID}`;
     }
-    else if (domainName === "HAMAP") {
+    else if (domainName === 'HAMAP') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/hamap/${domainID}`;
         // domainURL = `https://hamap.expasy.org/signature/${domainID}`;
     }
-    else if (domainName === "Pfam") {
+    else if (domainName === 'Pfam') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/pfam/${domainID}`;
         // domainURL = `https://pfam.xfam.org/family/${domainID}`;
     }
-    else if (domainName === "PIRSF") {
+    else if (domainName === 'PIRSF') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/pirsf/${domainID}`;
         // domainURL = `https://pir.georgetown.edu/cgi-bin/ipcSF?id=${domainID}`;
     }
-    else if (domainName === "PRINTS") {
+    else if (domainName === 'PRINTS') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/prints/${domainID}`;
         // domainURL = `http://www.bioinf.manchester.ac.uk/cgi-bin/dbbrowser/sprint/searchprintss.cgi?prints_accn=${domainID}&display_opts=Prints&category=None&queryform=false&regexpr=off`;
     }
-    else if (domainName === "PROSITE profiles") {
+    else if (domainName === 'PROSITE profiles') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/profile/${domainID}`;
         // domainURL = `https://www.expasy.org/prosite/${domainID}`;
     }
-    else if (domainName === "PROSITE patterns") {
+    else if (domainName === 'PROSITE patterns') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/prosite/${domainID}`;
         // domainURL = `https://www.expasy.org/prosite/${domainID}`;
     }
-    else if (domainName === "SFLD") {
+    else if (domainName === 'SFLD') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/sfld/${domainID}`;
         // domainURL = `http://sfld.rbvi.ucsf.edu/django/family/${domainID}`;
     }
-    else if (domainName === "SMART") {
+    else if (domainName === 'SMART') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/smart/${domainID}`;
         // domainURL = `https://smart.embl-heidelberg.de/smart/do_annotation.pl?BLAST=DUMMY&amp;ACC=${domainID}`;
     }
-    else if (domainName === "SUPERFAMILY") {
+    else if (domainName === 'SUPERFAMILY') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/ssf/${domainID}`;
         // domainURL = `https://supfam.org/SUPERFAMILY/cgi-bin/scop.cgi?ipid=${domainID}`;
     }
-    else if (domainName === "TIGRFAMs") {
+    else if (domainName === 'TIGRFAMs') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/tigrfams/${domainID}`;
         // domainURL = `https://cmr.tigr.org/tigr-scripts/CMR/HmmReport.cgi?hmm_acc=${domainID}`;
     }
-    else if (domainName === "PRODOM") {
+    else if (domainName === 'PRODOM') {
         domainURL = `https://www.ebi.ac.uk/interpro/entry/prodom/${domainID}`;
         // domainURL = `https://prodom.prabi.fr/prodom/current/cgi-bin/request.pl?SSID=1289309949_1085&amp;db_ent1=${domainID}`;
     }

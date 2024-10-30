@@ -1,10 +1,10 @@
-import { defaultGradient, ncbiBlastGradient } from "./color-schemes";
-import { getQuerySubjPixelCoords, getDomainPixelCoords, } from "./coords-utilities";
-import { getRgbColorGradient, getRgbColorFixed, getGradientSteps, } from "./color-utilities";
-import { BasicCanvasRenderer, ObjectCache } from "./other-utilities";
-import { ColorSchemeEnum } from "./custom-types";
-import { mouseDownText, mouseOverText, mouseOutText, mouseOverDomain, mouseOutDomain, mouseOverCheckbox, mouseDownCheckbox, mouseOutCheckbox, } from "./custom-events";
-import { drawHeaderTextGroup, drawHeaderLinkText, drawContentHeaderTextGroup, drawLineTracksQuerySubject, drawContentSequenceInfoText, drawHspNoticeText, drawScoreText, drawContentQuerySubjFooterTextGroup, drawNoHitsFoundText, drawDomainQueySubject, drawScaleTypeText, drawCheckBoxText, drawScaleScoreText, drawScaleColorGradient, drawLineAxis5Buckets, drawLineAxis6Buckets, drawScaleTick5LabelsGroup, drawScaleTick4LabelsGroup, drawFooterText, drawCanvasWrapperStroke, drawContentSupressText, } from "./drawing-utilities";
+import { defaultGradient, ncbiBlastGradient } from './color-schemes';
+import { getQuerySubjPixelCoords, getDomainPixelCoords } from './coords-utilities';
+import { getRgbColorGradient, getRgbColorFixed, getGradientSteps } from './color-utilities';
+import { BasicCanvasRenderer, ObjectCache } from './other-utilities';
+import { ColorSchemeEnum } from './custom-types';
+import { mouseDownText, mouseOverText, mouseOutText, mouseOverDomain, mouseOutDomain, mouseOverCheckbox, mouseDownCheckbox, mouseOutCheckbox, } from './custom-events';
+import { drawHeaderTextGroup, drawHeaderLinkText, drawContentHeaderTextGroup, drawLineTracksQuerySubject, drawContentSequenceInfoText, drawHspNoticeText, drawScoreText, drawContentQuerySubjFooterTextGroup, drawNoHitsFoundText, drawDomainQueySubject, drawScaleTypeText, drawCheckBoxText, drawScaleScoreText, drawScaleColorGradient, drawLineAxis5Buckets, drawLineAxis6Buckets, drawScaleTick5LabelsGroup, drawScaleTick4LabelsGroup, drawFooterText, drawCanvasWrapperStroke, drawContentSupressText, } from './drawing-utilities';
 let objCache = new ObjectCache();
 export class VisualOutput extends BasicCanvasRenderer {
     constructor(element, dataObj, renderOptions) {
@@ -16,9 +16,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.gradientSteps = [];
         this.queryFactor = 1.0;
         this.subjFactor = 1.0;
-        renderOptions.canvasWidth != undefined
-            ? (this.canvasWidth = renderOptions.canvasWidth)
-            : (this.canvasWidth = 1000);
+        renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1000);
         renderOptions.canvasHeight != undefined
             ? (this.canvasHeight = renderOptions.canvasHeight)
             : (this.canvasHeight = 110);
@@ -43,24 +41,16 @@ export class VisualOutput extends BasicCanvasRenderer {
         renderOptions.colorScheme != undefined
             ? (this.colorScheme = renderOptions.colorScheme)
             : (this.colorScheme = ColorSchemeEnum.dynamic);
-        renderOptions.numberHits != undefined
-            ? (this.numberHits = renderOptions.numberHits)
-            : (this.numberHits = 100);
-        renderOptions.numberHsps != undefined
-            ? (this.numberHsps = renderOptions.numberHsps)
-            : (this.numberHsps = 10);
+        renderOptions.numberHits != undefined ? (this.numberHits = renderOptions.numberHits) : (this.numberHits = 100);
+        renderOptions.numberHsps != undefined ? (this.numberHsps = renderOptions.numberHsps) : (this.numberHsps = 10);
         renderOptions.logSkippedHsps != undefined
             ? (this.logSkippedHsps = renderOptions.logSkippedHsps)
             : (this.logSkippedHsps = true);
-        renderOptions.fontSize != undefined
-            ? (this.fontSize = renderOptions.fontSize)
-            : (this.fontSize = 12);
-        renderOptions.fontWeigth != undefined
-            ? (this.fontWeigth = renderOptions.fontWeigth)
-            : (this.fontWeigth = "normal");
+        renderOptions.fontSize != undefined ? (this.fontSize = renderOptions.fontSize) : (this.fontSize = 12);
+        renderOptions.fontWeigth != undefined ? (this.fontWeigth = renderOptions.fontWeigth) : (this.fontWeigth = 'normal');
         renderOptions.fontFamily != undefined
             ? (this.fontFamily = renderOptions.fontFamily)
-            : (this.fontFamily = "Times New Roman");
+            : (this.fontFamily = 'Times New Roman');
         renderOptions.canvasWrapperStroke != undefined
             ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
             : (this.canvasWrapperStroke = false);
@@ -104,58 +94,52 @@ export class VisualOutput extends BasicCanvasRenderer {
         }
     }
     loadInitialCoords() {
-        this.startQueryPixels = objCache.get("startQueryPixels");
-        this.endQueryPixels = objCache.get("endQueryPixels");
-        this.startSubjPixels = objCache.get("startSubjPixels");
-        this.endSubjPixels = objCache.get("endSubjPixels");
-        this.startEvalPixels = objCache.get("startEvalPixels");
+        this.startQueryPixels = objCache.get('startQueryPixels');
+        this.endQueryPixels = objCache.get('endQueryPixels');
+        this.startSubjPixels = objCache.get('startSubjPixels');
+        this.endSubjPixels = objCache.get('endSubjPixels');
+        this.startEvalPixels = objCache.get('startEvalPixels');
         if (!this.startQueryPixels &&
             !this.endQueryPixels &&
             !this.startSubjPixels &&
             !this.endSubjPixels &&
             !this.startEvalPixels) {
-            [
-                this.startQueryPixels,
-                this.endQueryPixels,
-                this.startSubjPixels,
-                this.endSubjPixels,
-            ] = getQuerySubjPixelCoords(this.queryLen * this.queryFactor, this.subjLen * this.subjFactor, this.subjLen * this.subjFactor, this.contentWidth, this.contentScoringWidth, this.contentLabelWidth, this.marginWidth);
+            [this.startQueryPixels, this.endQueryPixels, this.startSubjPixels, this.endSubjPixels] = getQuerySubjPixelCoords(this.queryLen * this.queryFactor, this.subjLen * this.subjFactor, this.subjLen * this.subjFactor, this.contentWidth, this.contentScoringWidth, this.contentLabelWidth, this.marginWidth);
             this.startEvalPixels = this.endQueryPixels + 2 * this.marginWidth;
-            objCache.put("startQueryPixels", this.startQueryPixels);
-            objCache.put("endQueryPixels", this.endQueryPixels);
-            objCache.put("startSubjPixels", this.startSubjPixels);
-            objCache.put("endSubjPixels", this.endSubjPixels);
-            objCache.put("startEvalPixels", this.startEvalPixels);
+            objCache.put('startQueryPixels', this.startQueryPixels);
+            objCache.put('endQueryPixels', this.endQueryPixels);
+            objCache.put('startSubjPixels', this.startSubjPixels);
+            objCache.put('endSubjPixels', this.endSubjPixels);
+            objCache.put('startEvalPixels', this.startEvalPixels);
         }
     }
     drawHeaderGroup() {
         // canvas header
         this.topPadding = 2;
         let textHeaderGroup;
-        textHeaderGroup = objCache.get("textHeaderGroup");
+        textHeaderGroup = objCache.get('textHeaderGroup');
         if (!textHeaderGroup) {
             textHeaderGroup = drawHeaderTextGroup(this.dataObj, {
                 fontSize: this.fontSize,
                 canvasWidth: this.canvasWidth,
             }, this.topPadding);
-            objCache.put("textHeaderGroup", textHeaderGroup);
+            objCache.put('textHeaderGroup', textHeaderGroup);
         }
         this.canvas.add(textHeaderGroup);
         // canvas header (sequence info)
         this.topPadding += 45;
         let textHeaderLink;
         let textSeqObj;
-        textHeaderLink = objCache.get("textHeaderLink");
-        textSeqObj = objCache.get("textHeaderLink_textSeqObj");
+        textHeaderLink = objCache.get('textHeaderLink');
+        textSeqObj = objCache.get('textHeaderLink_textSeqObj');
         if (!textHeaderLink) {
             [textHeaderLink, textSeqObj] = drawHeaderLinkText(this.dataObj, { fontSize: this.fontSize }, this.topPadding);
-            objCache.put("textHeaderLink", textHeaderLink);
-            objCache.put("textHeaderLink_textSeqObj", textSeqObj);
+            objCache.put('textHeaderLink', textHeaderLink);
+            objCache.put('textHeaderLink_textSeqObj', textSeqObj);
         }
         this.canvas.add(textHeaderLink);
         if (!this.staticCanvas) {
-            if (this.dataObj.query_url !== null &&
-                this.dataObj.query_url !== "") {
+            if (this.dataObj.query_url !== null && this.dataObj.query_url !== '') {
                 mouseOverText(textHeaderLink, textSeqObj, this.dataObj.query_def, this.dataObj.query_url, { fontSize: this.fontSize }, this);
                 mouseDownText(textHeaderLink, this.dataObj.query_url, this);
                 mouseOutText(textHeaderLink, textSeqObj, this);
@@ -167,7 +151,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             // content header
             this.topPadding += 25;
             let textContentHeaderGroup;
-            textContentHeaderGroup = objCache.get("textContentHeaderGroup");
+            textContentHeaderGroup = objCache.get('textContentHeaderGroup');
             if (!textContentHeaderGroup) {
                 textContentHeaderGroup = drawContentHeaderTextGroup({
                     queryLen: this.queryLen * this.queryFactor,
@@ -181,13 +165,13 @@ export class VisualOutput extends BasicCanvasRenderer {
                     fontSize: this.fontSize,
                     colorScheme: this.colorScheme,
                 }, this.topPadding);
-                objCache.put("textContentHeaderGroup", textContentHeaderGroup);
+                objCache.put('textContentHeaderGroup', textContentHeaderGroup);
             }
             this.canvas.add(textContentHeaderGroup);
             // content header line tracks
             this.topPadding += 20;
             let lineTrackGroup;
-            lineTrackGroup = objCache.get("lineTrackGroup");
+            lineTrackGroup = objCache.get('lineTrackGroup');
             if (!lineTrackGroup) {
                 lineTrackGroup = drawLineTracksQuerySubject({
                     startQueryPixels: this.startQueryPixels,
@@ -195,12 +179,12 @@ export class VisualOutput extends BasicCanvasRenderer {
                     startSubjPixels: this.startSubjPixels,
                     endSubjPixels: this.endSubjPixels,
                 }, { strokeWidth: 2 }, this.topPadding);
-                objCache.put("lineTrackGroup", lineTrackGroup);
+                objCache.put('lineTrackGroup', lineTrackGroup);
             }
             this.canvas.add(lineTrackGroup);
             this.topPadding += 5;
             let textContentFooterGroup;
-            textContentFooterGroup = objCache.get("textContentFooterGroup");
+            textContentFooterGroup = objCache.get('textContentFooterGroup');
             if (!textContentFooterGroup) {
                 textContentFooterGroup = drawContentQuerySubjFooterTextGroup({
                     queryLen: this.queryLen,
@@ -212,7 +196,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                 }, {
                     fontSize: this.fontSize,
                 }, this.topPadding);
-                objCache.put("textContentFooterGroup", textContentFooterGroup);
+                objCache.put('textContentFooterGroup', textContentFooterGroup);
             }
             this.canvas.add(textContentFooterGroup);
             // dynamic content
@@ -253,8 +237,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         minScore = hsp.hsp_bit_score;
                     if (hsp.hsp_bit_score > maxScore)
                         maxScore = hsp.hsp_bit_score;
-                    if (hsp.hsp_bit_score < minNotZeroScore &&
-                        hsp.hsp_bit_score > 0.0)
+                    if (hsp.hsp_bit_score < minNotZeroScore && hsp.hsp_bit_score > 0.0)
                         minNotZeroScore = hsp.hsp_bit_score;
                 }
                 else {
@@ -262,8 +245,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         minScore = hsp.hsp_expect;
                     if (hsp.hsp_expect > maxScore)
                         maxScore = hsp.hsp_expect;
-                    if (hsp.hsp_expect < minNotZeroScore &&
-                        hsp.hsp_expect > 0.0)
+                    if (hsp.hsp_expect < minNotZeroScore && hsp.hsp_expect > 0.0)
                         minNotZeroScore = hsp.hsp_expect;
                 }
             }
@@ -300,12 +282,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         let endQueryPixels;
                         let startSubjPixels;
                         let endSubjPixels;
-                        [
-                            startQueryPixels,
-                            endQueryPixels,
-                            startSubjPixels,
-                            endSubjPixels,
-                        ] = getQuerySubjPixelCoords(this.queryLen * this.queryFactor, this.subjLen * this.subjFactor, subjHspLen, this.contentWidth, this.contentScoringWidth, this.contentLabelWidth, this.marginWidth);
+                        [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels] = getQuerySubjPixelCoords(this.queryLen * this.queryFactor, this.subjLen * this.subjFactor, subjHspLen, this.contentWidth, this.contentScoringWidth, this.contentLabelWidth, this.marginWidth);
                         this.topPadding += 5;
                         const linesGroup = drawLineTracksQuerySubject({
                             startQueryPixels: startQueryPixels,
@@ -323,7 +300,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                         let hspQueryEnd;
                         let hspSubjStart;
                         let hspSubjEnd;
-                        if (hsp.hsp_query_frame === "-1") {
+                        if (hsp.hsp_query_frame === '-1') {
                             hspQueryStart = hsp.hsp_query_to;
                             hspQueryEnd = hsp.hsp_query_from;
                         }
@@ -331,7 +308,7 @@ export class VisualOutput extends BasicCanvasRenderer {
                             hspQueryStart = hsp.hsp_query_from;
                             hspQueryEnd = hsp.hsp_query_to;
                         }
-                        if (hsp.hsp_hit_frame === "-1") {
+                        if (hsp.hsp_hit_frame === '-1') {
                             hspSubjStart = hsp.hsp_hit_to;
                             hspSubjEnd = hsp.hsp_hit_from;
                         }
@@ -339,14 +316,8 @@ export class VisualOutput extends BasicCanvasRenderer {
                             hspSubjStart = hsp.hsp_hit_from;
                             hspSubjEnd = hsp.hsp_hit_to;
                         }
-                        [
-                            startQueryHspPixels,
-                            endQueryHspPixels,
-                        ] = getDomainPixelCoords(startQueryPixels, endQueryPixels, this.queryLen, hspQueryStart, hspQueryEnd, this.marginWidth);
-                        [
-                            startSubjHspPixels,
-                            endSubjHspPixels,
-                        ] = getDomainPixelCoords(startSubjPixels, endSubjPixels, subjHspLen, hspSubjStart, hspSubjEnd, this.marginWidth);
+                        [startQueryHspPixels, endQueryHspPixels] = getDomainPixelCoords(startQueryPixels, endQueryPixels, this.queryLen, hspQueryStart, hspQueryEnd, this.marginWidth);
+                        [startSubjHspPixels, endSubjHspPixels] = getDomainPixelCoords(startSubjPixels, endSubjPixels, subjHspLen, hspSubjStart, hspSubjEnd, this.marginWidth);
                         let color;
                         if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
                             color = getRgbColorFixed(hsp.hsp_bit_score, this.gradientSteps, ncbiBlastGradient);
@@ -384,13 +355,13 @@ export class VisualOutput extends BasicCanvasRenderer {
                     else {
                         if (this.logSkippedHsps === true) {
                             let hspTextNotice;
-                            hspTextNotice = objCache.get("hspTextNotice");
+                            hspTextNotice = objCache.get('hspTextNotice');
                             if (!hspTextNotice) {
                                 hspTextNotice = drawHspNoticeText(totalNumberHsps, this.numberHsps, {
                                     fontSize: this.fontSize,
                                     contentWidth: this.contentWidth,
                                 }, this.topPadding);
-                                objCache.put("hspTextNotice", hspTextNotice);
+                                objCache.put('hspTextNotice', hspTextNotice);
                             }
                             this.canvas.add(hspTextNotice);
                             this.topPadding += 20;
@@ -403,13 +374,13 @@ export class VisualOutput extends BasicCanvasRenderer {
                 // canvas content suppressed output
                 this.topPadding += 20;
                 let supressText;
-                supressText = objCache.get("supressText");
+                supressText = objCache.get('supressText');
                 if (!supressText) {
                     supressText = drawContentSupressText({
                         fontSize: this.fontSize,
                         contentWidth: this.contentWidth,
                     }, this.topPadding, this.numberHits);
-                    objCache.put("supressText", supressText);
+                    objCache.put('supressText', supressText);
                 }
                 supressText.top = this.topPadding;
                 this.canvas.add(supressText);
@@ -481,10 +452,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.canvas.add(colorScale);
         // E-value/Bit score Axis (line and ticks)
         if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-            const oneFifthGradPixels = (this.scaleLabelWidth +
-                this.scaleWidth -
-                this.scaleLabelWidth) /
-                5;
+            const oneFifthGradPixels = (this.scaleLabelWidth + this.scaleWidth - this.scaleLabelWidth) / 5;
             this.topPadding += 15;
             const axisGroup = drawLineAxis6Buckets(this.scaleLabelWidth, this.scaleLabelWidth + oneFifthGradPixels, this.scaleLabelWidth + oneFifthGradPixels * 2, this.scaleLabelWidth + oneFifthGradPixels * 3, this.scaleLabelWidth + oneFifthGradPixels * 4, this.scaleLabelWidth + this.scaleWidth, { strokeWidth: 1 }, this.topPadding);
             this.canvas.add(axisGroup);
@@ -498,10 +466,7 @@ export class VisualOutput extends BasicCanvasRenderer {
             this.canvas.add(tickLabels5Group);
         }
         else {
-            const oneForthGradPixels = (this.scaleLabelWidth +
-                this.scaleWidth -
-                this.scaleLabelWidth) /
-                4;
+            const oneForthGradPixels = (this.scaleLabelWidth + this.scaleWidth - this.scaleLabelWidth) / 4;
             this.topPadding += 15;
             const axisGroup = drawLineAxis5Buckets(this.scaleLabelWidth, this.scaleLabelWidth + oneForthGradPixels, this.scaleLabelWidth + oneForthGradPixels * 2, this.scaleLabelWidth + oneForthGradPixels * 3, this.scaleLabelWidth + this.scaleWidth, { strokeWidth: 1 }, this.topPadding);
             this.canvas.add(axisGroup);
@@ -519,14 +484,14 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.topPadding += 30;
         let copyrightText;
         let textFooterObj;
-        copyrightText = objCache.get("copyrightText");
-        textFooterObj = objCache.get("copyrightText_textFooterObj");
+        copyrightText = objCache.get('copyrightText');
+        textFooterObj = objCache.get('copyrightText_textFooterObj');
         if (!copyrightText && !textFooterObj) {
             [copyrightText, textFooterObj] = drawFooterText({
                 fontSize: this.fontSize,
             }, this.topPadding);
-            objCache.put("copyrightText", copyrightText);
-            objCache.put("copyrightText_textFooterObj", textFooterObj);
+            objCache.put('copyrightText', copyrightText);
+            objCache.put('copyrightText_textFooterObj', textFooterObj);
         }
         this.canvas.add(copyrightText);
     }

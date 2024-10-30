@@ -193,16 +193,10 @@ class FabricjsRenderer {
     document.getElementById('btn-png')!.onclick = function () {
       const img: HTMLImageElement = document.getElementById('png') as HTMLImageElement;
       img.src = fabricjs!.canvas
-        // .toDataURL({
-        //   format: 'png',
-        //   enableRetinaScaling: true,
-        //   withoutTransform: true,
-        // })
         .toDataURL({
           format: 'png',
           enableRetinaScaling: true,
-          quality: 2,
-          multiplier: 2,
+          withoutTransform: true,
         })
         .toString();
       img.width = fabricjs.canvas.getWidth();

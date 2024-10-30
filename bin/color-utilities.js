@@ -1,12 +1,12 @@
-import { ColorSchemeEnum } from "./custom-types";
+import { ColorSchemeEnum } from './custom-types';
 export function getRgbColorGradient(score, gradientSteps, colorScheme) {
     // assumes length of gradientSteps is 5
     const colorSchemeSteps = colorScheme.keys;
     if (colorSchemeSteps.length != gradientSteps.length) {
-        throw Error("Color Scheme and Gradient Steps should have matching lengths!");
+        throw Error('Color Scheme and Gradient Steps should have matching lengths!');
     }
     if (score + 0.0 === 0.0) {
-        return `rgb(${colorScheme[colorSchemeSteps[0]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[0]].join(',')})`;
     }
     else {
         const start = gradientSteps[0];
@@ -17,55 +17,44 @@ export function getRgbColorGradient(score, gradientSteps, colorScheme) {
         let h;
         if (score < step1) {
             const logStart = start === 0 ? Math.log10(Number.MIN_VALUE) : Math.log10(start);
-            h =
-                0.0 +
-                    (Math.log10(score) - logStart) / (Math.log10(step1) - logStart);
+            h = 0.0 + (Math.log10(score) - logStart) / (Math.log10(step1) - logStart);
         }
         else if (score < step2) {
-            h =
-                1.0 +
-                    (Math.log10(score) - Math.log10(step1)) /
-                        (Math.log10(step2) - Math.log10(step1));
+            h = 1.0 + (Math.log10(score) - Math.log10(step1)) / (Math.log10(step2) - Math.log10(step1));
         }
         else if (score < step3) {
-            h =
-                2.0 +
-                    (Math.log10(score) - Math.log10(step2)) /
-                        (Math.log10(step3) - Math.log10(step2));
+            h = 2.0 + (Math.log10(score) - Math.log10(step2)) / (Math.log10(step3) - Math.log10(step2));
         }
         else if (score < end) {
-            h =
-                3.0 +
-                    (Math.log10(score) - Math.log10(step3)) /
-                        (Math.log10(end) - Math.log10(step3));
+            h = 3.0 + (Math.log10(score) - Math.log10(step3)) / (Math.log10(end) - Math.log10(step3));
         }
         else {
             h = 4.0;
         }
         const rgb = HSVtoRGB(h / 6, 0.75, 1.0);
-        return `rgb(${rgb.join(",")})`;
+        return `rgb(${rgb.join(',')})`;
     }
 }
 export function getRgbColorFixed(score, gradientSteps, colorScheme) {
     // assumes length of gradientSteps is 5
     const colorSchemeSteps = colorScheme.keys;
     if (colorSchemeSteps.length != gradientSteps.length) {
-        throw Error("Color Scheme and Gradient Steps should have matching lengths!");
+        throw Error('Color Scheme and Gradient Steps should have matching lengths!');
     }
     if (score + 0.0 === 0.0 || score < gradientSteps[1]) {
-        return `rgb(${colorScheme[colorSchemeSteps[0]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[0]].join(',')})`;
     }
     else if (score >= gradientSteps[1] && score < gradientSteps[2]) {
-        return `rgb(${colorScheme[colorSchemeSteps[1]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[1]].join(',')})`;
     }
     else if (score >= gradientSteps[2] && score < gradientSteps[3]) {
-        return `rgb(${colorScheme[colorSchemeSteps[2]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[2]].join(',')})`;
     }
     else if (score >= gradientSteps[3] && score < gradientSteps[4]) {
-        return `rgb(${colorScheme[colorSchemeSteps[3]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[3]].join(',')})`;
     }
     else if (score >= gradientSteps[4]) {
-        return `rgb(${colorScheme[colorSchemeSteps[4]].join(",")})`;
+        return `rgb(${colorScheme[colorSchemeSteps[4]].join(',')})`;
     }
     else {
         return `rgb(192,192,192)`;
@@ -74,13 +63,7 @@ export function getRgbColorFixed(score, gradientSteps, colorScheme) {
 export function getGradientSteps(minEvalue, maxEvalue, minEvalueNotZero, colorScheme) {
     let gradientSteps = [];
     if (colorScheme === ColorSchemeEnum.fixed) {
-        gradientSteps = [
-            0,
-            Math.pow(10, -1),
-            Math.pow(10, 0),
-            Math.pow(10, 1),
-            Math.pow(10, 2),
-        ];
+        gradientSteps = [0, Math.pow(10, -1), Math.pow(10, 0), Math.pow(10, 1), Math.pow(10, 2)];
     }
     else if (colorScheme === ColorSchemeEnum.dynamic) {
         if (maxEvalue < 1e-304) {
@@ -119,31 +102,13 @@ export function getGradientSteps(minEvalue, maxEvalue, minEvalueNotZero, colorSc
             else {
                 const diffEvalue = Math.log10(minEvalueNotZero) - Math.log10(maxEvalue);
                 if (Math.abs(diffEvalue) <= 2) {
-                    gradientSteps = [
-                        minEvalue,
-                        1,
-                        (2 + maxEvalue) / 3,
-                        (2 + 2 * maxEvalue) / 3,
-                        maxEvalue,
-                    ];
+                    gradientSteps = [minEvalue, 1, (2 + maxEvalue) / 3, (2 + 2 * maxEvalue) / 3, maxEvalue];
                 }
                 else if (Math.abs(diffEvalue) <= 4) {
-                    gradientSteps = [
-                        minEvalue,
-                        Math.pow(10, diffEvalue / 2),
-                        1,
-                        (maxEvalue + 1) / 2,
-                        maxEvalue,
-                    ];
+                    gradientSteps = [minEvalue, Math.pow(10, diffEvalue / 2), 1, (maxEvalue + 1) / 2, maxEvalue];
                 }
                 else {
-                    gradientSteps = [
-                        minEvalue,
-                        Math.pow(10, diffEvalue / 2),
-                        Math.pow(10, diffEvalue / 4),
-                        1,
-                        maxEvalue,
-                    ];
+                    gradientSteps = [minEvalue, Math.pow(10, diffEvalue / 2), Math.pow(10, diffEvalue / 4), 1, maxEvalue];
                 }
             }
         }
@@ -235,36 +200,36 @@ export function HSVtoRGB(h, s, v) {
 export function colorByDatabaseName(domainName) {
     let color;
     // if (domainName == "InterPro") color = "rgb(211,47,47)";
-    if (domainName == "Pfam")
-        color = "rgb(211,47,47)";
-    else if (domainName == "SUPERFAMILY")
-        color = "rgb(171,71,188)";
-    else if (domainName == "SMART")
-        color = "rgb(106,27,154)";
-    else if (domainName == "HAMAP")
-        color = "rgb(57,73,171)";
-    else if (domainName == "PANTHER")
-        color = "rgb(33,150,243)";
-    else if (domainName == "PRODOM")
-        color = "rgb(0,188,212)";
-    else if (domainName == "PROSITE profiles")
-        color = "rgb(0,150,136)";
-    else if (domainName == "CDD")
-        color = "rgb(76,175,80)";
-    else if (domainName == "CATH-Gene3D")
-        color = "rgb(205,220,57)";
-    else if (domainName == "PIRSF")
-        color = "rgb(255,235,59)";
-    else if (domainName == "PRINTS")
-        color = "rgb(255,193,7)";
-    else if (domainName == "TIGRFAMs")
-        color = "rgb(255,112,67)";
-    else if (domainName == "SFLD")
-        color = "rgb(121,85,72)";
-    else if (domainName == "PROSITE patterns")
-        color = "rgb(55,71,79)";
+    if (domainName == 'Pfam')
+        color = 'rgb(211,47,47)';
+    else if (domainName == 'SUPERFAMILY')
+        color = 'rgb(171,71,188)';
+    else if (domainName == 'SMART')
+        color = 'rgb(106,27,154)';
+    else if (domainName == 'HAMAP')
+        color = 'rgb(57,73,171)';
+    else if (domainName == 'PANTHER')
+        color = 'rgb(33,150,243)';
+    else if (domainName == 'PRODOM')
+        color = 'rgb(0,188,212)';
+    else if (domainName == 'PROSITE profiles')
+        color = 'rgb(0,150,136)';
+    else if (domainName == 'CDD')
+        color = 'rgb(76,175,80)';
+    else if (domainName == 'CATH-Gene3D')
+        color = 'rgb(205,220,57)';
+    else if (domainName == 'PIRSF')
+        color = 'rgb(255,235,59)';
+    else if (domainName == 'PRINTS')
+        color = 'rgb(255,193,7)';
+    else if (domainName == 'TIGRFAMs')
+        color = 'rgb(255,112,67)';
+    else if (domainName == 'SFLD')
+        color = 'rgb(121,85,72)';
+    else if (domainName == 'PROSITE patterns')
+        color = 'rgb(55,71,79)';
     else
-        color = "rgb(128,128,128)"; // UNCLASSIFIED and OTHERS
+        color = 'rgb(128,128,128)'; // UNCLASSIFIED and OTHERS
     return color;
 }
 // Using coloring scheme from https://www.ebi.ac.uk/interpro/entry/InterPro/#table

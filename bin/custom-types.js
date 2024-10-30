@@ -6,7 +6,7 @@ export var ColorSchemeEnum;
     ColorSchemeEnum["blasterjs"] = "blasterjs";
 })(ColorSchemeEnum || (ColorSchemeEnum = {}));
 export const jobIdDefaults = {
-    value: "",
+    value: '',
     required: true,
     minLength: 35,
     maxLength: 60,
