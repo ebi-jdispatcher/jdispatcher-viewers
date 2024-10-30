@@ -1,9 +1,9 @@
-import svgToMiniDataURI from "mini-svg-data-uri";
-import { isBrowser, isNode } from "browser-or-node";
-import { VisualOutput } from "./visual-output-app";
-import { FunctionalPredictions } from "./functional-predictions-app";
-import { validateJobId, fetchData, dataAsType, getJdispatcherJsonURL, validateSubmittedJobIdInput, validateSubmittedDbfetchInput, getIPRMCDataModelFlatFromXML, } from "./other-utilities";
-import { ColorSchemeEnum } from "./custom-types";
+import svgToMiniDataURI from 'mini-svg-data-uri';
+import { isBrowser, isNode } from 'browser-or-node';
+import { VisualOutput } from './visual-output-app';
+import { FunctionalPredictions } from './functional-predictions-app';
+import { validateJobId, fetchData, dataAsType, getJdispatcherJsonURL, validateSubmittedJobIdInput, validateSubmittedDbfetchInput, getIPRMCDataModelFlatFromXML, } from './other-utilities';
+import { ColorSchemeEnum } from './custom-types';
 // plugin support & module support
 // if (typeof window === "undefined") {
 if (isBrowser) {
@@ -35,7 +35,7 @@ if (isNode) {
     };
 }
 // web-component support
-import "./visual-output-webcomponent.ts";
-import "./functional-predictions-webcomponent.ts";
+import './visual-output-webcomponent.ts';
+import './functional-predictions-webcomponent.ts';
 // demo index page with JobId input form (implemented in TypeScript)
-import "./index.ts";
+import './index.ts';

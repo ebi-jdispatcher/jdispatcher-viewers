@@ -41,24 +41,12 @@ export function getQuerySubjPixelCoords(queryLen, subjLen, subjHspLen, contentWi
     const totalSubjPixels = getTotalPixels(queryLen, subjLen, subjHspLen, contentWidth, contentScoringWidth);
     const startQueryPixels = contentLabelWidth + marginWidth;
     const endQueryPixels = contentLabelWidth + totalQueryPixels - marginWidth;
-    const startSubjPixels = contentLabelWidth +
-        totalQueryPixels +
-        contentScoringWidth +
-        marginWidth;
-    const endSubjPixels = contentLabelWidth +
-        totalQueryPixels +
-        contentScoringWidth +
-        totalSubjPixels -
-        marginWidth;
+    const startSubjPixels = contentLabelWidth + totalQueryPixels + contentScoringWidth + marginWidth;
+    const endSubjPixels = contentLabelWidth + totalQueryPixels + contentScoringWidth + totalSubjPixels - marginWidth;
     return [startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels];
 }
 export function getDomainPixelCoords(startPixels, endPixels, hitLen, startDomain, endDomain, marginWidth) {
-    const startDomainPixels = startPixels +
-        (startDomain * (endPixels - startPixels)) / hitLen +
-        marginWidth;
-    const endDomainPixels = startPixels +
-        (endDomain * (endPixels - startPixels)) / hitLen -
-        marginWidth -
-        startDomainPixels;
+    const startDomainPixels = startPixels + (startDomain * (endPixels - startPixels)) / hitLen + marginWidth;
+    const endDomainPixels = startPixels + (endDomain * (endPixels - startPixels)) / hitLen - marginWidth - startDomainPixels;
     return [startDomainPixels, endDomainPixels];
 }

@@ -1,8 +1,8 @@
-import { drawURLInfoTooltip, drawDomainTooltips, drawDomainInfoTooltips, } from "./drawing-utilities";
+import { drawURLInfoTooltip, drawDomainTooltips, drawDomainInfoTooltips } from './drawing-utilities';
 export function mouseOverText(fabricObj, textObj, sequence, URL, renderOptions, _this) {
-    fabricObj.on("mouseover", (e) => {
+    fabricObj.on('mouseover', (e) => {
         if (e.target) {
-            e.target.set("hoverCursor", "pointer");
+            e.target.set('hoverCursor', 'pointer');
             e.target.setOptions(textObj);
             e.target.setOptions({ underline: true });
             // add tooltip (on the flight)
@@ -14,15 +14,15 @@ export function mouseOverText(fabricObj, textObj, sequence, URL, renderOptions, 
     });
 }
 export function mouseDownText(fabricObj, href, _this) {
-    fabricObj.on("mousedown", (e) => {
+    fabricObj.on('mousedown', (e) => {
         if (e.target) {
-            window.open(href, "_blank");
+            window.open(href, '_blank');
             _this.canvas.renderAll();
         }
     });
 }
 export function mouseOutText(fabricObj, textObj, _this) {
-    fabricObj.on("mouseout", (e) => {
+    fabricObj.on('mouseout', (e) => {
         if (e.target) {
             e.target.setOptions(textObj);
             e.target.setOptions({ underline: false });
@@ -31,12 +31,12 @@ export function mouseOutText(fabricObj, textObj, _this) {
     });
 }
 function isHsp(object) {
-    return "hsp_hit_from" in object;
+    return 'hsp_hit_from' in object;
 }
 export function mouseOverDomain(fabricObj, startPixels, endPixels, seq_from, seq_to, domain, renderOptions, _this) {
-    fabricObj.on("mouseover", (e) => {
+    fabricObj.on('mouseover', (e) => {
         if (e.target) {
-            e.target.set("hoverCursor", "pointer");
+            e.target.set('hoverCursor', 'pointer');
             let tooltipGroup;
             if (isHsp(domain)) {
                 // Query/Subject tooltip
@@ -56,24 +56,24 @@ export function mouseOverDomain(fabricObj, startPixels, endPixels, seq_from, seq
     });
 }
 export function mouseOutDomain(fabricObj, _this) {
-    fabricObj.on("mouseout", (e) => {
+    fabricObj.on('mouseout', (e) => {
         if (e.target) {
             _this.canvas.renderAll();
         }
     });
 }
 export function mouseOverCheckbox(fabricObj, textObj, _this) {
-    fabricObj.on("mouseover", (e) => {
+    fabricObj.on('mouseover', (e) => {
         if (e.target) {
-            e.target.set("hoverCursor", "pointer");
+            e.target.set('hoverCursor', 'pointer');
             e.target.setOptions(textObj);
-            e.target.setOptions({ fill: "black" });
+            e.target.setOptions({ fill: 'black' });
             _this.canvas.renderAll();
         }
     });
 }
 export function mouseDownCheckbox(fabricObj, value, _this) {
-    fabricObj.on("mousedown", (e) => {
+    fabricObj.on('mousedown', (e) => {
         if (e.target) {
             if (_this.colorScheme != value) {
                 _this.colorScheme = value;
@@ -83,12 +83,12 @@ export function mouseDownCheckbox(fabricObj, value, _this) {
     });
 }
 export function mouseOutCheckbox(fabricObj, textObj, value, _this) {
-    fabricObj.on("mouseout", (e) => {
+    fabricObj.on('mouseout', (e) => {
         if (e.target) {
             e.target.setOptions(textObj);
             if (_this.colorScheme != value) {
                 e.target.setOptions({
-                    fill: "grey",
+                    fill: 'grey',
                 });
             }
             _this.canvas.renderAll();
@@ -96,32 +96,32 @@ export function mouseOutCheckbox(fabricObj, textObj, value, _this) {
     });
 }
 export function mouseOverDomainCheckbox(fabricObj, rectObj, currentDomainDatabase, _this) {
-    fabricObj.on("mouseover", (e) => {
+    fabricObj.on('mouseover', (e) => {
         if (e.target) {
-            e.target.set("hoverCursor", "pointer");
+            e.target.set('hoverCursor', 'pointer');
             e.target.setOptions(rectObj);
             let currentDomainDatabaseDisabled = false;
             if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
                 currentDomainDatabaseDisabled = true;
             }
             if (currentDomainDatabaseDisabled) {
-                e.target.setOptions({ fill: "white", stroke: "grey" });
-                e.target.set("hoverCursor", "default");
+                e.target.setOptions({ fill: 'white', stroke: 'grey' });
+                e.target.set('hoverCursor', 'default');
             }
             else if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
-                e.target.setOptions({ stroke: "black" });
-                e.target.set("hoverCursor", "pointer");
+                e.target.setOptions({ stroke: 'black' });
+                e.target.set('hoverCursor', 'pointer');
             }
             else {
-                e.target.setOptions({ opacity: 0.5, stroke: "grey" });
-                e.target.set("hoverCursor", "pointer");
+                e.target.setOptions({ opacity: 0.5, stroke: 'grey' });
+                e.target.set('hoverCursor', 'pointer');
             }
             _this.canvas.renderAll();
         }
     });
 }
 export function mouseDownDomainCheckbox(fabricObj, currentDomainDatabase, _this) {
-    fabricObj.on("mousedown", (e) => {
+    fabricObj.on('mousedown', (e) => {
         if (e.target) {
             if (!_this.domainDatabaseList.includes(currentDomainDatabase) &&
                 _this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
@@ -141,21 +141,21 @@ export function mouseDownDomainCheckbox(fabricObj, currentDomainDatabase, _this)
     });
 }
 export function mouseOutDomainCheckbox(fabricObj, rectObj, currentDomainDatabase, _this) {
-    fabricObj.on("mouseout", (e) => {
+    fabricObj.on('mouseout', (e) => {
         if (e.target) {
             let currentDomainDatabaseDisabled = false;
             if (!_this.uniqueDomainDatabases.includes(currentDomainDatabase)) {
                 currentDomainDatabaseDisabled = true;
             }
             if (!_this.domainDatabaseList.includes(currentDomainDatabase)) {
-                e.target.setOptions({ stroke: "grey", fill: "white" });
+                e.target.setOptions({ stroke: 'grey', fill: 'white' });
             }
             else if (currentDomainDatabaseDisabled) {
-                e.target.setOptions({ stroke: "grey", fill: "white" });
+                e.target.setOptions({ stroke: 'grey', fill: 'white' });
             }
             else {
                 e.target.setOptions(rectObj);
-                e.target.setOptions({ opacity: 1.0, stroke: "black" });
+                e.target.setOptions({ opacity: 1.0, stroke: 'black' });
             }
             _this.canvas.renderAll();
         }
