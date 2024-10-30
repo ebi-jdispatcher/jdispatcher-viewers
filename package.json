@@ -15,7 +15,7 @@
     ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+        "refresh": "rm -rf ./node_modules ./package-lock.json && npm install --ignore-scripts",
         "dev": "npx webpack serve --config webpack.config.js",
         "dev2": "npx webpack --watch --config webpack.config.js",
         "build": "npx webpack --config webpack.config.prod.js",
