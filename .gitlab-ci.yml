@@ -1,10 +1,15 @@
-# Author: Fábio Madeira <fmadeira@ebi.ac.uk>, 2020
-# test/run locally with
-# gitlab-runner exec docker build_module
-# gitlab-runner exec docker build_nodecli
+default:
+  image: node:18.20-alpine3.19
+  tags:
+    - k8s-agent-runner
 
-# node 18.7
-image: node:18.20-alpine3.19
+.npm_cache:
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - .npm/
 
 before_script:
     # installing dependencies for node-canvas (https://github.com/Automattic/node-canvas)
@@ -13,13 +18,58 @@ before_script:
     - npm install
 
 stages:
-    # building the ES modules and node CLI (also ES module now, from commonJS)
-    - build
+  - check
+  # - test
+  # - tag
+  # building the ES modules and node CLI (also ES module now, from commonJS)
+  - build
+  # - deploy
+
+# Try a "clean" install (without forcing dependencies)
+clean_install:
+  stage: check
+  script:
+    - npm install --dry-run
+  allow_failure: false
+
+# Check if lock-file is compatible with packages.json
+check_lockfile:
+  stage: check
+  script:
+    - npm install --prefer-offline --cache .npm --force
+    - git ls-files -m | grep -q package-lock.json &&
+      { echo "WARNING - Lock file is outdated!" && exit 1; }
+    - exit 0
+  cache:
+    - !reference [.npm_cache, cache]
+  allow_failure: false
+
+# Run npm audit
+audit:
+  stage: check
+  script:
+    - npm audit
+  allow_failure: true
+
+# Check code format with prettier
+format:
+  stage: check
+  script:
+    - npm run format
+  allow_failure: false
 
 build_module:
-    stage: build
-    script: npm run build
+  stage: build
+  script:
+    - npm ci --prefer-offline --cache .npm --force
+    - npm run build
+  cache:
+    - !reference [.npm_cache, cache]
 
 build_nodecli:
-    stage: build
-    script: npm run build:cli
+  stage: build
+  script:
+    - npm ci --prefer-offline --cache .npm --force
+    - npm run build:cli
+  cache:
+    - !reference [.npm_cache, cache]

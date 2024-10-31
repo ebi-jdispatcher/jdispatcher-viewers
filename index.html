@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>jdistpatcher-viewers</title>
-        <script type="text/javascript" src="dist/jd_viewers_0.0.8.bundle.min.js" defer></script>
+        <script type="text/javascript" src="dist/jd_viewers_0.0.9.bundle.min.js" defer></script>
         <link rel="stylesheet" href="static/style.css" type="text/css" media="all" />
     </head>
     <body>
@@ -75,7 +75,7 @@
 
                 let iprmcXmlData;
                 if (jobId === "mock_jobid-I20200317-103136-0485-5599422-np2") {
-                    iprmcXmlData = "./src/testdata/iprmc.xml"; 
+                    iprmcXmlData = "./src/testdata/iprmc.xml";
                 } else {
                     iprmcXmlData = validateSubmittedDbfetchInput(sssDataObj)
                 }
@@ -83,10 +83,10 @@
                 // convert XML into Flattened JSON
                 const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(iprmcXmlResponse);
                 const iprmcDataObj = dataAsType(iprmcJSONResponse, "IPRMCResultModelFlat");
-                
+
                 // viz app
                 let fabricjs;
-                let submitterShort = ";" 
+                let submitterShort = ";"
                 if (submitter == "visual-output") {
                     submitterShort = "vo";
                     // Render Options
