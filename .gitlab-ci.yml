@@ -44,12 +44,14 @@ check_lockfile:
     - !reference [.npm_cache, cache]
   allow_failure: false
 
+# Run npm audit
 audit:
   stage: check
   script:
     - npm audit
   allow_failure: true
 
+# Check code format with prettier
 format:
   stage: check
   script:
