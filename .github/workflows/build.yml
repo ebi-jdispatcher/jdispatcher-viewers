@@ -1,0 +1,49 @@
+name: jdispatcher-viewers
+on: [push]
+jobs:
+  check:
+    runs-on: node:18.20-alpine3.19
+    steps:
+      #----------------------------------------------
+      # Check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v4
+      #----------------------------------------------
+      # Install Canvas/Fabric dependencies
+      #----------------------------------------------
+      - name: Install Canvas/Fabric Dependencies
+        run: apk add --no-cache build-base g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+      #----------------------------------------------
+      # Try a "clean" install (without forcing dependencies)
+      #----------------------------------------------
+      - name: Clean install
+        run: npm install --dry-run
+      #----------------------------------------------
+      # Check if lock-file is compatible with packages.json
+      #----------------------------------------------
+      - name: Check lockfile
+        run: |
+          - npm install --force
+          - git ls-files -m | grep -q package-lock.json && { echo "WARNING - Lock file is outdated!" && exit 1; }
+          - exit 0
+      #----------------------------------------------
+      # Run npm audit
+      #----------------------------------------------
+      - name: Npm audit
+        run: npm audit
+      #----------------------------------------------
+      # Check code format
+      #----------------------------------------------
+      - name: Check code format
+        run: npm run format
+      #----------------------------------------------
+      # Build Module
+      #----------------------------------------------
+      - name: Build module
+        run: npm run build
+      #----------------------------------------------
+      # Build Node CLI
+      #----------------------------------------------
+      - name: Build CLI
+        run: npm run build:cli
