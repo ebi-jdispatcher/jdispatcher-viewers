@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
-import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
+import { JobIdValidable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
 
 export class BasicCanvasRenderer {
   public canvas: fabric.Canvas | fabric.StaticCanvas;
@@ -137,7 +137,7 @@ export function getJdispatcherJsonURL(jobId: string) {
   }
 }
 
-export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false) {
+export function validateJobId(jobIdObj: JobIdValidable, verbose: boolean = false) {
   let isValid = true;
   if (jobIdObj.required) {
     isValid = isValid && jobIdObj.value.trim().length !== 0;

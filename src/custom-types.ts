@@ -37,7 +37,7 @@ export interface RenderOptions {
 }
 
 // jobId validation
-export interface JobIdValitable {
+export interface JobIdValidable {
   value: string;
   required?: boolean;
   minLength?: number;
@@ -45,7 +45,7 @@ export interface JobIdValitable {
   pattern?: RegExp;
 }
 
-export const jobIdDefaults: JobIdValitable = {
+export const jobIdDefaults: JobIdValidable = {
   value: '',
   required: true,
   minLength: 35,
@@ -71,7 +71,7 @@ export interface TextType {
   [key: string]: any;
 }
 
-interface LineType {
+export interface LineType {
   selectable: boolean;
   evented: boolean;
   objectCaching: boolean;
@@ -97,7 +97,7 @@ export interface RectType {
   [key: string]: any;
 }
 
-interface ObjectType {
+export interface ObjectType {
   selectable: boolean;
   evented: boolean;
   objectCaching: boolean;

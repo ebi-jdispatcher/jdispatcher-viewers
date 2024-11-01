@@ -126,6 +126,11 @@ export function getGradientSteps(
  * h, s, v
  */
 export function HSVtoRGB(h: number, s: number, v: number) {
+  // Clamp input values to the expected range [0, 1]
+  h = Math.min(Math.max(h, 0), 1);
+  s = Math.min(Math.max(s, 0), 1);
+  v = Math.min(Math.max(v, 0), 1);
+
   let r: number = 0;
   let g: number = 0;
   let b: number = 0;
