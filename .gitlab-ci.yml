@@ -19,7 +19,7 @@ before_script:
 
 stages:
   - check
-  # - test
+  - test
   # - tag
   # building the ES modules and node CLI (also ES module now, from commonJS)
   - build
@@ -56,6 +56,12 @@ format:
   stage: check
   script:
     - npm run format
+  allow_failure: false
+
+test:
+  stage: test
+  script:
+    - npm test
   allow_failure: false
 
 build_module:
