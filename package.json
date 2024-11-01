@@ -86,5 +86,15 @@
         "webpack-cli": "^4.10.0",
         "webpack-dev-server": "^4.15.2",
         "webpack-node-externals": "^3.0.0"
-    }
+    },
+    "bin": {
+        "jdispatcher-viewers": "bin/app.js"
+    },
+    "directories": {
+        "test": "tests"
+    },
+    "bugs": {
+        "url": "https://github.com/ebi-jdispatcher/jdispatcher-viewers/issues"
+    },
+    "homepage": "https://github.com/ebi-jdispatcher/jdispatcher-viewers#readme"
 }
