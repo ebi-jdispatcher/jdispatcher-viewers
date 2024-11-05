@@ -12,6 +12,8 @@ import {
   textDefaults,
   rectDefaults,
   lineDefaults,
+  toPositiveNumber,
+  posnumber,
 } from '../src/custom-types';
 
 // Test suite for ColorSchemeEnum
@@ -110,5 +112,26 @@ describe('CoordsValues Interface', () => {
     expect(coords.subjLen).toBe(200);
     expect(coords.start).toBe(10);
     expect(coords.end).toBe(90);
+  });
+});
+
+describe('toPositiveNumber', () => {
+  it('should return a posnumber for a positive input', () => {
+    const value = 5;
+    const result: posnumber = toPositiveNumber(value);
+    expect(result).toBe(value); // Check if the returned value is the input itself
+    expect(typeof result).toBe('number'); // Ensure the type is still a number
+  });
+
+  it('should return a posnumber for zero', () => {
+    const value = 0;
+    const result: posnumber = toPositiveNumber(value);
+    expect(result).toBe(value); // Check if the returned value is zero
+    expect(typeof result).toBe('number'); // Ensure the type is still a number
+  });
+
+  it('should throw an error for a negative input', () => {
+    const value = -3;
+    expect(() => toPositiveNumber(value)).toThrow(`${value} is not a positive number`);
   });
 });

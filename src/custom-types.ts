@@ -140,3 +140,12 @@ export interface CoordsValues {
   startSubjPixels?: number;
   endSubjPixels?: number;
 }
+
+export type posnumber = number & { readonly _positive: unique symbol };
+
+export function toPositiveNumber(value: number): posnumber {
+  if (value < 0) {
+    throw new Error(`${value} is not a positive number`);
+  }
+  return value as posnumber;
+}
