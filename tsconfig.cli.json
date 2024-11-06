@@ -7,6 +7,6 @@
         "declaration": false,
         "outDir": "./bin"
     },
-    "exclude": ["node_modules", "src/index.ts", "src/*-webcomponent.ts"],
+    "exclude": ["node_modules", "src/index.ts", "src/*-webcomponent.ts", "tests"],
     "include": ["**/*", "src/*", "*.ts"]
 }

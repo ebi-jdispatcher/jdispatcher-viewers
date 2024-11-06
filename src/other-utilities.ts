@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
-import { JobIdValitable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
+import { JobIdValidable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
 
 export class BasicCanvasRenderer {
   public canvas: fabric.Canvas | fabric.StaticCanvas;
@@ -75,16 +75,16 @@ export class ObjectCache<T> {
   }
 }
 
-function countDecimals(n: number) {
+export function countDecimals(n: number) {
   if (Math.floor(n) === n) return 0;
   return n.toString().split('.')[1].length || 0;
 }
 
 export function numberToString(n: number) {
-  if (Number.isInteger(n)) {
-    return n + '.0';
-  } else if (n < 0.0001 || n > 10000) {
+  if (n < 0.0001 || n > 10000) {
     return n.toExponential(2);
+  } else if (Number.isInteger(n)) {
+    return n + '.0';
   } else if (countDecimals(n) > 3) {
     return n.toFixed(3).toString();
   } else {
@@ -137,7 +137,7 @@ export function getJdispatcherJsonURL(jobId: string) {
   }
 }
 
-export function validateJobId(jobIdObj: JobIdValitable, verbose: boolean = false) {
+export function validateJobId(jobIdObj: JobIdValidable, verbose: boolean = false) {
   let isValid = true;
   if (jobIdObj.required) {
     isValid = isValid && jobIdObj.value.trim().length !== 0;

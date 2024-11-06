@@ -38,6 +38,11 @@ jobs:
       - name: Check code format
         run: npm run format
       #----------------------------------------------
+      # Run tests with Jest
+      #----------------------------------------------
+      - name: Run tests with Jest
+        run: npm test
+      #----------------------------------------------
       # Build Module
       #----------------------------------------------
       - name: Build module
