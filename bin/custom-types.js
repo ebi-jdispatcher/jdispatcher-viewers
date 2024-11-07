@@ -20,3 +20,9 @@ export const objectDefaults = {
 export const textDefaults = { ...objectDefaults };
 export const rectDefaults = { ...objectDefaults };
 export const lineDefaults = { ...objectDefaults };
+export function toPositiveNumber(value) {
+    if (value < 0) {
+        throw new Error(`${value} is not a positive number`);
+    }
+    return value;
+}

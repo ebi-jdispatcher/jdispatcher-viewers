@@ -1,7 +1,7 @@
 {
     "name": "@ebi-jdispatcher/jdispatcher-viewers",
     "description": "Interactive Visual Output and Functional Prediction visualizations",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "module": "./dist/jd_viewers.bundle.js",
     "exports": "./bin/jd-viewers-cli.js",
     "main": "./bin/jd-viewers-cli.js",
