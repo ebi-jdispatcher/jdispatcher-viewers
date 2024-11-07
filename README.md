@@ -3,7 +3,7 @@
     <a href="https://www.npmjs.com/package/@ebi-jdispatcher/jdispatcher-viewers" alt="NPM">
         <img src="https://img.shields.io/badge/npm-%40ebi--jdispatcher%2Fjdispatcher--viewers-blue" /></a>
     <a href="https://nodejs.org/en/download/releases/" alt="Node">
-            <img src="https://img.shields.io/badge/node-18.7-green" /></a>
+            <img src="https://img.shields.io/badge/node-18.20-green" /></a>
     <a href="https://twitter.com/intent/follow?screen_name=ebi_jdispatcher">
         <img src="https://img.shields.io/twitter/follow/ebi_jdispatcher?style=social&logo=twitter"
             alt="follow on Twitter"></a>  
