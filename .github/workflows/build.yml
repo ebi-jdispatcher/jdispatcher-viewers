@@ -2,7 +2,7 @@ name: jdispatcher-viewers
 on: [push]
 jobs:
   check:
-    runs-on: node:18.20-alpine3.19
+    runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
       # Check-out repo and set-up python
@@ -13,10 +13,17 @@ jobs:
       # Install Canvas/Fabric dependencies
       #----------------------------------------------
       - name: Install Canvas/Fabric Dependencies
-        run: apk add --no-cache build-base g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential \
+            g++ libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
       #----------------------------------------------
       # Try a "clean" install (without forcing dependencies)
       #----------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.20'
       - name: Clean install
         run: npm install --dry-run
       #----------------------------------------------
@@ -24,9 +31,10 @@ jobs:
       #----------------------------------------------
       - name: Check lockfile
         run: |
-          - npm install --force
-          - git ls-files -m | grep -q package-lock.json && { echo "WARNING - Lock file is outdated!" && exit 1; }
-          - exit 0
+          npm install --force
+          git ls-files -m | grep -q package-lock.json \
+            && { echo "WARNING - Lock file is outdated!" && exit 1; }
+          exit 0
       #----------------------------------------------
       # Run npm audit
       #----------------------------------------------
