@@ -13,7 +13,9 @@ jobs:
       # Install Canvas/Fabric dependencies
       #----------------------------------------------
       - name: Install Canvas/Fabric Dependencies
-        run: apk add --no-cache build-base g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+        run: |
+          sudo apt update && apt install -y build-essential \
+            g++ libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
       #----------------------------------------------
       # Try a "clean" install (without forcing dependencies)
       #----------------------------------------------
@@ -29,7 +31,8 @@ jobs:
       - name: Check lockfile
         run: |
           - npm install --force
-          - git ls-files -m | grep -q package-lock.json && { echo "WARNING - Lock file is outdated!" && exit 1; }
+          - git ls-files -m | grep -q package-lock.json \
+            && { echo "WARNING - Lock file is outdated!" && exit 1; }
           - exit 0
       #----------------------------------------------
       # Run npm audit
