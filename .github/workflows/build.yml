@@ -14,7 +14,8 @@ jobs:
       #----------------------------------------------
       - name: Install Canvas/Fabric Dependencies
         run: |
-          sudo apt update && apt install -y build-essential \
+          sudo apt update
+          sudo apt install -y build-essential \
             g++ libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
       #----------------------------------------------
       # Try a "clean" install (without forcing dependencies)
