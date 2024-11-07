@@ -2,7 +2,7 @@ name: jdispatcher-viewers
 on: [push]
 jobs:
   check:
-    runs-on: node:18.20-alpine3.19
+    runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
       # Check-out repo and set-up python
@@ -17,6 +17,10 @@ jobs:
       #----------------------------------------------
       # Try a "clean" install (without forcing dependencies)
       #----------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.20'
       - name: Clean install
         run: npm install --dry-run
       #----------------------------------------------
