@@ -762,11 +762,24 @@ export function drawFooterText(renderOptions: RenderOptions, topPadding: number)
   textObj.evented = true;
   textObj.top = topPadding;
   textObj.left = 225;
-  const copyright =
-    `European Bioinformatics Institute 2006-2024. ` +
-    `EBI is an Outstation of the European Molecular Biology Laboratory.`;
+  const copyright = `European Bioinformatics Institute (EMBL-EBI) - `;
   const copyrightText = new fabric.Text(`${copyright}`, textObj);
   return [copyrightText, textObj];
+}
+
+export function drawFooterLinkText(
+  url: string,
+  renderOptions: RenderOptions,
+  topPadding: number
+): [fabric.Text, TextType] {
+  // Sequence
+  const textSeqObj = { ...textDefaults };
+  textSeqObj.fontSize = renderOptions.fontSize!;
+  textSeqObj.evented = true;
+  textSeqObj.top = topPadding;
+  textSeqObj.left = 467;
+  const sequenceDefText = new fabric.Text(`${url}`, textSeqObj);
+  return [sequenceDefText, textSeqObj];
 }
 
 export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {

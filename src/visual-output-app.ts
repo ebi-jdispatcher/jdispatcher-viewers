@@ -17,6 +17,7 @@ import {
 } from './custom-events';
 import {
   drawHeaderTextGroup,
+  drawFooterLinkText,
   drawHeaderLinkText,
   drawContentHeaderTextGroup,
   drawLineTracksQuerySubject,
@@ -54,11 +55,7 @@ export class VisualOutput extends BasicCanvasRenderer {
   private queryFactor: number = 1.0;
   private subjFactor: number = 1.0;
 
-  constructor(
-    element: string | HTMLCanvasElement,
-    private dataObj: SSSResultModel,
-    renderOptions: RenderOptions
-  ) {
+  constructor(element: string | HTMLCanvasElement, private dataObj: SSSResultModel, renderOptions: RenderOptions) {
     super(element);
 
     renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1000);
@@ -698,6 +695,31 @@ export class VisualOutput extends BasicCanvasRenderer {
       objCache.put('copyrightText_textFooterObj', textFooterObj);
     }
     this.canvas.add(copyrightText);
+
+    // canvas footer (repo info)
+    let textFooterLink: fabric.Text;
+    let textFooterLinkObj: TextType;
+    textFooterLink = objCache.get('textFooterLink') as fabric.Text;
+    textFooterLinkObj = objCache.get('textFooterLink_textSeqObj') as TextType;
+    const footerLink: string = 'https://github.com/ebi-jdispatcher/jdispatcher-viewers';
+    if (!textFooterLink && !textFooterLinkObj) {
+      if (!textFooterLink) {
+        [textFooterLink, textFooterLinkObj] = drawFooterLinkText(
+          footerLink,
+          { fontSize: this.fontSize },
+          this.topPadding
+        );
+        objCache.put('textFooterLink', textFooterLink);
+        objCache.put('textFooterLink_textSeqObj', textFooterLinkObj);
+      }
+      this.canvas.add(textFooterLink);
+      if (!this.staticCanvas) {
+        mouseOverText(textFooterLink, textFooterLinkObj, footerLink, '', { fontSize: this.fontSize }, this, false);
+        mouseDownText(textFooterLink, footerLink, this);
+        mouseOutText(textFooterLink, textFooterLinkObj, this);
+      }
+    }
+    this.canvas.add(textFooterLink);
   }
 
   private wrapCanvas() {
