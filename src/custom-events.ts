@@ -11,7 +11,8 @@ export function mouseOverText(
   sequence: string,
   URL: string,
   renderOptions: RenderOptions,
-  _this: VisualOutput | FunctionalPredictions
+  _this: VisualOutput | FunctionalPredictions,
+  _tooltip = true
 ) {
   fabricObj.on('mouseover', (e: fabric.IEvent) => {
     if (e.target) {
@@ -19,10 +20,12 @@ export function mouseOverText(
       e.target.setOptions(textObj);
       e.target.setOptions({ underline: true });
       // add tooltip (on the flight)
-      const urlTooltip = drawURLInfoTooltip(+fabricObj.left!, sequence, URL, renderOptions, +fabricObj.top! + 15);
-      _this.canvas.add(urlTooltip);
+      if (_tooltip) {
+        const urlTooltip = drawURLInfoTooltip(+fabricObj.left!, sequence, URL, renderOptions, +fabricObj.top! + 15);
+        _this.canvas.add(urlTooltip);
+        urlTooltip.visible = false;
+      }
       _this.canvas.renderAll();
-      urlTooltip.visible = false;
     }
   });
 }
