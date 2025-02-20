@@ -553,9 +553,9 @@ export function drawScaleColorGradient(renderOptions: RenderOptions, topPadding:
   rectObj.height = 15;
   const colorScale = new fabric.Rect(rectObj);
   if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) {
-    colorNcbiBlastGradient(colorScale, 0, renderOptions.scaleWidth!);
+    colorScale.set('fill', colorNcbiBlastGradient(0, renderOptions.scaleWidth!));
   } else {
-    colorDefaultGradient(colorScale, 0, renderOptions.scaleWidth!);
+    colorScale.set('fill', colorDefaultGradient(0, renderOptions.scaleWidth!));
   }
   return colorScale;
 }

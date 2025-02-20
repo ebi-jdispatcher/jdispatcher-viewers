@@ -10,26 +10,21 @@ export const defaultGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
-export function colorDefaultGradient(canvasObj: fabric.Object, start: number, end: number) {
-  canvasObj.set(
-    'fill',
-    new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: start,
-        y1: 0,
-        x2: end,
-        y2: 0,
-      },
-      colorStops: [
-        { offset: 0.0, color: `rgb(${defaultGradient[0.0].join(',')})` },
-        { offset: 0.25, color: `rgb(${defaultGradient[0.25].join(',')})` },
-        { offset: 0.5, color: `rgb(${defaultGradient[0.5].join(',')})` },
-        { offset: 0.75, color: `rgb(${defaultGradient[0.75].join(',')})` },
-        { offset: 1.0, color: `rgb(${defaultGradient[1.0].join(',')})` },
-      ],
-    })
-  );
+export function colorDefaultGradient(start: number, end: number) {
+  const colorStops = defaultGradient.keys.map(key => ({
+    offset: key,
+    color: `rgb(${defaultGradient[key].join(',')})`,
+  }));
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: {
+      x1: start,
+      y1: 0,
+      x2: end,
+      y2: 0,
+    },
+    colorStops: colorStops,
+  });
 }
 
 export const ncbiBlastGradient: ColorType = {
@@ -41,29 +36,27 @@ export const ncbiBlastGradient: ColorType = {
   keys: [0, 40, 50, 80, 200],
 };
 
-export function colorNcbiBlastGradient(canvasObj: fabric.Object, start: number, end: number) {
-  canvasObj.set(
-    'fill',
-    new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: start,
-        y1: 0,
-        x2: end,
-        y2: 0,
-      },
-      colorStops: [
-        { offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
-        { offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
-        { offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
-        { offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
-        { offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
-        { offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
-        { offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
-        { offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
-        { offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
-        { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
-      ],
-    })
-  );
+export function colorNcbiBlastGradient(start: number, end: number) {
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: {
+      x1: start,
+      y1: 0,
+      x2: end,
+      y2: 0,
+    },
+    colorStops: [
+      { offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
+      { offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
+      { offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
+      { offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
+      { offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
+      { offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
+      { offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
+      { offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
+      { offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
+      { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
+    ],
+  });
+}
 }

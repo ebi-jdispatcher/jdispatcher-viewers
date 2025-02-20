@@ -18,7 +18,7 @@ describe('defaultGradient', () => {
 describe('colorDefaultGradient', () => {
   it('should apply default gradient to a fabric object', () => {
     const canvasObj = new fabric.Object({});
-    colorDefaultGradient(canvasObj, 0, 100);
+    canvasObj.set('fill', colorDefaultGradient(0, 100));
 
     const gradient = canvasObj.get('fill') as fabric.Gradient;
     expect(gradient.type).toBe('linear');
@@ -53,7 +53,7 @@ describe('ncbiBlastGradient', () => {
 describe('colorNcbiBlastGradient', () => {
   it('should apply NCBI Blast gradient to a fabric object', () => {
     const canvasObj = new fabric.Object({});
-    colorNcbiBlastGradient(canvasObj, 0, 100);
+    canvasObj.set('fill', colorNcbiBlastGradient(0, 100));
 
     const gradient = canvasObj.get('fill') as fabric.Gradient;
     expect(gradient.type).toBe('linear');
