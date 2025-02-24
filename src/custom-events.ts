@@ -4,6 +4,7 @@ import { VisualOutput } from './visual-output-app';
 import { Hsp, IprMatchFlat } from './data-model';
 import { FunctionalPredictions } from './functional-predictions-app';
 import { drawURLInfoTooltip, drawDomainTooltips, drawDomainInfoTooltips } from './drawing-utilities';
+import { tooltipState } from './other-utilities';
 
 export function mouseOverText(
   fabricObj: fabric.Object,
@@ -95,6 +96,60 @@ export function mouseOverDomain(
       tooltipGroup.bringToFront();
       _this.canvas.renderAll();
       tooltipGroup.set({ visible: false });
+    }
+  });
+}
+
+export function mouseClickDomain(
+  fabricObj: fabric.Object,
+  startPixels: number,
+  endPixels: number,
+  seq_from: number,
+  seq_to: number,
+  domain: Hsp | IprMatchFlat,
+  renderOptions: RenderOptions,
+  _this: VisualOutput | FunctionalPredictions
+) {
+  fabricObj.on('mousedown', (e: fabric.IEvent) => {
+    if (e.target) {
+      e.target.set('hoverCursor', 'pointer');
+      let tooltipGroup: fabric.Group;
+      if (isHsp(domain)) {
+        // Query/Subject tooltip
+        tooltipGroup = drawDomainTooltips(
+          startPixels,
+          endPixels,
+          seq_from,
+          seq_to,
+          domain as Hsp,
+          renderOptions,
+          fabricObj.top! + 5
+        );
+      } else {
+        // Domain tooltip
+        tooltipGroup = drawDomainInfoTooltips(
+          startPixels,
+          endPixels,
+          seq_from,
+          seq_to,
+          domain as IprMatchFlat,
+          renderOptions,
+          fabricObj.top! + 5
+        );
+      }
+      const coordProxy = startPixels;
+      +endPixels + seq_from + seq_to;
+      let newState: any = tooltipState(coordProxy, tooltipGroup);
+      if (newState.state) {
+        _this.canvas.add(tooltipGroup);
+        tooltipGroup.set({ visible: true });
+        fabricObj.bringToFront();
+        tooltipGroup.bringToFront();
+      } else {
+        fabricObj.bringToFront();
+        _this.canvas.remove(newState.data);
+        _this.canvas.renderAll();
+      }
     }
   });
 }

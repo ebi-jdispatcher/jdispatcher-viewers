@@ -388,3 +388,20 @@ export function getDomainURLbyDatabase(domainID: string, domainName: string) {
   }
   return domainURL;
 }
+
+let coordStates: Record<number, { state: boolean; data: any }> = {};
+
+export function tooltipState(coord: number, data: object): typeof coordStates {
+  // ensure the initial state is false
+  if (!(coord in coordStates)) {
+    coordStates[coord] = { state: false, data: data };
+  }
+  // toggle the boolean state
+  coordStates[coord].state = !coordStates[coord].state;
+
+  // update the associated object if provided
+  if (coordStates[coord].state && data !== undefined) {
+    coordStates[coord].data = data;
+  }
+  return coordStates[coord];
+}
