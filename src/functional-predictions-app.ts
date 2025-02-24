@@ -12,7 +12,7 @@ import {
 } from './other-utilities';
 import { RenderOptions, ColorSchemeEnum, TextType, RectType } from './custom-types';
 import {
-  mouseDownText,
+  mouseDownLink,
   mouseOverText,
   mouseOutText,
   mouseOverCheckbox,
@@ -271,7 +271,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
           { fontSize: this.fontSize },
           this
         );
-        mouseDownText(textHeaderLink, this.sssDataObj.query_url, this);
+        mouseDownLink(textHeaderLink, this.sssDataObj.query_url, this);
         mouseOutText(textHeaderLink, textSeqObj, this);
       }
     }
@@ -474,7 +474,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
         this.canvas.add(hitText);
         if (!this.staticCanvas) {
           mouseOverText(hitText, textObj, hit.hit_def, hit.hit_url, { fontSize: this.fontSize }, this);
-          mouseDownText(hitText, hit.hit_url, this);
+          mouseDownLink(hitText, hit.hit_url, this);
           mouseOutText(hitText, textObj, this);
         }
 
@@ -574,7 +574,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                 const domainURL = getDomainURLbyDatabase(did.split('_')[1], domain);
                 if (!this.staticCanvas) {
                   mouseOverText(hitText, textObj, '', domainURL, { fontSize: this.fontSize }, this);
-                  mouseDownText(hitText, domainURL, this);
+                  mouseDownLink(hitText, domainURL, this);
                   mouseOutText(hitText, textObj, this);
                 }
 
@@ -836,7 +836,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
       if (!this.staticCanvas) {
         mouseOverText(textFooterLink, textFooterLinkObj, footerLink, '', { fontSize: this.fontSize }, this, false);
-        mouseDownText(textFooterLink, footerLink, this);
+        mouseDownLink(textFooterLink, footerLink, this);
         mouseOutText(textFooterLink, textFooterLinkObj, this);
       }
     }

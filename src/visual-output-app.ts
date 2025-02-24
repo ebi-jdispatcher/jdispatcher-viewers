@@ -6,7 +6,7 @@ import { getRgbColorGradient, getRgbColorFixed, getGradientSteps } from './color
 import { BasicCanvasRenderer, ObjectCache } from './other-utilities';
 import { RenderOptions, ColorSchemeEnum, TextType } from './custom-types';
 import {
-  mouseDownText,
+  mouseDownLink,
   mouseOverText,
   mouseOutText,
   mouseOverDomain,
@@ -214,7 +214,7 @@ export class VisualOutput extends BasicCanvasRenderer {
           { fontSize: this.fontSize },
           this
         );
-        mouseDownText(textHeaderLink, this.dataObj.query_url!, this);
+        mouseDownLink(textHeaderLink, this.dataObj.query_url!, this);
         mouseOutText(textHeaderLink, textSeqObj, this);
       }
     }
@@ -360,7 +360,7 @@ export class VisualOutput extends BasicCanvasRenderer {
         this.canvas.add(hitText);
         if (!this.staticCanvas) {
           mouseOverText(hitText, textObj, hit.hit_def, hit.hit_url, { fontSize: this.fontSize }, this);
-          mouseDownText(hitText, hit.hit_url, this);
+          mouseDownLink(hitText, hit.hit_url, this);
           mouseOutText(hitText, textObj, this);
         }
         for (const hsp of hit.hit_hsps) {
@@ -719,7 +719,7 @@ export class VisualOutput extends BasicCanvasRenderer {
       this.canvas.add(textFooterLink);
       if (!this.staticCanvas) {
         mouseOverText(textFooterLink, textFooterLinkObj, footerLink, '', { fontSize: this.fontSize }, this, false);
-        mouseDownText(textFooterLink, footerLink, this);
+        mouseDownLink(textFooterLink, footerLink, this);
         mouseOutText(textFooterLink, textFooterLinkObj, this);
       }
     }

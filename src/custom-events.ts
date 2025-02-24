@@ -30,7 +30,7 @@ export function mouseOverText(
   });
 }
 
-export function mouseDownText(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions) {
+export function mouseDownLink(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions) {
   fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
       window.open(href, '_blank');
