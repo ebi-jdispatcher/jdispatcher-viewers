@@ -92,7 +92,6 @@ export function mouseOverDomain(
       }
       _this.canvas.add(tooltipGroup);
       tooltipGroup.set({ visible: true });
-      fabricObj.bringToFront();
       tooltipGroup.bringToFront();
       _this.canvas.renderAll();
       tooltipGroup.set({ visible: false });
