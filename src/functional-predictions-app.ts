@@ -13,6 +13,7 @@ import {
 import { RenderOptions, ColorSchemeEnum, TextType, RectType } from './custom-types';
 import {
   mouseDownLink,
+  mouseClickDomain,
   mouseOverText,
   mouseOutText,
   mouseOverCheckbox,
@@ -617,6 +618,20 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
                       this
                     );
                     mouseOutDomain(dpDomain, this);
+
+                    // Mouse click display/hide domain tooltip
+                    mouseClickDomain(
+                      dpDomain,
+                      startDomainPixels,
+                      endDomainPixels,
+                      domainStart,
+                      domainEnd,
+                      dp,
+                      {
+                        fontSize: this.fontSize,
+                      },
+                      this
+                    );
                   }
                 }
               }

@@ -7,6 +7,7 @@ import { BasicCanvasRenderer, ObjectCache } from './other-utilities';
 import { RenderOptions, ColorSchemeEnum, TextType } from './custom-types';
 import {
   mouseDownLink,
+  mouseClickDomain,
   mouseOverText,
   mouseOutText,
   mouseOverDomain,
@@ -478,6 +479,21 @@ export class VisualOutput extends BasicCanvasRenderer {
               );
               mouseOutDomain(queryDomain, this);
 
+              // Query click display/hide domain tooltip
+              mouseClickDomain(
+                queryDomain,
+                startQueryHspPixels,
+                endQueryHspPixels,
+                hspQueryStart,
+                hspQueryEnd,
+                hsp,
+                {
+                  fontSize: this.fontSize,
+                  colorScheme: this.colorScheme,
+                },
+                this
+              );
+
               // Subject hovering and tooltip
               mouseOverDomain(
                 subjDomain,
@@ -493,6 +509,21 @@ export class VisualOutput extends BasicCanvasRenderer {
                 this
               );
               mouseOutDomain(subjDomain, this);
+
+              // Subject click display/hide domain tooltip
+              mouseClickDomain(
+                subjDomain,
+                startSubjHspPixels,
+                endSubjHspPixels,
+                hspSubjStart,
+                hspSubjEnd,
+                hsp,
+                {
+                  fontSize: this.fontSize,
+                  colorScheme: this.colorScheme,
+                },
+                this
+              );
             }
           } else {
             if (this.logSkippedHsps === true) {
