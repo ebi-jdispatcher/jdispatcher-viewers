@@ -1,11 +1,11 @@
 import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
-import { JobIdValidable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
+import { JobIdValidable, ColorSchemeEnum, jobIdDefaults, ScoreTypeEnum, ScaleTypeEnum } from './custom-types';
 
 export class BasicCanvasRenderer {
   public canvas: fabric.Canvas | fabric.StaticCanvas;
-  protected canvasWidth: number;
+  protected canvasWidth: any;
   protected canvasHeight: number;
   protected contentWidth: number;
   protected contentScoringWidth: number;
@@ -15,6 +15,8 @@ export class BasicCanvasRenderer {
   protected scaleLabelWidth: number;
   protected marginWidth: number;
   public colorScheme: ColorSchemeEnum;
+  public scaleType: ScaleTypeEnum;
+  public scoreType: ScoreTypeEnum;
   protected numberHits: number;
   protected numberHsps: number;
   protected logSkippedHsps: boolean;

@@ -1,8 +1,13 @@
 import { fabric } from 'fabric';
 import { SSSResultModel, IPRMCResultModelFlat } from './data-model';
 import { getPixelCoords, getDomainPixelCoords } from './coords-utilities';
-import { getGradientSteps, getRgbColorFixed, getRgbColorGradient, colorByDatabaseName } from './color-utilities';
-import { defaultGradient, ncbiBlastGradient } from './color-schemes';
+import {
+  getGradientSteps,
+  getRgbColorFixed,
+  getRgbColorLogGradient,
+  getRgbColorLinearGradient,
+  colorByDatabaseName,
+} from './color-utilities';
 import {
   BasicCanvasRenderer,
   ObjectCache,
@@ -10,7 +15,7 @@ import {
   domainDatabaseNameToString,
   getDomainURLbyDatabase,
 } from './other-utilities';
-import { RenderOptions, ColorSchemeEnum, TextType, RectType } from './custom-types';
+import { RenderOptions, ColorSchemeEnum, ScaleTypeEnum, ScoreTypeEnum, TextType, RectType } from './custom-types';
 import {
   mouseDownLink,
   mouseClickDomain,
@@ -30,7 +35,7 @@ import {
   drawFooterLinkText,
   drawHeaderLinkText,
   drawNoHitsFoundText,
-  drawScaleTypeText,
+  drawScaleLabelText,
   drawScaleScoreText,
   drawScaleColorGradient,
   drawLineAxis5Buckets,
@@ -39,7 +44,9 @@ import {
   drawScaleTick4LabelsGroup,
   drawFooterText,
   drawCanvasWrapperStroke,
-  drawCheckBoxText,
+  drawColorSchemeCheckBoxText,
+  drawScaleTypeCheckBoxText,
+  drawScoreTypeCheckBoxText,
   drawContentTitleText,
   drawContentSupressText,
   drawProteinFeaturesText,
@@ -134,7 +141,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
   ) {
     super(element);
 
-    renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1000);
+    renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1200);
     renderOptions.canvasHeight != undefined
       ? (this.canvasHeight = renderOptions.canvasHeight)
       : (this.canvasHeight = 110);
@@ -149,22 +156,20 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       : (this.contentLabelLeftWidth = (8.25 * this.canvasWidth) / 100);
     renderOptions.scaleWidth != undefined
       ? (this.scaleWidth = renderOptions.scaleWidth)
-      : (this.scaleWidth = (75.0 * this.canvasWidth) / 100);
+      : (this.scaleWidth = (75 * this.canvasWidth) / 100);
     renderOptions.scaleLabelWidth != undefined
       ? (this.scaleLabelWidth = renderOptions.scaleLabelWidth)
-      : (this.scaleLabelWidth = (20.0 * this.canvasWidth) / 100);
+      : (this.scaleLabelWidth = (15 * this.canvasWidth) / 100);
     renderOptions.marginWidth != undefined
       ? (this.marginWidth = renderOptions.marginWidth)
       : (this.marginWidth = (0.15 * this.canvasWidth) / 100);
     renderOptions.colorScheme != undefined
       ? (this.colorScheme = renderOptions.colorScheme)
-      : (this.colorScheme = ColorSchemeEnum.dynamic);
+      : (this.colorScheme = ColorSchemeEnum.heatmap);
     renderOptions.numberHits != undefined ? (this.numberHits = renderOptions.numberHits) : (this.numberHits = 30);
-    renderOptions.fontSize != undefined ? (this.fontSize = renderOptions.fontSize) : (this.fontSize = 12);
+    renderOptions.fontSize != undefined ? (this.fontSize = renderOptions.fontSize) : (this.fontSize = 14);
     renderOptions.fontWeigth != undefined ? (this.fontWeigth = renderOptions.fontWeigth) : (this.fontWeigth = 'normal');
-    renderOptions.fontFamily != undefined
-      ? (this.fontFamily = renderOptions.fontFamily)
-      : (this.fontFamily = 'Times New Roman');
+    renderOptions.fontFamily != undefined ? (this.fontFamily = renderOptions.fontFamily) : (this.fontFamily = 'Arial');
     renderOptions.canvasWrapperStroke != undefined
       ? (this.canvasWrapperStroke = renderOptions.canvasWrapperStroke)
       : (this.canvasWrapperStroke = false);
@@ -441,10 +446,18 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     let minNotZeroScore: number = Number.MAX_VALUE;
     for (const hit of this.sssDataObj.hits.slice(0, this.numberHits)) {
       for (const hsp of hit.hit_hsps) {
-        if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
+        if (this.scoreType === ScoreTypeEnum.bitscore) {
           if (hsp.hsp_bit_score! < minScore) minScore = hsp.hsp_bit_score!;
           if (hsp.hsp_bit_score! > maxScore) maxScore = hsp.hsp_bit_score!;
           if (hsp.hsp_bit_score! < minNotZeroScore && hsp.hsp_bit_score! > 0.0) minNotZeroScore = hsp.hsp_bit_score!;
+        } else if (this.scoreType === ScoreTypeEnum.identity) {
+          if (hsp.hsp_identity! < minScore) minScore = hsp.hsp_identity!;
+          if (hsp.hsp_identity! > maxScore) maxScore = hsp.hsp_identity!;
+          if (hsp.hsp_identity! < minNotZeroScore && hsp.hsp_identity! > 0.0) minNotZeroScore = hsp.hsp_identity!;
+        } else if (this.scoreType === ScoreTypeEnum.similarity) {
+          if (hsp.hsp_positive! < minScore) minScore = hsp.hsp_positive!;
+          if (hsp.hsp_positive! > maxScore) maxScore = hsp.hsp_positive!;
+          if (hsp.hsp_positive! < minNotZeroScore && hsp.hsp_positive! > 0.0) minNotZeroScore = hsp.hsp_positive!;
         } else {
           if (hsp.hsp_expect! < minScore) minScore = hsp.hsp_expect!;
           if (hsp.hsp_expect! > maxScore) maxScore = hsp.hsp_expect!;
@@ -453,11 +466,15 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       }
     }
 
-    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-      this.gradientSteps = getGradientSteps(minScore, maxScore, minNotZeroScore, this.colorScheme);
-    } else {
-      this.gradientSteps = getGradientSteps(minScore, maxScore, minNotZeroScore, this.colorScheme);
-    }
+    this.gradientSteps = getGradientSteps(
+      minScore,
+      maxScore,
+      minNotZeroScore,
+      this.scaleType,
+      this.scoreType,
+      this.colorScheme
+    );
+
     let tmpNumberHits = 0;
     for (const hit of this.sssDataObj.hits) {
       tmpNumberHits++;
@@ -519,10 +536,24 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
             hspStart = hsp.hsp_hit_from;
             hspEnd = hsp.hsp_hit_to;
           }
-          if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
-            boxColor = getRgbColorFixed(hsp.hsp_bit_score!, this.gradientSteps, ncbiBlastGradient);
+          let score: number;
+          if (this.scoreType === ScoreTypeEnum.bitscore) {
+            score = hsp.hsp_bit_score!;
+          } else if (this.scoreType === ScoreTypeEnum.identity) {
+            score = hsp.hsp_identity!;
+          } else if (this.scoreType === ScoreTypeEnum.similarity) {
+            score = hsp.hsp_positive!;
           } else {
-            boxColor = getRgbColorGradient(hsp.hsp_expect!, this.gradientSteps, defaultGradient);
+            score = hsp.hsp_expect!;
+          }
+          if (this.colorScheme === ColorSchemeEnum.qualitative || this.colorScheme === ColorSchemeEnum.ncbiblast) {
+            boxColor = getRgbColorFixed(score, this.gradientSteps, this.colorScheme);
+          } else {
+            if (this.scoreType === ScoreTypeEnum.evalue && this.colorScheme === ColorSchemeEnum.heatmap) {
+              boxColor = getRgbColorLogGradient(score, this.gradientSteps, this.colorScheme);
+            } else {
+              boxColor = getRgbColorLinearGradient(score, this.gradientSteps, this.colorScheme);
+            }
           }
           break;
         }
@@ -677,73 +708,244 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
 
   private drawColorScaleGroup() {
     // Scale Type
-    const scaleTypeText = drawScaleTypeText(
+    const scaleTypeText = drawScaleLabelText(
       {
         fontSize: this.fontSize,
         scaleLabelWidth: this.scaleLabelWidth,
       },
-      this.topPadding
+      this.topPadding,
+      'Scale Type:'
     );
     this.canvas.add(scaleTypeText);
 
-    // Scale Type selection
-    let textCheckDynObj, textCheckFixObj, textCheckNcbiObj: TextType;
-    let dynamicBoxText, dynamicText, fixedBoxText, fixedText, ncbiblastBoxText, ncbiblastText: fabric.Text;
-    [
-      dynamicBoxText,
-      dynamicText,
-      textCheckDynObj,
-      fixedBoxText,
-      fixedText,
-      textCheckFixObj,
-      ncbiblastBoxText,
-      ncbiblastText,
-      textCheckNcbiObj,
-    ] = drawCheckBoxText(
-      {
-        colorScheme: this.colorScheme,
-        fontSize: this.fontSize,
-        scaleLabelWidth: this.scaleLabelWidth,
-      },
-      this.topPadding
-    );
+    // Scale Type selection: dynamic and static
+    let textCheckDynObj, textCheckFixObj: TextType;
+    let dynamicBoxText, dynamicText, fixedBoxText, fixedText: fabric.Text;
+
+    [dynamicBoxText, dynamicText, textCheckDynObj, fixedBoxText, fixedText, textCheckFixObj] =
+      drawScaleTypeCheckBoxText(
+        {
+          scaleType: this.scaleType,
+          scoreType: this.scoreType,
+          fontSize: this.fontSize,
+          scaleLabelWidth: this.scaleLabelWidth,
+        },
+        this.topPadding
+      );
     this.canvas.add(dynamicBoxText);
     this.canvas.add(dynamicText);
     if (!this.staticCanvas) {
       mouseOverCheckbox(dynamicBoxText, textCheckDynObj, this);
-      mouseOutCheckbox(dynamicBoxText, textCheckDynObj, ColorSchemeEnum.dynamic, this);
-      mouseDownCheckbox(dynamicBoxText, ColorSchemeEnum.dynamic, this);
+      mouseOutCheckbox(dynamicBoxText, textCheckDynObj, ScaleTypeEnum.dynamic, 'ScaleTypeEnum', this);
+      mouseDownCheckbox(dynamicBoxText, ScaleTypeEnum.dynamic, 'ScaleTypeEnum', this);
     }
 
     this.canvas.add(fixedBoxText);
     this.canvas.add(fixedText);
     if (!this.staticCanvas) {
       mouseOverCheckbox(fixedBoxText, textCheckFixObj, this);
-      mouseOutCheckbox(fixedBoxText, textCheckFixObj, ColorSchemeEnum.fixed, this);
-      mouseDownCheckbox(fixedBoxText, ColorSchemeEnum.fixed, this);
+      mouseOutCheckbox(fixedBoxText, textCheckFixObj, ScaleTypeEnum.fixed, 'ScaleTypeEnum', this);
+      mouseDownCheckbox(fixedBoxText, ScaleTypeEnum.fixed, 'ScaleTypeEnum', this);
+    }
+
+    // Score Type: e-value, identity, similarity, bit-score
+    this.topPadding += 20;
+    const scoreTypeText = drawScaleLabelText(
+      {
+        fontSize: this.fontSize,
+        scaleLabelWidth: this.scaleLabelWidth,
+      },
+      this.topPadding,
+      'Score Used:'
+    );
+    this.canvas.add(scoreTypeText);
+    let textCheckEvalueObj, textCheckIdentityObj, textCheckSimilarityObj, textCheckBitscoreObj: TextType;
+    let evalueBoxText,
+      evalueText,
+      identityBoxText,
+      identityText,
+      similarityBoxText,
+      similarityText,
+      bitscoreBoxText,
+      bitscoreText: fabric.Text;
+
+    [
+      evalueBoxText,
+      evalueText,
+      textCheckEvalueObj,
+      identityBoxText,
+      identityText,
+      textCheckIdentityObj,
+      similarityBoxText,
+      similarityText,
+      textCheckSimilarityObj,
+      bitscoreBoxText,
+      bitscoreText,
+      textCheckBitscoreObj,
+    ] = drawScoreTypeCheckBoxText(
+      {
+        scoreType: this.scoreType,
+        fontSize: this.fontSize,
+        scaleLabelWidth: this.scaleLabelWidth,
+      },
+      this.topPadding
+    );
+    this.canvas.add(evalueBoxText);
+    this.canvas.add(evalueText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(evalueBoxText, textCheckEvalueObj, this);
+      mouseOutCheckbox(evalueBoxText, textCheckEvalueObj, ScoreTypeEnum.evalue, 'ScoreTypeEnum', this);
+      mouseDownCheckbox(evalueBoxText, ScoreTypeEnum.evalue, 'ScoreTypeEnum', this);
+    }
+
+    this.canvas.add(identityBoxText);
+    this.canvas.add(identityText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(identityBoxText, textCheckIdentityObj, this);
+      mouseOutCheckbox(identityBoxText, textCheckIdentityObj, ScoreTypeEnum.identity, 'ScoreTypeEnum', this);
+      mouseDownCheckbox(identityBoxText, ScoreTypeEnum.identity, 'ScoreTypeEnum', this);
+    }
+
+    this.canvas.add(similarityBoxText);
+    this.canvas.add(similarityText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(similarityBoxText, textCheckSimilarityObj, this);
+      mouseOutCheckbox(similarityBoxText, textCheckSimilarityObj, ScoreTypeEnum.similarity, 'ScoreTypeEnum', this);
+      mouseDownCheckbox(similarityBoxText, ScoreTypeEnum.similarity, 'ScoreTypeEnum', this);
+    }
+
+    this.canvas.add(bitscoreBoxText);
+    this.canvas.add(bitscoreText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(bitscoreBoxText, textCheckBitscoreObj, this);
+      mouseOutCheckbox(bitscoreBoxText, textCheckBitscoreObj, ScoreTypeEnum.bitscore, 'ScoreTypeEnum', this);
+      mouseDownCheckbox(bitscoreBoxText, ScoreTypeEnum.bitscore, 'ScoreTypeEnum', this);
+    }
+
+    // Color Scheme: Heatmap, NCBI-BLAST+, Greys, Blues, YellowBlue, YellowRed
+    this.topPadding += 20;
+    const colorSchemeText = drawScaleLabelText(
+      {
+        fontSize: this.fontSize,
+        scaleLabelWidth: this.scaleLabelWidth,
+      },
+      this.topPadding,
+      'Color Scheme:'
+    );
+    this.canvas.add(colorSchemeText);
+    let textCheckHeatmapObj,
+      textCheckGreyscaleObj,
+      textCheckSequentialObj,
+      textCheckDivergentObj,
+      textCheckQualitativeObj,
+      textCheckNcbiBlastObj: TextType;
+    let heatmapBoxText,
+      heatmapText,
+      greyscaleBoxText,
+      greyscaleText,
+      sequentialBoxText,
+      sequentialText,
+      divergentBoxText,
+      divergentText,
+      qualitativeBoxText,
+      qualitativeText,
+      ncbiblastBoxText,
+      ncbiblastText: fabric.Text;
+
+    [
+      heatmapBoxText,
+      heatmapText,
+      textCheckHeatmapObj,
+      greyscaleBoxText,
+      greyscaleText,
+      textCheckGreyscaleObj,
+      sequentialBoxText,
+      sequentialText,
+      textCheckSequentialObj,
+      divergentBoxText,
+      divergentText,
+      textCheckDivergentObj,
+      qualitativeBoxText,
+      qualitativeText,
+      textCheckQualitativeObj,
+      ncbiblastBoxText,
+      ncbiblastText,
+      textCheckNcbiBlastObj,
+    ] = drawColorSchemeCheckBoxText(
+      {
+        colorScheme: this.colorScheme,
+        fontSize: this.fontSize,
+        scaleLabelWidth: this.scaleLabelWidth,
+      },
+      this.topPadding
+    );
+    this.canvas.add(heatmapBoxText);
+    this.canvas.add(heatmapText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(heatmapBoxText, textCheckHeatmapObj, this);
+      mouseOutCheckbox(heatmapBoxText, textCheckHeatmapObj, ColorSchemeEnum.heatmap, 'ColorSchemeEnum', this);
+      mouseDownCheckbox(heatmapBoxText, ColorSchemeEnum.heatmap, 'ColorSchemeEnum', this);
+    }
+
+    this.canvas.add(greyscaleBoxText);
+    this.canvas.add(greyscaleText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(greyscaleBoxText, textCheckGreyscaleObj, this);
+      mouseOutCheckbox(greyscaleBoxText, textCheckGreyscaleObj, ColorSchemeEnum.greyscale, 'ColorSchemeEnum', this);
+      mouseDownCheckbox(greyscaleBoxText, ColorSchemeEnum.greyscale, 'ColorSchemeEnum', this);
+    }
+
+    this.canvas.add(sequentialBoxText);
+    this.canvas.add(sequentialText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(sequentialBoxText, textCheckSequentialObj, this);
+      mouseOutCheckbox(sequentialBoxText, textCheckSequentialObj, ColorSchemeEnum.sequential, 'ColorSchemeEnum', this);
+      mouseDownCheckbox(sequentialBoxText, ColorSchemeEnum.sequential, 'ColorSchemeEnum', this);
+    }
+
+    this.canvas.add(divergentBoxText);
+    this.canvas.add(divergentText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(divergentBoxText, textCheckDivergentObj, this);
+      mouseOutCheckbox(divergentBoxText, textCheckDivergentObj, ColorSchemeEnum.divergent, 'ColorSchemeEnum', this);
+      mouseDownCheckbox(divergentBoxText, ColorSchemeEnum.divergent, 'ColorSchemeEnum', this);
+    }
+
+    this.canvas.add(qualitativeBoxText);
+    this.canvas.add(qualitativeText);
+    if (!this.staticCanvas) {
+      mouseOverCheckbox(qualitativeBoxText, textCheckQualitativeObj, this);
+      mouseOutCheckbox(
+        qualitativeBoxText,
+        textCheckQualitativeObj,
+        ColorSchemeEnum.qualitative,
+        'ColorSchemeEnum',
+        this
+      );
+      mouseDownCheckbox(qualitativeBoxText, ColorSchemeEnum.qualitative, 'ColorSchemeEnum', this);
     }
 
     this.canvas.add(ncbiblastBoxText);
     this.canvas.add(ncbiblastText);
     if (!this.staticCanvas) {
-      mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiObj, this);
-      mouseOutCheckbox(ncbiblastBoxText, textCheckNcbiObj, ColorSchemeEnum.ncbiblast, this);
-      mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, this);
+      mouseOverCheckbox(ncbiblastBoxText, textCheckNcbiBlastObj, this);
+      mouseOutCheckbox(ncbiblastBoxText, textCheckNcbiBlastObj, ColorSchemeEnum.ncbiblast, 'ColorSchemeEnum', this);
+      mouseDownCheckbox(ncbiblastBoxText, ColorSchemeEnum.ncbiblast, 'ColorSchemeEnum', this);
     }
 
-    // E-value/Bit Score Text
+    // Score Text
     this.topPadding += 25;
     const scaleScoreText = drawScaleScoreText(
       {
         fontSize: this.fontSize,
         scaleLabelWidth: this.scaleLabelWidth,
-        colorScheme: this.colorScheme,
+        scoreType: this.scoreType,
       },
       this.topPadding
     );
     this.canvas.add(scaleScoreText);
 
-    // E-value/Bit score Color Gradient
+    // Color Gradient
     const colorScale = drawScaleColorGradient(
       {
         scaleWidth: this.scaleWidth,
@@ -752,11 +954,10 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       },
       this.topPadding
     );
-
     this.canvas.add(colorScale);
 
-    // E-value/Bit score Axis (line and ticks)
-    if (this.colorScheme === ColorSchemeEnum.ncbiblast) {
+    // Score Axis (line and ticks)
+    if (this.colorScheme === ColorSchemeEnum.ncbiblast || this.colorScheme === ColorSchemeEnum.qualitative) {
       const oneFifthGradPixels = (this.scaleLabelWidth + this.scaleWidth - this.scaleLabelWidth) / 5;
       this.topPadding += 15;
       const axisGroup = drawLineAxis6Buckets(
@@ -771,7 +972,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       );
       this.canvas.add(axisGroup);
 
-      // Bits scale tick mark labels
+      // scale tick mark labels
       this.topPadding += 5;
       const tickLabels5Group = drawScaleTick5LabelsGroup(
         this.gradientSteps,
@@ -798,7 +999,7 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
       );
       this.canvas.add(axisGroup);
 
-      // E-value scale tick mark labels
+      // scale tick mark labels
       this.topPadding += 5;
       const tickLabels4Group = drawScaleTick4LabelsGroup(
         this.gradientSteps,
