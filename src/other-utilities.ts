@@ -81,12 +81,14 @@ export function countDecimals(n: number) {
 }
 
 export function numberToString(n: number) {
-  if (n < 0.0001 || n > 10000) {
+  if (n === 0.0) {
+    return n.toString();
+  } else if (n < 0.0001 || n > 10000) {
     return n.toExponential(2);
   } else if (Number.isInteger(n)) {
     return n + '.0';
-  } else if (countDecimals(n) > 3) {
-    return n.toFixed(3).toString();
+  } else if (countDecimals(n) > 2) {
+    return n.toFixed(2);
   } else {
     return n.toString();
   }
