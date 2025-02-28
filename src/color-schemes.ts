@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import { ColorType } from './custom-types';
+import { ColorSchemeEnum, ColorType } from './custom-types';
 
 export const heatmapGradient: ColorType = {
   0.0: [255, 64, 64],
@@ -93,5 +93,23 @@ export function colorNcbiBlastGradient(start: number, end: number) {
       { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
     ],
   });
+}
+
+export function getColorType(colorScheme: ColorSchemeEnum) {
+  let colorType: ColorType = heatmapGradient;
+  if (colorScheme === ColorSchemeEnum.heatmap) {
+    colorType = heatmapGradient;
+  } else if (colorScheme === ColorSchemeEnum.greyscale) {
+    colorType = greyscaleGradient;
+  } else if (colorScheme === ColorSchemeEnum.sequential) {
+    colorType = sequentialGradient;
+  } else if (colorScheme === ColorSchemeEnum.divergent) {
+    colorType = divergentGradient;
+  } else if (colorScheme === ColorSchemeEnum.qualitative) {
+    colorType = qualitativeGradient;
+  } else if (colorScheme === ColorSchemeEnum.ncbiblast) {
+    colorType = ncbiBlastGradient;
+  }
+  return colorType;
 }
 }
