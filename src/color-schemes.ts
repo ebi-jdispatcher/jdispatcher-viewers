@@ -10,11 +10,6 @@ export const heatmapGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
-export function colorDefaultGradient(start: number, end: number) {
-  const colorStops = defaultGradient.keys.map(key => ({
-    offset: key,
-    color: `rgb(${defaultGradient[key].join(',')})`,
-  }));
 export const greyscaleGradient: ColorType = {
   0.0: [215, 215, 215],
   0.25: [177, 177, 177],
@@ -50,6 +45,8 @@ export const qualitativeGradient: ColorType = {
   1.0: [166, 216, 84],
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
+
+export function colorQualitativeGradient(start: number, end: number) {
   return new fabric.Gradient({
     type: 'linear',
     coords: {
@@ -58,7 +55,18 @@ export const qualitativeGradient: ColorType = {
       x2: end,
       y2: 0,
     },
-    colorStops: colorStops,
+    colorStops: [
+      { offset: 0.0, color: `rgb(${qualitativeGradient[0.0].join(',')})` },
+      { offset: 0.199999, color: `rgb(${qualitativeGradient[0.0].join(',')})` },
+      { offset: 0.2, color: `rgb(${qualitativeGradient[0.25].join(',')})` },
+      { offset: 0.399999, color: `rgb(${qualitativeGradient[0.25].join(',')})` },
+      { offset: 0.4, color: `rgb(${qualitativeGradient[0.5].join(',')})` },
+      { offset: 0.599999, color: `rgb(${qualitativeGradient[0.5].join(',')})` },
+      { offset: 0.6, color: `rgb(${qualitativeGradient[0.75].join(',')})` },
+      { offset: 0.799999, color: `rgb(${qualitativeGradient[0.75].join(',')})` },
+      { offset: 0.8, color: `rgb(${qualitativeGradient[1.0].join(',')})` },
+      { offset: 1.0, color: `rgb(${qualitativeGradient[1.0].join(',')})` },
+    ],
   });
 }
 
@@ -112,4 +120,16 @@ export function getColorType(colorScheme: ColorSchemeEnum) {
   }
   return colorType;
 }
+
+export function colorGenericGradient(start: number, end: number, colorScheme: ColorSchemeEnum): fabric.Gradient {
+  let gradient: ColorType = getColorType(colorScheme);
+  const colorStops = gradient.keys.map(key => ({
+    offset: key,
+    color: `rgb(${gradient[key].join(',')})`,
+  }));
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: { x1: start, y1: 0, x2: end, y2: 0 },
+    colorStops: colorStops,
+  });
 }
