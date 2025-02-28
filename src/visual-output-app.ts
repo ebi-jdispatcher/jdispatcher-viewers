@@ -62,7 +62,11 @@ export class VisualOutput extends BasicCanvasRenderer {
   private queryFactor: number = 1.0;
   private subjFactor: number = 1.0;
 
-  constructor(element: string | HTMLCanvasElement, private dataObj: SSSResultModel, renderOptions: RenderOptions) {
+  constructor(
+    element: string | HTMLCanvasElement,
+    private dataObj: SSSResultModel,
+    renderOptions: RenderOptions
+  ) {
     super(element);
 
     renderOptions.canvasWidth != undefined ? (this.canvasWidth = renderOptions.canvasWidth) : (this.canvasWidth = 1200);

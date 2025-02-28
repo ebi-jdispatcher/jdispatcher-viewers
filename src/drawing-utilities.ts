@@ -551,7 +551,7 @@ export function drawScoreTypeCheckBoxText(
   TextType,
   fabric.Text,
   fabric.Text,
-  TextType
+  TextType,
 ] {
   // Score Type selection
   const textSelObj = { ...textDefaults };
@@ -635,7 +635,7 @@ export function drawColorSchemeCheckBoxText(
   TextType,
   fabric.Text,
   fabric.Text,
-  TextType
+  TextType,
 ] {
   // Score Type selection
   const textSelObj = { ...textDefaults };
