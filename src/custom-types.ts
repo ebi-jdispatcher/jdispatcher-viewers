@@ -1,8 +1,11 @@
 export enum ColorSchemeEnum {
-  fixed = 'fixed', // e-value (fixed scale)
-  dynamic = 'dynamic', // e-value (dynamic scale)
-  ncbiblast = 'ncbiblast', // bit score (fixed scale)
-  blasterjs = 'blasterjs', // e-value (fixed scale)
+  heatmap = 'heatmap', // red to blue
+  ncbiblast = 'ncbiblast', // NCBI BLAST+ coloring
+  greyscale = 'greyscale', // greyscale
+  sequential = 'sequential', // light blue to blue
+  divergent = 'divergent', // green to red
+  qualitative = 'qualitative', // diverse colors
+}
 }
 
 /* Global Options for Rendering the Fabric.js canvas
