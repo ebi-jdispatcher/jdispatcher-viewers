@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import { TextType, RectType, ColorSchemeEnum, RenderOptions } from './custom-types';
+import { TextType, RectType, ColorSchemeEnum, RenderOptions, ScaleTypeEnum, ScoreTypeEnum } from './custom-types';
 import { VisualOutput } from './visual-output-app';
 import { Hsp, IprMatchFlat } from './data-model';
 import { FunctionalPredictions } from './functional-predictions-app';
@@ -179,14 +179,31 @@ export function mouseOverCheckbox(
 
 export function mouseDownCheckbox(
   fabricObj: fabric.Object,
-  value: ColorSchemeEnum,
+  value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum,
+  inputEnum: string,
   _this: VisualOutput | FunctionalPredictions
 ) {
   fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
-      if (_this.colorScheme != value) {
-        _this.colorScheme = value;
-        _this.render();
+      if (inputEnum === 'ColorSchemeEnum') {
+        if (_this.colorScheme != value) {
+          _this.colorScheme = value as ColorSchemeEnum;
+          // if (_this.colorScheme === ColorSchemeEnum.ncbiblast) {
+          //   _this.scaleType = ScaleTypeEnum.fixed;
+          //   _this.scoreType = ScoreTypeEnum.bitscore;
+          // }
+          _this.render();
+        }
+      } else if (inputEnum === 'ScaleTypeEnum') {
+        if (_this.scaleType != value) {
+          _this.scaleType = value as ScaleTypeEnum;
+          _this.render();
+        }
+      } else if (inputEnum === 'ScoreTypeEnum') {
+        if (_this.scoreType != value) {
+          _this.scoreType = value as ScoreTypeEnum;
+          _this.render();
+        }
       }
     }
   });
@@ -195,16 +212,31 @@ export function mouseDownCheckbox(
 export function mouseOutCheckbox(
   fabricObj: fabric.Object,
   textObj: TextType,
-  value: ColorSchemeEnum,
+  value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum,
+  inputEnum: string,
   _this: VisualOutput | FunctionalPredictions
 ) {
   fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
       e.target.setOptions(textObj);
-      if (_this.colorScheme != value) {
-        e.target.setOptions({
-          fill: 'grey',
-        });
+      if (inputEnum === 'ColorSchemeEnum') {
+        if (_this.colorScheme != value) {
+          e.target.setOptions({
+            fill: 'grey',
+          });
+        }
+      } else if (inputEnum === 'ScaleTypeEnum') {
+        if (_this.scaleType != value) {
+          e.target.setOptions({
+            fill: 'grey',
+          });
+        }
+      } else if (inputEnum === 'ScoreTypeEnum') {
+        if (_this.scoreType != value) {
+          e.target.setOptions({
+            fill: 'grey',
+          });
+        }
       }
       _this.canvas.renderAll();
     }
