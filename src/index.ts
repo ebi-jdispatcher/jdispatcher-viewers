@@ -156,7 +156,7 @@ class FabricjsRenderer {
     const dataObj = dataAsType(sssJsonResponse, 'SSSResultModel');
     if (this.canvasInstance.submitter === 'visual-output') {
       fabricjs = new VisualOutput('canvas', dataObj, {
-        colorScheme: ColorSchemeEnum.dynamic,
+        colorScheme: ColorSchemeEnum.heatmap,
         numberHits: 100,
         numberHsps: 10,
         logSkippedHsps: true,
@@ -176,7 +176,7 @@ class FabricjsRenderer {
       const iprmcDataObj = dataAsType(iprmcJSONResponse, 'IPRMCResultModelFlat');
 
       fabricjs = new FunctionalPredictions('canvas', dataObj, iprmcDataObj, {
-        colorScheme: ColorSchemeEnum.dynamic,
+        colorScheme: ColorSchemeEnum.heatmap,
         numberHits: 30,
         canvasWrapperStroke: true,
       });

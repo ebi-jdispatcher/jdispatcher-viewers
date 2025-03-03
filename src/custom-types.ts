@@ -1,8 +1,22 @@
 export enum ColorSchemeEnum {
-  fixed = 'fixed', // e-value (fixed scale)
-  dynamic = 'dynamic', // e-value (dynamic scale)
-  ncbiblast = 'ncbiblast', // bit score (fixed scale)
-  blasterjs = 'blasterjs', // e-value (fixed scale)
+  heatmap = 'heatmap', // red to blue
+  ncbiblast = 'ncbiblast', // NCBI BLAST+ coloring
+  greyscale = 'greyscale', // greyscale
+  sequential = 'sequential', // light blue to blue
+  divergent = 'divergent', // green to red
+  qualitative = 'qualitative', // diverse colors
+}
+
+export enum ScaleTypeEnum {
+  dynamic = 'dynamic',
+  fixed = 'fixed',
+}
+
+export enum ScoreTypeEnum {
+  evalue = 'evalue',
+  bitscore = 'bitscore',
+  identity = 'identity',
+  similarity = 'similarity',
 }
 
 /* Global Options for Rendering the Fabric.js canvas
@@ -21,6 +35,8 @@ export interface RenderOptions {
   scaleLabelWidth?: number; // Color score information
   marginWidth?: number; // Space around different objects
   colorScheme?: ColorSchemeEnum;
+  scaleType?: ScaleTypeEnum;
+  scoreType?: ScoreTypeEnum;
   numberHits?: number; // Number of Hits to be displayed
   numberHsps?: number; // Number of HSPs to be displayed
   logSkippedHsps?: boolean; // Display notice about skipped HSPs

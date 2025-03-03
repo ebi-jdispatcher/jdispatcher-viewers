@@ -1,11 +1,11 @@
 import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
-import { JobIdValidable, ColorSchemeEnum, jobIdDefaults } from './custom-types';
+import { JobIdValidable, ColorSchemeEnum, jobIdDefaults, ScoreTypeEnum, ScaleTypeEnum } from './custom-types';
 
 export class BasicCanvasRenderer {
   public canvas: fabric.Canvas | fabric.StaticCanvas;
-  protected canvasWidth: number;
+  protected canvasWidth: any;
   protected canvasHeight: number;
   protected contentWidth: number;
   protected contentScoringWidth: number;
@@ -15,6 +15,8 @@ export class BasicCanvasRenderer {
   protected scaleLabelWidth: number;
   protected marginWidth: number;
   public colorScheme: ColorSchemeEnum;
+  public scaleType: ScaleTypeEnum;
+  public scoreType: ScoreTypeEnum;
   protected numberHits: number;
   protected numberHsps: number;
   protected logSkippedHsps: boolean;
@@ -81,12 +83,14 @@ export function countDecimals(n: number) {
 }
 
 export function numberToString(n: number) {
-  if (n < 0.0001 || n > 10000) {
+  if (n === 0.0) {
+    return n.toString();
+  } else if (n < 0.0001 || n > 10000) {
     return n.toExponential(2);
   } else if (Number.isInteger(n)) {
     return n + '.0';
-  } else if (countDecimals(n) > 3) {
-    return n.toFixed(3).toString();
+  } else if (countDecimals(n) > 2) {
+    return n.toFixed(2);
   } else {
     return n.toString();
   }
@@ -387,4 +391,21 @@ export function getDomainURLbyDatabase(domainID: string, domainName: string) {
     // domainURL = `https://prodom.prabi.fr/prodom/current/cgi-bin/request.pl?SSID=1289309949_1085&amp;db_ent1=${domainID}`;
   }
   return domainURL;
+}
+
+let coordStates: Record<number, { state: boolean; data: any }> = {};
+
+export function tooltipState(coord: number, data: object): typeof coordStates {
+  // ensure the initial state is false
+  if (!(coord in coordStates)) {
+    coordStates[coord] = { state: false, data: data };
+  }
+  // toggle the boolean state
+  coordStates[coord].state = !coordStates[coord].state;
+
+  // update the associated object if provided
+  if (coordStates[coord].state && data !== undefined) {
+    coordStates[coord].data = data;
+  }
+  return coordStates[coord];
 }

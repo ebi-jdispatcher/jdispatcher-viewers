@@ -19,10 +19,12 @@ import {
 // Test suite for ColorSchemeEnum
 describe('ColorSchemeEnum', () => {
   test('should have expected values', () => {
-    expect(ColorSchemeEnum.fixed).toBe('fixed');
-    expect(ColorSchemeEnum.dynamic).toBe('dynamic');
+    expect(ColorSchemeEnum.heatmap).toBe('heatmap');
+    expect(ColorSchemeEnum.greyscale).toBe('greyscale');
+    expect(ColorSchemeEnum.sequential).toBe('sequential');
+    expect(ColorSchemeEnum.divergent).toBe('divergent');
+    expect(ColorSchemeEnum.qualitative).toBe('qualitative');
     expect(ColorSchemeEnum.ncbiblast).toBe('ncbiblast');
-    expect(ColorSchemeEnum.blasterjs).toBe('blasterjs');
   });
 });
 
@@ -31,13 +33,13 @@ describe('RenderOptions Interface', () => {
   const options: RenderOptions = {
     canvasWidth: 800,
     canvasHeight: 600,
-    colorScheme: ColorSchemeEnum.fixed,
+    colorScheme: ColorSchemeEnum.heatmap,
   };
 
   test('should accept valid values for RenderOptions properties', () => {
     expect(typeof options.canvasWidth).toBe('number');
     expect(typeof options.canvasHeight).toBe('number');
-    expect(options.colorScheme).toBe(ColorSchemeEnum.fixed);
+    expect(options.colorScheme).toBe(ColorSchemeEnum.heatmap);
   });
 
   test('should allow undefined properties in RenderOptions', () => {

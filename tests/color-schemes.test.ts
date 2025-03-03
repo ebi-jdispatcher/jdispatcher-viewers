@@ -1,24 +1,25 @@
 import { fabric } from 'fabric';
-import { defaultGradient, colorDefaultGradient, ncbiBlastGradient, colorNcbiBlastGradient } from '../src/color-schemes';
+import { heatmapGradient, colorGenericGradient, ncbiBlastGradient, colorNcbiBlastGradient } from '../src/color-schemes';
+import { ColorSchemeEnum } from '../src/custom-types';
 
-describe('defaultGradient', () => {
+describe('heatmapGradient', () => {
   it('should have expected gradient color values', () => {
-    expect(defaultGradient[0.0]).toEqual([255, 64, 64]);
-    expect(defaultGradient[0.25]).toEqual([255, 255, 64]);
-    expect(defaultGradient[0.5]).toEqual([64, 255, 64]);
-    expect(defaultGradient[0.75]).toEqual([64, 255, 255]);
-    expect(defaultGradient[1.0]).toEqual([64, 64, 255]);
+    expect(heatmapGradient[0.0]).toEqual([255, 64, 64]);
+    expect(heatmapGradient[0.25]).toEqual([255, 255, 64]);
+    expect(heatmapGradient[0.5]).toEqual([64, 255, 64]);
+    expect(heatmapGradient[0.75]).toEqual([64, 255, 255]);
+    expect(heatmapGradient[1.0]).toEqual([64, 64, 255]);
   });
 
   it('should have expected keys', () => {
-    expect(defaultGradient.keys).toEqual([0.0, 0.25, 0.5, 0.75, 1.0]);
+    expect(heatmapGradient.keys).toEqual([0.0, 0.25, 0.5, 0.75, 1.0]);
   });
 });
 
 describe('colorDefaultGradient', () => {
   it('should apply default gradient to a fabric object', () => {
     const canvasObj = new fabric.Object({});
-    colorDefaultGradient(canvasObj, 0, 100);
+    canvasObj.set('fill', colorGenericGradient(0, 100, ColorSchemeEnum.heatmap));
 
     const gradient = canvasObj.get('fill') as fabric.Gradient;
     expect(gradient.type).toBe('linear');
@@ -53,7 +54,7 @@ describe('ncbiBlastGradient', () => {
 describe('colorNcbiBlastGradient', () => {
   it('should apply NCBI Blast gradient to a fabric object', () => {
     const canvasObj = new fabric.Object({});
-    colorNcbiBlastGradient(canvasObj, 0, 100);
+    canvasObj.set('fill', colorNcbiBlastGradient(0, 100));
 
     const gradient = canvasObj.get('fill') as fabric.Gradient;
     expect(gradient.type).toBe('linear');

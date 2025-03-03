@@ -1,13 +1,15 @@
-import { ColorType, ColorSchemeEnum } from './custom-types';
+import { getColorType } from './color-schemes';
+import { ColorType, ColorSchemeEnum, ScaleTypeEnum, ScoreTypeEnum } from './custom-types';
 
-export function getRgbColorGradient(score: number, gradientSteps: number[], colorScheme: ColorType) {
+export function getRgbColorLogGradient(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
   // assumes length of gradientSteps is 5
-  const colorSchemeSteps: number[] = colorScheme.keys;
+  let colorType: ColorType = getColorType(colorScheme);
+  const colorSchemeSteps: number[] = colorType.keys;
   if (colorSchemeSteps.length != gradientSteps.length) {
     throw Error('Color Scheme and Gradient Steps should have matching lengths!');
   }
   if (score + 0.0 === 0.0) {
-    return `rgb(${colorScheme[colorSchemeSteps[0]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[0]].join(',')})`;
   } else {
     const start = gradientSteps[0];
     const step1 = gradientSteps[1];
@@ -32,91 +34,270 @@ export function getRgbColorGradient(score: number, gradientSteps: number[], colo
   }
 }
 
-export function getRgbColorFixed(score: number, gradientSteps: number[], colorScheme: ColorType) {
+function interpolateGradient(value: number, colorType: ColorType): [number, number, number] {
+  const { keys } = colorType;
+
+  // Clamp value to [0, 1]
+  if (value <= 0) return colorType[0.0];
+  if (value >= 1) return colorType[1.0];
+
+  // Find the two nearest keys
+  for (let i = 0; i < keys.length - 1; i++) {
+    const lowerKey = keys[i];
+    const upperKey = keys[i + 1];
+    if (value >= lowerKey && value <= upperKey) {
+      const lowerColor = colorType[lowerKey];
+      const upperColor = colorType[upperKey];
+      const fraction = (value - lowerKey) / (upperKey - lowerKey);
+
+      // Linear interpolation for each RGB component
+      const r = Math.round(lowerColor[0] + fraction * (upperColor[0] - lowerColor[0]));
+      const g = Math.round(lowerColor[1] + fraction * (upperColor[1] - lowerColor[1]));
+      const b = Math.round(lowerColor[2] + fraction * (upperColor[2] - lowerColor[2]));
+      return [r, g, b];
+    }
+  }
+
+  // Fallback (shouldn’t happen with valid keys)
+  return colorType[1.0];
+}
+
+export function getRgbColorLinearGradient(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
   // assumes length of gradientSteps is 5
-  const colorSchemeSteps: number[] = colorScheme.keys;
+  let colorType: ColorType = getColorType(colorScheme);
+  const colorSchemeSteps: number[] = colorType.keys;
+  if (colorSchemeSteps.length != gradientSteps.length) {
+    throw Error('Color Scheme and Gradient Steps should have matching lengths!');
+  }
+  if (score + 0.0 === 0.0) {
+    return `rgb(${colorType[colorSchemeSteps[0]].join(',')})`;
+  } else {
+    const start = gradientSteps[0];
+    const step1 = gradientSteps[1];
+    const step2 = gradientSteps[2];
+    const step3 = gradientSteps[3];
+    const end = gradientSteps[4];
+    let h: number;
+    console.log(start, step1, step2, step3, end, score);
+    if (score < step1) {
+      h = 0.0 + (score - start) / (step1 - start);
+    } else if (score < step2) {
+      h = 1.0 + (score - step1) / (step2 - step1);
+    } else if (score < step3) {
+      h = 2.0 + (score - step2) / (step3 - step2);
+    } else if (score < end) {
+      h = 3.0 + (score - step3) / (end - step3);
+    } else {
+      h = 4.0;
+    }
+    // Normalize h from 0–4 to 0–1
+    const normalizedH = h / 4;
+
+    // Interpolate the grayscale color
+    const rgb = interpolateGradient(normalizedH, colorType);
+    return `rgb(${rgb.join(',')})`;
+  }
+}
+
+export function getRgbColorFixed(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
+  // assumes length of gradientSteps is 5
+  let colorType: ColorType = getColorType(colorScheme);
+  const colorSchemeSteps: number[] = colorType.keys;
   if (colorSchemeSteps.length != gradientSteps.length) {
     throw Error('Color Scheme and Gradient Steps should have matching lengths!');
   }
   if (score + 0.0 === 0.0 || score < gradientSteps[1]) {
-    return `rgb(${colorScheme[colorSchemeSteps[0]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[0]].join(',')})`;
   } else if (score >= gradientSteps[1] && score < gradientSteps[2]) {
-    return `rgb(${colorScheme[colorSchemeSteps[1]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[1]].join(',')})`;
   } else if (score >= gradientSteps[2] && score < gradientSteps[3]) {
-    return `rgb(${colorScheme[colorSchemeSteps[2]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[2]].join(',')})`;
   } else if (score >= gradientSteps[3] && score < gradientSteps[4]) {
-    return `rgb(${colorScheme[colorSchemeSteps[3]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[3]].join(',')})`;
   } else if (score >= gradientSteps[4]) {
-    return `rgb(${colorScheme[colorSchemeSteps[4]].join(',')})`;
+    return `rgb(${colorType[colorSchemeSteps[4]].join(',')})`;
   } else {
     return `rgb(192,192,192)`;
   }
 }
 
 export function getGradientSteps(
-  minEvalue: number,
-  maxEvalue: number,
-  minEvalueNotZero: number,
+  minScore: number,
+  maxSCore: number,
+  minScoreNotZero: number,
+  scaleType: ScaleTypeEnum,
+  scoreType: ScoreTypeEnum,
   colorScheme: ColorSchemeEnum
 ): number[] {
   let gradientSteps: number[] = [];
-  if (colorScheme === ColorSchemeEnum.fixed) {
-    gradientSteps = [0, Math.pow(10, -1), Math.pow(10, 0), Math.pow(10, 1), Math.pow(10, 2)];
-  } else if (colorScheme === ColorSchemeEnum.dynamic) {
-    if (maxEvalue < 1e-304) {
-      const eScale = -304;
-      gradientSteps = [
-        0,
-        Math.pow(10, eScale),
-        Math.pow(10, eScale / 2),
-        Math.pow(10, eScale / 4),
-        Math.pow(10, eScale / 8),
-      ];
-    } else if (minEvalue < 1) {
-      const maxLog10 = Math.log10(maxEvalue);
-      if (maxEvalue <= 1) {
-        let secondEvalue: number;
-        let thirdEvalue: number;
-        let forthEvalue: number;
-        if (minEvalue === 0 && minEvalueNotZero > 0) {
-          secondEvalue = Math.log10(minEvalueNotZero) - 1;
-        } else {
-          const minLog10 = Math.log10(minEvalue);
-          secondEvalue = minLog10 + (maxLog10 - minLog10) / 2;
-        }
-        thirdEvalue = secondEvalue + (maxLog10 - secondEvalue) / 2;
-        forthEvalue = thirdEvalue + (maxLog10 - thirdEvalue) / 2;
-        gradientSteps = [
-          minEvalue,
-          Math.pow(10, secondEvalue),
-          Math.pow(10, thirdEvalue),
-          Math.pow(10, forthEvalue),
-          maxEvalue,
-        ];
+  if (colorScheme === ColorSchemeEnum.qualitative || colorScheme === ColorSchemeEnum.ncbiblast) {
+    // buckets instead of gradient
+    if (scaleType === ScaleTypeEnum.fixed) {
+      // fixed scale
+      if (scoreType === ScoreTypeEnum.bitscore) {
+        gradientSteps = [0, 40, 50, 80, 200];
+      } else if (scoreType === ScoreTypeEnum.similarity || scoreType === ScoreTypeEnum.identity) {
+        gradientSteps = [0, 20, 40, 60, 80];
       } else {
-        const diffEvalue = Math.log10(minEvalueNotZero) - Math.log10(maxEvalue);
-        if (Math.abs(diffEvalue) <= 2) {
-          gradientSteps = [minEvalue, 1, (2 + maxEvalue) / 3, (2 + 2 * maxEvalue) / 3, maxEvalue];
-        } else if (Math.abs(diffEvalue) <= 4) {
-          gradientSteps = [minEvalue, Math.pow(10, diffEvalue / 2), 1, (maxEvalue + 1) / 2, maxEvalue];
-        } else {
-          gradientSteps = [minEvalue, Math.pow(10, diffEvalue / 2), Math.pow(10, diffEvalue / 4), 1, maxEvalue];
-        }
+        // fixed (based on E-value)
+        gradientSteps = [0, 0.001, 0.01, 0.1, 1];
       }
     } else {
-      gradientSteps = [
-        minEvalue,
-        (3 * minEvalue + maxEvalue) / 4,
-        (minEvalue + maxEvalue) / 2,
-        (minEvalue + 3 * maxEvalue) / 4,
-        maxEvalue,
-      ];
+      // dynamic scale
+      // dynamic scale
+      if (scoreType === ScoreTypeEnum.evalue) {
+        if (maxSCore < 1e-304) {
+          const eScale = -304;
+          gradientSteps = [
+            0,
+            Math.pow(10, eScale),
+            Math.pow(10, eScale / 2),
+            Math.pow(10, eScale / 4),
+            Math.pow(10, eScale / 8),
+          ];
+        } else if (minScore < 1) {
+          const maxLog10 = Math.log10(maxSCore);
+          if (maxSCore <= 1) {
+            let secondEvalue: number;
+            let thirdEvalue: number;
+            let forthEvalue: number;
+            let fifthEvalue: number;
+            if (minScore === 0 && minScoreNotZero > 0) {
+              secondEvalue = Math.log10(minScoreNotZero) - 1;
+            } else {
+              const minLog10 = Math.log10(minScore);
+              secondEvalue = minLog10 + (maxLog10 - minLog10) / 3;
+            }
+            thirdEvalue = secondEvalue + (maxLog10 - secondEvalue) / 3;
+            forthEvalue = thirdEvalue + (maxLog10 - thirdEvalue) / 3;
+            fifthEvalue = forthEvalue + (maxLog10 - forthEvalue) / 3;
+            gradientSteps = [
+              minScore,
+              Math.pow(10, secondEvalue),
+              Math.pow(10, thirdEvalue),
+              Math.pow(10, forthEvalue),
+              Math.pow(10, fifthEvalue),
+            ];
+          } else {
+            const diffEvalue = Math.log10(minScoreNotZero) - Math.log10(maxSCore);
+            if (Math.abs(diffEvalue) <= 2) {
+              gradientSteps = [minScore, 1, (2 + maxSCore) / 4, (2 + 2 * maxSCore) / 4, (2 + 3 * maxSCore) / 4];
+            } else if (Math.abs(diffEvalue) <= 4) {
+              gradientSteps = [minScore, Math.pow(10, diffEvalue / 2), 1, (maxSCore + 1) / 2, ((maxSCore + 1) / 2) * 2];
+            } else {
+              gradientSteps = [
+                minScore,
+                Math.pow(10, diffEvalue / 2),
+                Math.pow(10, diffEvalue / 4),
+                Math.pow(10, diffEvalue / 8),
+                1,
+              ];
+            }
+          }
+        } else {
+          gradientSteps = [
+            minScore,
+            (maxSCore - minScore) / 5,
+            ((maxSCore - minScore) / 5) * 2,
+            ((maxSCore - minScore) / 5) * 3,
+            ((maxSCore - minScore) / 5) * 4,
+          ];
+        }
+      } else {
+        gradientSteps = [
+          minScore,
+          (maxSCore - minScore) / 5,
+          ((maxSCore - minScore) / 5) * 2,
+          ((maxSCore - minScore) / 5) * 3,
+          ((maxSCore - minScore) / 5) * 4,
+        ];
+      }
     }
-  } else if (colorScheme === ColorSchemeEnum.ncbiblast) {
-    gradientSteps = [0, 40, 50, 80, 200];
   } else {
-    // fixed (based on E-value)
-    gradientSteps = [0, 1e-5, 1e-2, 1, 100];
+    // gradient
+    if (scaleType === ScaleTypeEnum.fixed) {
+      if (scoreType === ScoreTypeEnum.evalue) {
+        const diffEvalue = Math.log10(minScoreNotZero) - Math.log10(maxSCore);
+        minScore = 0.0;
+        maxSCore = 10.0;
+        if (Math.abs(diffEvalue) <= 2) {
+          gradientSteps = [minScore, 1, (2 + maxSCore) / 3, (2 + 2 * maxSCore) / 3, maxSCore];
+        } else if (Math.abs(diffEvalue) <= 4) {
+          gradientSteps = [minScore, Math.pow(10, diffEvalue / 2), 1, (maxSCore + 1) / 2, maxSCore];
+        } else {
+          gradientSteps = [minScore, Math.pow(10, diffEvalue / 2), Math.pow(10, diffEvalue / 4), 1, maxSCore];
+        }
+        // }
+      } else if (scoreType === ScoreTypeEnum.bitscore) {
+        gradientSteps = [0, 40, 50, 80, 200];
+      } else if (scoreType === ScoreTypeEnum.similarity || scoreType === ScoreTypeEnum.identity) {
+        gradientSteps = [0, 25, 50, 75, 100];
+      } else {
+        // fixed (based on E-value)
+        gradientSteps = [0, 1e-5, 1e-2, 1, 100];
+      }
+    } else {
+      // dynamic scale
+      if (scoreType === ScoreTypeEnum.evalue) {
+        if (maxSCore < 1e-304) {
+          const eScale = -304;
+          gradientSteps = [
+            0,
+            Math.pow(10, eScale),
+            Math.pow(10, eScale / 2),
+            Math.pow(10, eScale / 4),
+            Math.pow(10, eScale / 8),
+          ];
+        } else if (minScore < 1) {
+          const maxLog10 = Math.log10(maxSCore);
+          if (maxSCore <= 1) {
+            let secondEvalue: number;
+            let thirdEvalue: number;
+            let forthEvalue: number;
+            if (minScore === 0 && minScoreNotZero > 0) {
+              secondEvalue = Math.log10(minScoreNotZero) - 1;
+            } else {
+              const minLog10 = Math.log10(minScore);
+              secondEvalue = minLog10 + (maxLog10 - minLog10) / 2;
+            }
+            thirdEvalue = secondEvalue + (maxLog10 - secondEvalue) / 2;
+            forthEvalue = thirdEvalue + (maxLog10 - thirdEvalue) / 2;
+            gradientSteps = [
+              minScore,
+              Math.pow(10, secondEvalue),
+              Math.pow(10, thirdEvalue),
+              Math.pow(10, forthEvalue),
+              maxSCore,
+            ];
+          } else {
+            const diffEvalue = Math.log10(minScoreNotZero) - Math.log10(maxSCore);
+            if (Math.abs(diffEvalue) <= 2) {
+              gradientSteps = [minScore, 1, (2 + maxSCore) / 3, (2 + 2 * maxSCore) / 3, maxSCore];
+            } else if (Math.abs(diffEvalue) <= 4) {
+              gradientSteps = [minScore, Math.pow(10, diffEvalue / 2), 1, (maxSCore + 1) / 2, maxSCore];
+            } else {
+              gradientSteps = [minScore, Math.pow(10, diffEvalue / 2), Math.pow(10, diffEvalue / 4), 1, maxSCore];
+            }
+          }
+        } else {
+          gradientSteps = [
+            minScore,
+            minScore + (maxSCore - minScore) / 5,
+            minScore + ((maxSCore - minScore) / 5) * 2,
+            minScore + ((maxSCore - minScore) / 5) * 3,
+            maxSCore,
+          ];
+        }
+      } else {
+        gradientSteps = [
+          minScore,
+          minScore + (maxSCore - minScore) / 5,
+          minScore + ((maxSCore - minScore) / 5) * 2,
+          minScore + ((maxSCore - minScore) / 5) * 3,
+          maxSCore,
+        ];
+      }
+    }
   }
   return gradientSteps;
 }

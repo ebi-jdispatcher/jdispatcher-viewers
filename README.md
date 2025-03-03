@@ -11,11 +11,11 @@
 
 Job Dispatcher viewers is a TypeScript module that uses [Fabric.js](http://fabricjs.com/)
 (based on a HTML canvas) to implement interactive visualisations,
-Visual Output and Functional Predictions. The app is provided as a ES module, can be used as plugin and 
+Visual Output and Functional Predictions. The app is provided as an ES module, can be used as plugin and 
 also as [Web Components](https://www.webcomponents.org/). A [Node.js](https://nodejs.org/) CLI application
 is also provided to generate static figures in SVG and PNG formats.
 
-[Live Demo](https://ebi-jdispatcher.github.io/jdispatcher-viewers)
+[Live Demo](https://ebi-jdispatcher.github.io/jdispatcher-viewers/demo/)
 
 ## Visual Output
 
@@ -23,7 +23,7 @@ Visual Output is a diagram visualisation for the hit sequences of sequence simil
 [NCBI BLAST+](https://www.ebi.ac.uk/Tools/sss/ncbiblast/) and 
 [FASTA](https://www.ebi.ac.uk/Tools/sss/ncbiblast/), that highlights the region of the sequences that
 is matching the query sequence and provides corresponding E-values. 
-This currently works only with Job Dispatcher JobIDs, as it depends on the JSON output provided by the service. 
+This currently works only with Job Dispatcher Job IDs, as it depends on the JSON output provided by the service.
 
 ![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/assets/VO.gif)
 

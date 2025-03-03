@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
-import { ColorType } from './custom-types';
+import { ColorSchemeEnum, ColorType } from './custom-types';
 
-export const defaultGradient: ColorType = {
+export const heatmapGradient: ColorType = {
   0.0: [255, 64, 64],
   0.25: [255, 255, 64],
   0.5: [64, 255, 64],
@@ -10,26 +10,64 @@ export const defaultGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
-export function colorDefaultGradient(canvasObj: fabric.Object, start: number, end: number) {
-  canvasObj.set(
-    'fill',
-    new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: start,
-        y1: 0,
-        x2: end,
-        y2: 0,
-      },
-      colorStops: [
-        { offset: 0.0, color: `rgb(${defaultGradient[0.0].join(',')})` },
-        { offset: 0.25, color: `rgb(${defaultGradient[0.25].join(',')})` },
-        { offset: 0.5, color: `rgb(${defaultGradient[0.5].join(',')})` },
-        { offset: 0.75, color: `rgb(${defaultGradient[0.75].join(',')})` },
-        { offset: 1.0, color: `rgb(${defaultGradient[1.0].join(',')})` },
-      ],
-    })
-  );
+export const greyscaleGradient: ColorType = {
+  0.0: [215, 215, 215],
+  0.25: [177, 177, 177],
+  0.5: [141, 141, 141],
+  0.75: [107, 107, 107],
+  1.0: [74, 74, 74],
+  keys: [0.0, 0.25, 0.5, 0.75, 1.0],
+};
+
+export const sequentialGradient: ColorType = {
+  0.0: [193, 231, 255],
+  0.25: [148, 190, 217],
+  0.5: [105, 150, 179],
+  0.75: [61, 112, 143],
+  1.0: [0, 76, 109],
+  keys: [0.0, 0.25, 0.5, 0.75, 1.0],
+};
+
+export const divergentGradient: ColorType = {
+  0.0: [222, 66, 91],
+  0.25: [236, 156, 157],
+  0.5: [255, 233, 171],
+  0.75: [159, 192, 143],
+  1.0: [72, 143, 49],
+  keys: [0.0, 0.25, 0.5, 0.75, 1.0],
+};
+
+export const qualitativeGradient: ColorType = {
+  0.0: [102, 194, 165],
+  0.25: [252, 141, 98],
+  0.5: [141, 160, 203],
+  0.75: [231, 138, 195],
+  1.0: [166, 216, 84],
+  keys: [0.0, 0.25, 0.5, 0.75, 1.0],
+};
+
+export function colorQualitativeGradient(start: number, end: number) {
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: {
+      x1: start,
+      y1: 0,
+      x2: end,
+      y2: 0,
+    },
+    colorStops: [
+      { offset: 0.0, color: `rgb(${qualitativeGradient[0.0].join(',')})` },
+      { offset: 0.199999, color: `rgb(${qualitativeGradient[0.0].join(',')})` },
+      { offset: 0.2, color: `rgb(${qualitativeGradient[0.25].join(',')})` },
+      { offset: 0.399999, color: `rgb(${qualitativeGradient[0.25].join(',')})` },
+      { offset: 0.4, color: `rgb(${qualitativeGradient[0.5].join(',')})` },
+      { offset: 0.599999, color: `rgb(${qualitativeGradient[0.5].join(',')})` },
+      { offset: 0.6, color: `rgb(${qualitativeGradient[0.75].join(',')})` },
+      { offset: 0.799999, color: `rgb(${qualitativeGradient[0.75].join(',')})` },
+      { offset: 0.8, color: `rgb(${qualitativeGradient[1.0].join(',')})` },
+      { offset: 1.0, color: `rgb(${qualitativeGradient[1.0].join(',')})` },
+    ],
+  });
 }
 
 export const ncbiBlastGradient: ColorType = {
@@ -41,29 +79,57 @@ export const ncbiBlastGradient: ColorType = {
   keys: [0, 40, 50, 80, 200],
 };
 
-export function colorNcbiBlastGradient(canvasObj: fabric.Object, start: number, end: number) {
-  canvasObj.set(
-    'fill',
-    new fabric.Gradient({
-      type: 'linear',
-      coords: {
-        x1: start,
-        y1: 0,
-        x2: end,
-        y2: 0,
-      },
-      colorStops: [
-        { offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
-        { offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
-        { offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
-        { offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
-        { offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
-        { offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
-        { offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
-        { offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
-        { offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
-        { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
-      ],
-    })
-  );
+export function colorNcbiBlastGradient(start: number, end: number) {
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: {
+      x1: start,
+      y1: 0,
+      x2: end,
+      y2: 0,
+    },
+    colorStops: [
+      { offset: 0.0, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
+      { offset: 0.199999, color: `rgb(${ncbiBlastGradient[0].join(',')})` },
+      { offset: 0.2, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
+      { offset: 0.399999, color: `rgb(${ncbiBlastGradient[40].join(',')})` },
+      { offset: 0.4, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
+      { offset: 0.599999, color: `rgb(${ncbiBlastGradient[50].join(',')})` },
+      { offset: 0.6, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
+      { offset: 0.799999, color: `rgb(${ncbiBlastGradient[80].join(',')})` },
+      { offset: 0.8, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
+      { offset: 1.0, color: `rgb(${ncbiBlastGradient[200].join(',')})` },
+    ],
+  });
+}
+
+export function getColorType(colorScheme: ColorSchemeEnum) {
+  let colorType: ColorType = heatmapGradient;
+  if (colorScheme === ColorSchemeEnum.heatmap) {
+    colorType = heatmapGradient;
+  } else if (colorScheme === ColorSchemeEnum.greyscale) {
+    colorType = greyscaleGradient;
+  } else if (colorScheme === ColorSchemeEnum.sequential) {
+    colorType = sequentialGradient;
+  } else if (colorScheme === ColorSchemeEnum.divergent) {
+    colorType = divergentGradient;
+  } else if (colorScheme === ColorSchemeEnum.qualitative) {
+    colorType = qualitativeGradient;
+  } else if (colorScheme === ColorSchemeEnum.ncbiblast) {
+    colorType = ncbiBlastGradient;
+  }
+  return colorType;
+}
+
+export function colorGenericGradient(start: number, end: number, colorScheme: ColorSchemeEnum): fabric.Gradient {
+  let gradient: ColorType = getColorType(colorScheme);
+  const colorStops = gradient.keys.map(key => ({
+    offset: key,
+    color: `rgb(${gradient[key].join(',')})`,
+  }));
+  return new fabric.Gradient({
+    type: 'linear',
+    coords: { x1: start, y1: 0, x2: end, y2: 0 },
+    colorStops: colorStops,
+  });
 }

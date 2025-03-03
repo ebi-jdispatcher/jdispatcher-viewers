@@ -2,7 +2,7 @@ import { fabric } from 'fabric';
 import { numberToString } from './other-utilities';
 import { SSSResultModel, Hit, Hsp, IprMatchFlat } from './data-model';
 import { getTotalPixels, getTextLegendPaddingFactor } from './coords-utilities';
-import { colorDefaultGradient, colorNcbiBlastGradient } from './color-schemes';
+import { colorGenericGradient, colorNcbiBlastGradient, colorQualitativeGradient } from './color-schemes';
 import {
   objectDefaults,
   textDefaults,
@@ -11,6 +11,8 @@ import {
   RenderOptions,
   CoordsValues,
   ColorSchemeEnum,
+  ScaleTypeEnum,
+  ScoreTypeEnum,
   TextType,
   RectType,
 } from './custom-types';
@@ -55,7 +57,7 @@ export function drawHeaderTextGroup(
   // Start
   const start = dataObj.start;
   textObj.top = origTopPadding;
-  textObj.left = renderOptions.canvasWidth! - 135;
+  textObj.left = renderOptions.canvasWidth! - 170;
   const startText = new fabric.Text(`${start}`, textObj);
   // End
   const end = dataObj.end;
@@ -114,19 +116,24 @@ export function drawContentHeaderTextGroup(
   const queryText = new fabric.Text('Sequence Match', textObj);
   queryText.width = totalQueryPixels;
   textObj.left = coordValues.startEvalPixels;
-  let evalueText;
+  let scoreTypeLabel;
   // E-value/ Bits
-  if (renderOptions.colorScheme === ColorSchemeEnum.ncbiblast) {
-    evalueText = new fabric.Text('Bit score', textObj);
+  if (renderOptions.scoreType === ScoreTypeEnum.identity) {
+    scoreTypeLabel = new fabric.Text('Identity', textObj);
+  } else if (renderOptions.scoreType === ScoreTypeEnum.similarity) {
+    scoreTypeLabel = new fabric.Text('Similarity', textObj);
+  } else if (renderOptions.scoreType === ScoreTypeEnum.bitscore) {
+    scoreTypeLabel = new fabric.Text('Bit score', textObj);
   } else {
-    evalueText = new fabric.Text('E-value', textObj);
+    scoreTypeLabel = new fabric.Text('E-value', textObj);
   }
-  evalueText.width = renderOptions.contentScoringWidth;
+  scoreTypeLabel.width = renderOptions.contentScoringWidth;
+  scoreTypeLabel.textAlign = 'center';
   // Subject Match
   textObj.left = coordValues.startSubjPixels;
   const subjText = new fabric.Text('Subject Match', textObj);
   subjText.width = totalSubjPixels;
-  const textGroup = new fabric.Group([queryText, evalueText, subjText], objectDefaults);
+  const textGroup = new fabric.Group([queryText, scoreTypeLabel, subjText], objectDefaults);
   return textGroup;
 }
 
@@ -382,8 +389,12 @@ export function drawScoreText(
 
   textObj.left = startEvalPixels;
   let hspScoreText: fabric.Text;
-  if (renderOptions.colorScheme === ColorSchemeEnum.ncbiblast) {
+  if (renderOptions.scoreType === ScoreTypeEnum.bitscore) {
     hspScoreText = new fabric.Text(numberToString(hsp.hsp_bit_score!), textObj);
+  } else if (renderOptions.scoreType === ScoreTypeEnum.identity) {
+    hspScoreText = new fabric.Text(numberToString(hsp.hsp_identity!), textObj);
+  } else if (renderOptions.scoreType === ScoreTypeEnum.similarity) {
+    hspScoreText = new fabric.Text(numberToString(hsp.hsp_positive!), textObj);
   } else {
     hspScoreText = new fabric.Text(numberToString(hsp.hsp_expect!), textObj);
   }
@@ -437,11 +448,16 @@ export function drawDomainTooltips(
   floatTextObj.originY = 'top';
   floatTextObj.top = 5;
   let tooltip: string;
-  if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) {
-    tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nBit score: ${numberToString(hsp.hsp_bit_score!)}`;
-  } else {
-    tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nE-value: ${numberToString(hsp.hsp_expect!)}`;
-  }
+  // if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) {
+  //   tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nBit score: ${numberToString(hsp.hsp_bit_score!)}`;
+  // } else {
+  //   tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nE-value: ${numberToString(hsp.hsp_expect!)}`;
+  // }
+  tooltip = `Start: ${seq_from}\nEnd: ${seq_to}\nE-value: ${numberToString(
+    hsp.hsp_expect!
+  )}\nBit score: ${numberToString(hsp.hsp_bit_score!)}\nIdentity: ${numberToString(
+    hsp.hsp_identity!
+  )}\nSimilarity: ${numberToString(hsp.hsp_positive!)}`;
   const tooltipText = new fabric.Text(tooltip, floatTextObj);
   const rectObj = { ...rectDefaults };
   rectObj.fill = 'white';
@@ -451,7 +467,7 @@ export function drawDomainTooltips(
   rectObj.originX = 'top';
   rectObj.originY = 'top';
   rectObj.width = 140;
-  rectObj.height = 60;
+  rectObj.height = 125;
   rectObj.opacity = 0.95;
 
   const tooltipBox: fabric.Rect = new fabric.Rect(rectObj);
@@ -466,20 +482,20 @@ export function drawDomainTooltips(
   return tooltipGroup;
 }
 
-export function drawScaleTypeText(renderOptions: RenderOptions, topPadding: number): fabric.Text {
+export function drawScaleLabelText(renderOptions: RenderOptions, topPadding: number, label: string): fabric.Text {
   const textSelObj = { ...textDefaults };
   textSelObj.fontSize = renderOptions.fontSize! + 1;
   textSelObj.fontWeight = 'bold';
   textSelObj.top = topPadding;
   textSelObj.left = renderOptions.scaleLabelWidth!;
-  const scaleTypeText = new fabric.Text('Scale Type:', textSelObj);
+  const scaleTypeText = new fabric.Text(label, textSelObj);
   return scaleTypeText;
 }
 
-export function drawCheckBoxText(
+export function drawScaleTypeCheckBoxText(
   renderOptions: RenderOptions,
   topPadding: number
-): [fabric.Text, fabric.Text, TextType, fabric.Text, fabric.Text, TextType, fabric.Text, fabric.Text, TextType] {
+): [fabric.Text, fabric.Text, TextType, fabric.Text, fabric.Text, TextType] {
   // Scale Type selection
   const textSelObj = { ...textDefaults };
   textSelObj.fontSize = renderOptions.fontSize! + 1;
@@ -493,40 +509,214 @@ export function drawCheckBoxText(
   textCheckDynObj.top = topPadding - 8;
   textCheckDynObj.left = renderOptions.scaleLabelWidth!;
   const textCheckFixObj = { ...textCheckDynObj };
-  const textCheckNcbiObj = { ...textCheckDynObj };
 
   let checkSym: string;
-  renderOptions.colorScheme === ColorSchemeEnum.dynamic ? (checkSym = '☒') : (checkSym = '☐');
-  if (renderOptions.colorScheme === ColorSchemeEnum.dynamic) textCheckDynObj.fill = 'black';
-  textCheckDynObj.left! += 80;
+  renderOptions.scaleType === ScaleTypeEnum.dynamic ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scaleType === ScaleTypeEnum.dynamic) textCheckDynObj.fill = 'black';
+  textCheckDynObj.left! += 120;
   const dynamicCheckboxText = new fabric.Text(checkSym, textCheckDynObj);
-  textSelObj.left! += 100;
-  const dynamicText = new fabric.Text('Dynamic (E-value: min to max)', textSelObj);
+  textSelObj.left! += 140;
+  const dynamicText = new fabric.Text('Dynamic (Score: min to max)', textSelObj);
 
-  renderOptions.colorScheme! === ColorSchemeEnum.fixed ? (checkSym = '☒') : (checkSym = '☐');
-  if (renderOptions.colorScheme! === ColorSchemeEnum.fixed) textCheckFixObj.fill = 'black';
-  textCheckFixObj.left! += 290;
+  renderOptions.scaleType! === ScaleTypeEnum.fixed ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scaleType! === ScaleTypeEnum.fixed) textCheckFixObj.fill = 'black';
+  textCheckFixObj.left! += 340;
   const fixedCheckboxText = new fabric.Text(checkSym, textCheckFixObj);
-  textSelObj.left! += 210;
-  const fixedText = new fabric.Text('Fixed (E-value: 0.0 to 100.0)', textSelObj);
+  textSelObj.left! += 220;
+  let fixedText;
+  if (renderOptions.scoreType! === ScoreTypeEnum.bitscore) {
+    fixedText = new fabric.Text('Fixed (Bit score: <40 to ≥200)', textSelObj);
+  } else if (renderOptions.scoreType! === ScoreTypeEnum.similarity) {
+    fixedText = new fabric.Text('Fixed (Similarity: 0.0 to 100.0)', textSelObj);
+  } else if (renderOptions.scoreType! === ScoreTypeEnum.identity) {
+    fixedText = new fabric.Text('Fixed (Identity: 0.0 to 100.0)', textSelObj);
+  } else {
+    fixedText = new fabric.Text('Fixed (E-value: 0.0 to 10.0)', textSelObj);
+  }
+  return [dynamicCheckboxText, dynamicText, textCheckDynObj, fixedCheckboxText, fixedText, textCheckFixObj];
+}
 
-  renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast ? (checkSym = '☒') : (checkSym = '☐');
-  if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) textCheckNcbiObj.fill = 'black';
-  textCheckNcbiObj.left! += 480;
-  const ncbiblastCheckboxText = new fabric.Text(checkSym, textCheckNcbiObj);
-  textSelObj.left! += 190;
-  const ncbiblastText = new fabric.Text('NCBI BLAST+ (Bit score: <40 to ≥200)', textSelObj);
+export function drawScoreTypeCheckBoxText(
+  renderOptions: RenderOptions,
+  topPadding: number
+): [
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+] {
+  // Score Type selection
+  const textSelObj = { ...textDefaults };
+  textSelObj.fontSize = renderOptions.fontSize! + 1;
+  textSelObj.top = topPadding;
+  textSelObj.left = renderOptions.scaleLabelWidth!;
+
+  const textCheckEvalueObj = { ...textDefaults };
+  textCheckEvalueObj.fontSize = renderOptions.fontSize! + 12;
+  textCheckEvalueObj.fill = 'grey';
+  textCheckEvalueObj.evented = true;
+  textCheckEvalueObj.top = topPadding - 8;
+  textCheckEvalueObj.left = renderOptions.scaleLabelWidth!;
+  const textCheckIdentityObj = { ...textCheckEvalueObj };
+  const textCheckSimilarityObj = { ...textCheckEvalueObj };
+  const textCheckBitscoreObj = { ...textCheckEvalueObj };
+
+  let checkSym: string;
+  renderOptions.scoreType === ScoreTypeEnum.evalue ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scoreType === ScoreTypeEnum.evalue) textCheckEvalueObj.fill = 'black';
+  textCheckEvalueObj.left! += 120;
+  const evalueCheckboxText = new fabric.Text(checkSym, textCheckEvalueObj);
+  textSelObj.left! += 140;
+  const evalueText = new fabric.Text('E-value', textSelObj);
+
+  renderOptions.scoreType! === ScoreTypeEnum.identity ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scoreType! === ScoreTypeEnum.identity) textCheckIdentityObj.fill = 'black';
+  textCheckIdentityObj.left! += 230;
+  const identityCheckboxText = new fabric.Text(checkSym, textCheckIdentityObj);
+  textSelObj.left! += 110;
+  const identityText = new fabric.Text('Identity', textSelObj);
+
+  renderOptions.scoreType! === ScoreTypeEnum.similarity ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scoreType! === ScoreTypeEnum.similarity) textCheckSimilarityObj.fill = 'black';
+  textCheckSimilarityObj.left! += 340;
+  const similarityCheckboxText = new fabric.Text(checkSym, textCheckSimilarityObj);
+  textSelObj.left! += 110;
+  const similarityText = new fabric.Text('Similarity', textSelObj);
+
+  renderOptions.scoreType! === ScoreTypeEnum.bitscore ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.scoreType! === ScoreTypeEnum.bitscore) textCheckBitscoreObj.fill = 'black';
+  textCheckBitscoreObj.left! += 460;
+  const bitscoreCheckboxText = new fabric.Text(checkSym, textCheckBitscoreObj);
+  textSelObj.left! += 120;
+  const bitscoreText = new fabric.Text('Bit score', textSelObj);
 
   return [
-    dynamicCheckboxText,
-    dynamicText,
-    textCheckDynObj,
-    fixedCheckboxText,
-    fixedText,
-    textCheckFixObj,
+    evalueCheckboxText,
+    evalueText,
+    textCheckEvalueObj,
+    identityCheckboxText,
+    identityText,
+    textCheckIdentityObj,
+    similarityCheckboxText,
+    similarityText,
+    textCheckSimilarityObj,
+    bitscoreCheckboxText,
+    bitscoreText,
+    textCheckBitscoreObj,
+  ];
+}
+
+export function drawColorSchemeCheckBoxText(
+  renderOptions: RenderOptions,
+  topPadding: number
+): [
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+  fabric.Text,
+  fabric.Text,
+  TextType,
+] {
+  // Score Type selection
+  const textSelObj = { ...textDefaults };
+  textSelObj.fontSize = renderOptions.fontSize! + 1;
+  textSelObj.top = topPadding;
+  textSelObj.left = renderOptions.scaleLabelWidth!;
+
+  const textCheckHeatmapObj = { ...textDefaults };
+  textCheckHeatmapObj.fontSize = renderOptions.fontSize! + 12;
+  textCheckHeatmapObj.fill = 'grey';
+  textCheckHeatmapObj.evented = true;
+  textCheckHeatmapObj.top = topPadding - 8;
+  textCheckHeatmapObj.left = renderOptions.scaleLabelWidth!;
+  const textCheckGreyscaleObj = { ...textCheckHeatmapObj };
+  const textCheckSequentialObj = { ...textCheckHeatmapObj };
+  const textCheckDivergentObj = { ...textCheckHeatmapObj };
+  const textCheckQualitativeObj = { ...textCheckHeatmapObj };
+  const textCheckNcbiBlastObj = { ...textCheckHeatmapObj };
+
+  let checkSym: string;
+  renderOptions.colorScheme === ColorSchemeEnum.heatmap ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme === ColorSchemeEnum.heatmap) textCheckHeatmapObj.fill = 'black';
+  textCheckHeatmapObj.left! += 120;
+  const heatmapCheckboxText = new fabric.Text(checkSym, textCheckHeatmapObj);
+  textSelObj.left! += 140;
+  const heatmapText = new fabric.Text('Heatmap', textSelObj);
+
+  renderOptions.colorScheme! === ColorSchemeEnum.greyscale ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme! === ColorSchemeEnum.greyscale) textCheckGreyscaleObj.fill = 'black';
+  textCheckGreyscaleObj.left! += 230;
+  const greyscaleCheckboxText = new fabric.Text(checkSym, textCheckGreyscaleObj);
+  textSelObj.left! += 110;
+  const greyscaleText = new fabric.Text('Greyscale', textSelObj);
+
+  renderOptions.colorScheme! === ColorSchemeEnum.sequential ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme! === ColorSchemeEnum.sequential) textCheckSequentialObj.fill = 'black';
+  textCheckSequentialObj.left! += 340;
+  const sequentialCheckboxText = new fabric.Text(checkSym, textCheckSequentialObj);
+  textSelObj.left! += 110;
+  const sequentialText = new fabric.Text('Sequential', textSelObj);
+
+  renderOptions.colorScheme! === ColorSchemeEnum.divergent ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme! === ColorSchemeEnum.divergent) textCheckDivergentObj.fill = 'black';
+  textCheckDivergentObj.left! += 460;
+  const divergentCheckboxText = new fabric.Text(checkSym, textCheckDivergentObj);
+  textSelObj.left! += 120;
+  const divergentText = new fabric.Text('Divergent', textSelObj);
+
+  renderOptions.colorScheme! === ColorSchemeEnum.qualitative ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme! === ColorSchemeEnum.qualitative) textCheckQualitativeObj.fill = 'black';
+  textCheckQualitativeObj.left! += 560;
+  const qualitativeCheckboxText = new fabric.Text(checkSym, textCheckQualitativeObj);
+  textSelObj.left! += 100;
+  const qualitativeText = new fabric.Text('Qualitative', textSelObj);
+
+  renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast ? (checkSym = '☒') : (checkSym = '☐');
+  if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) textCheckNcbiBlastObj.fill = 'black';
+  textCheckNcbiBlastObj.left! += 660;
+  const ncbiblastCheckboxText = new fabric.Text(checkSym, textCheckNcbiBlastObj);
+  textSelObj.left! += 100;
+  const ncbiblastText = new fabric.Text('NCBI BLAST+', textSelObj);
+
+  return [
+    heatmapCheckboxText,
+    heatmapText,
+    textCheckHeatmapObj,
+    greyscaleCheckboxText,
+    greyscaleText,
+    textCheckGreyscaleObj,
+    sequentialCheckboxText,
+    sequentialText,
+    textCheckSequentialObj,
+    divergentCheckboxText,
+    divergentText,
+    textCheckDivergentObj,
+    qualitativeCheckboxText,
+    qualitativeText,
+    textCheckQualitativeObj,
     ncbiblastCheckboxText,
     ncbiblastText,
-    textCheckNcbiObj,
+    textCheckNcbiBlastObj,
   ];
 }
 
@@ -534,14 +724,19 @@ export function drawScaleScoreText(renderOptions: RenderOptions, topPadding: num
   const textObj = { ...textDefaults };
   textObj.fontSize = renderOptions.fontSize! + 1;
   textObj.top = topPadding;
-  let scaleTypeLabel: string;
-  renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast
-    ? (scaleTypeLabel = 'Bit score')
-    : (scaleTypeLabel = 'E-value');
-  renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast
-    ? (textObj.left = renderOptions.scaleLabelWidth! - 56)
-    : (textObj.left = renderOptions.scaleLabelWidth! - 50);
-  const scaleScoreText = new fabric.Text(`${scaleTypeLabel}`, textObj);
+  textObj.textAlign = 'right';
+  let scoreTypeLabel: string;
+  if (renderOptions.scoreType === ScoreTypeEnum.identity) {
+    scoreTypeLabel = 'Identity';
+  } else if (renderOptions.scoreType === ScoreTypeEnum.similarity) {
+    scoreTypeLabel = 'Similarity';
+  } else if (renderOptions.scoreType === ScoreTypeEnum.bitscore) {
+    scoreTypeLabel = 'Bit score';
+  } else {
+    scoreTypeLabel = 'E-value';
+  }
+  textObj.left = renderOptions.scaleLabelWidth! - 70;
+  const scaleScoreText = new fabric.Text(`${scoreTypeLabel}`, textObj);
   return scaleScoreText;
 }
 
@@ -553,9 +748,11 @@ export function drawScaleColorGradient(renderOptions: RenderOptions, topPadding:
   rectObj.height = 15;
   const colorScale = new fabric.Rect(rectObj);
   if (renderOptions.colorScheme! === ColorSchemeEnum.ncbiblast) {
-    colorNcbiBlastGradient(colorScale, 0, renderOptions.scaleWidth!);
+    colorScale.set('fill', colorNcbiBlastGradient(0, renderOptions.scaleWidth!));
+  } else if (renderOptions.colorScheme! === ColorSchemeEnum.qualitative) {
+    colorScale.set('fill', colorQualitativeGradient(0, renderOptions.scaleWidth!));
   } else {
-    colorDefaultGradient(colorScale, 0, renderOptions.scaleWidth!);
+    colorScale.set('fill', colorGenericGradient(0, renderOptions.scaleWidth!, renderOptions.colorScheme!));
   }
   return colorScale;
 }
@@ -696,23 +893,23 @@ export function drawScaleTick5LabelsGroup(
   textObj.top = topPadding;
   textObj.fontSize = renderOptions.fontSize!;
   // 20% Tick Label
-  let label = `<${gradientSteps[1]}`;
+  let label = `<${numberToString(gradientSteps[1])}`;
   textObj.left = renderOptions.scaleLabelWidth! + leftPadding - label.length * 3 - 72;
   const o20LabelText = new fabric.Text(label, textObj);
   // 40% Tick Label
-  label = `${gradientSteps[1]} - ${gradientSteps[2]}`;
+  label = `${numberToString(gradientSteps[1])} - ${numberToString(gradientSteps[2])}`;
   textObj.left = renderOptions.scaleLabelWidth! + leftPadding * 2 - label.length * 3 - 72;
   const o40LabelText = new fabric.Text(label, textObj);
   // 60% Tick Label
-  label = `${gradientSteps[2]} - ${gradientSteps[3]}`;
+  label = `${numberToString(gradientSteps[2])} - ${numberToString(gradientSteps[3])}`;
   textObj.left = renderOptions.scaleLabelWidth! + leftPadding * 3 - label.length * 3 - 72;
   const o60LabelText = new fabric.Text(label, textObj);
   // 60% Tick Label
-  label = `${gradientSteps[3]} - ${gradientSteps[4]}`;
+  label = `${numberToString(gradientSteps[3])} - ${numberToString(gradientSteps[4])}`;
   textObj.left = renderOptions.scaleLabelWidth! + leftPadding * 4 - label.length * 3 - 72;
   const o80LabelText = new fabric.Text(label, textObj);
   // End Tick Label
-  label = `≥${gradientSteps[4]}`;
+  label = `≥${numberToString(gradientSteps[4])}`;
   textObj.left = renderOptions.scaleLabelWidth! + renderOptions.scaleWidth! - label.length * 3 - 72;
   const endLabelText = new fabric.Text(label, textObj);
 
@@ -761,7 +958,7 @@ export function drawFooterText(renderOptions: RenderOptions, topPadding: number)
   textObj.fontSize = renderOptions.fontSize;
   textObj.evented = true;
   textObj.top = topPadding;
-  textObj.left = 225;
+  textObj.left = 310;
   const copyright = `European Bioinformatics Institute (EMBL-EBI) - `;
   const copyrightText = new fabric.Text(`${copyright}`, textObj);
   return [copyrightText, textObj];
@@ -777,7 +974,7 @@ export function drawFooterLinkText(
   textSeqObj.fontSize = renderOptions.fontSize!;
   textSeqObj.evented = true;
   textSeqObj.top = topPadding;
-  textSeqObj.left = 467;
+  textSeqObj.left = 593;
   const sequenceDefText = new fabric.Text(`${url}`, textSeqObj);
   return [sequenceDefText, textSeqObj];
 }
@@ -827,7 +1024,7 @@ export function drawProteinFeaturesText(renderOptions: RenderOptions, topPadding
   textSelObj.fontSize = renderOptions.fontSize! + 1;
   textSelObj.fontWeight = 'bold';
   textSelObj.top = topPadding;
-  textSelObj.left = renderOptions.scaleLabelWidth! - 10;
+  textSelObj.left = renderOptions.scaleLabelWidth! - 5;
   const scaleTypeText = new fabric.Text('Select your database:', textSelObj);
   return scaleTypeText;
 }
@@ -904,7 +1101,7 @@ export function drawContentDomainInfoText(
   if (domain_full.length > 40) {
     domain = (domain_full.slice(0, 38) + '...').slice(variableSpace.length);
   }
-  textObj.left = 12 + variableSpace.length * 6;
+  textObj.left = 12 + variableSpace.length * 7.25;
   textObj.evented = true;
   const hitText: fabric.Text = new fabric.Text(domain, textObj);
   return [spaceText, hitText, textObj];
