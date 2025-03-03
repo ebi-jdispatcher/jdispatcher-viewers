@@ -166,6 +166,12 @@ export class FunctionalPredictions extends BasicCanvasRenderer {
     renderOptions.colorScheme != undefined
       ? (this.colorScheme = renderOptions.colorScheme)
       : (this.colorScheme = ColorSchemeEnum.heatmap);
+    renderOptions.scaleType != undefined
+      ? (this.scaleType = renderOptions.scaleType)
+      : (this.scaleType = ScaleTypeEnum.dynamic);
+    renderOptions.scoreType != undefined
+      ? (this.scoreType = renderOptions.scoreType)
+      : (this.scoreType = ScoreTypeEnum.evalue);
     renderOptions.numberHits != undefined ? (this.numberHits = renderOptions.numberHits) : (this.numberHits = 30);
     renderOptions.fontSize != undefined ? (this.fontSize = renderOptions.fontSize) : (this.fontSize = 14);
     renderOptions.fontWeigth != undefined ? (this.fontWeigth = renderOptions.fontWeigth) : (this.fontWeigth = 'normal');
