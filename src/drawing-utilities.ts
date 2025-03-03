@@ -57,7 +57,7 @@ export function drawHeaderTextGroup(
   // Start
   const start = dataObj.start;
   textObj.top = origTopPadding;
-  textObj.left = renderOptions.canvasWidth! - 155;
+  textObj.left = renderOptions.canvasWidth! - 170;
   const startText = new fabric.Text(`${start}`, textObj);
   // End
   const end = dataObj.end;
