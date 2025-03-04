@@ -1,13 +1,4 @@
 # jdispatcher-viewers
-<p>
-    <a href="https://www.npmjs.com/package/@ebi-jdispatcher/jdispatcher-viewers" alt="NPM">
-        <img src="https://img.shields.io/badge/npm-%40ebi--jdispatcher%2Fjdispatcher--viewers-blue" /></a>
-    <a href="https://nodejs.org/en/download/releases/" alt="Node">
-            <img src="https://img.shields.io/badge/node-18.20-green" /></a>
-    <a href="https://twitter.com/intent/follow?screen_name=ebi_jdispatcher">
-        <img src="https://img.shields.io/twitter/follow/ebi_jdispatcher?style=social&logo=twitter"
-            alt="follow on Twitter"></a>  
-</p>
 
 Job Dispatcher viewers is a TypeScript module that uses [Fabric.js](http://fabricjs.com/)
 (based on a HTML canvas) to implement interactive visualisations,
@@ -15,7 +6,7 @@ Visual Output and Functional Predictions. The app is provided as an ES module, c
 also as [Web Components](https://www.webcomponents.org/). A [Node.js](https://nodejs.org/) CLI application
 is also provided to generate static figures in SVG and PNG formats.
 
-[Live Demo](https://ebi-jdispatcher.github.io/jdispatcher-viewers/demo/)
+[Live Demo](/jdispatcher-viewers/demo/)
 
 ## Visual Output
 
@@ -43,12 +34,12 @@ Pfam, SUPERFAMILY, SMART, CATH-Gene3D, CDD, etc.
 Six colouring schemes can be selected along side scale type and score. The scale types are either `dynamic`,
 i.e. the scale ranges from the 'local' minimum to maximum score found in the results, or `fixed`, where the range is pre-defined based on the score being used. There is a selection of scores that can be selected, `E-value` being the default. Besides E-value, sequence `identity` and `similarity`, as well as, `bit score` can selected.
 The colouring schemes currently provided are:
-- `Heatmap`: from red to blue (multiple hues)
-- `Greyscale`: a grey scale (single hue)
-- `Sequential`: a blue scale (single hue)
-- `Divergent`: red to yellow to green  (multiple) hues)
-- `Qualitative`: categorical colouring (multiple hues)
-- `NCBI BLAST+`: NCBI BLAST+ based categorical colouring (multiple hues)
+- `Heatmap`: from red to blue (multiple hues)  
+- `Greyscale`: a grey scale (single hue)  
+- `Sequential`: a blue scale (single hue)  
+- `Divergent`: red to yellow to green  (multiple hues)  
+- `Qualitative`: categorical colouring (multiple hues)  
+- `NCBI BLAST+`: NCBI BLAST+ based categorical colouring (multiple hues)  
 
 ## Dependencies and Installation
 

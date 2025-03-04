@@ -1,0 +1,7 @@
+{
+  "entryPoints": ["src/**/*.ts"],
+  "out": "docs/api/",
+  "exclude": ["**/node_modules/**", "**/*.spec.ts"],
+  "name": "jdispatcher-viewers",
+  "readme": "README.md"
+}

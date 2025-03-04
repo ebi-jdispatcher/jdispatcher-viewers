@@ -25,7 +25,9 @@
         "tsc:cli": "npx tsc -w -p ./tsconfig.cli.json",
         "release": "npx standard-version",
         "format": "npx prettier '**/*.ts' --check",
-        "format:write": "npx prettier '**/*.ts' --write"
+        "format:write": "npx prettier '**/*.ts' --write",
+        "docs": "mkdocs build && npx typedoc --out site/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh",
+        "docs:dev": "npx typedoc --out docs/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh && mkdocs serve"
     },
     "browser": {
         "child_process": false
@@ -81,6 +83,7 @@
         "standard-version": "^9.5.0",
         "ts-jest": "^29.2.5",
         "ts-loader": "^9.5.1",
+        "typedoc": "^0.26.11",
         "typescript": "^4.9.5",
         "webpack": "^5.95.0",
         "webpack-cli": "^4.10.0",
