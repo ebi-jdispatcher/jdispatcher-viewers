@@ -1,0 +1,103 @@
+{
+    "name": "@ebi-jdispatcher/jdispatcher-viewers",
+    "description": "Interactive Visual Output and Functional Prediction visualizations",
+    "version": "0.1.0",
+    "module": "./dist/jd_viewers.bundle.js",
+    "exports": "./bin/jd-viewers-cli.js",
+    "main": "./bin/jd-viewers-cli.js",
+    "type": "module",
+    "engines": {
+        "node": ">=18.20"
+    },
+    "files": [
+        "./dist/",
+        "./bin/"
+    ],
+    "scripts": {
+        "test": "jest",
+        "refresh": "rm -rf ./node_modules ./package-lock.json && npm install --ignore-scripts",
+        "dev": "npx webpack serve --config webpack.config.js",
+        "dev2": "npx webpack --watch --config webpack.config.js",
+        "build": "npx webpack --config webpack.config.prod.js",
+        "tsc": "npx tsc -w -p ./tsconfig.json",
+        "dev:cli": "npx tsc -w -p ./tsconfig.cli.json",
+        "build:cli": "npx tsc -p ./tsconfig.cli.json",
+        "tsc:cli": "npx tsc -w -p ./tsconfig.cli.json",
+        "release": "npx standard-version",
+        "format": "npx prettier '**/*.ts' --check",
+        "format:write": "npx prettier '**/*.ts' --write",
+        "docs": "mkdocs build && npx typedoc --out site/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh",
+        "docs:dev": "npx typedoc --out docs/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh && mkdocs serve"
+    },
+    "browser": {
+        "child_process": false
+    },
+    "keywords": [
+        "visual-output",
+        "functional-predictions",
+        "jdispatcher-viewers",
+        "jdispatcher-parsers",
+        "jdispatcher-viewers-cli"
+    ],
+    "author": "Fábio Madeira",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ebi-jdispatcher/jdispatcher-viewers.git"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "@types/browser-or-node": "^1.3.2",
+        "@types/fabric": "^5.3.9",
+        "@types/figlet": "^1.7.0",
+        "@types/node": "^18.19.62",
+        "@types/node-fetch": "^2.6.11",
+        "@webcomponents/webcomponentsjs": "^2.8.0",
+        "assert": "^2.1.0",
+        "browser-or-node": "^2.1.1",
+        "buffer": "^6.0.3",
+        "canvas": "^2.11.2",
+        "chalk": "^5.3.0",
+        "commander": "^9.5.0",
+        "commonjs": "0.0.1",
+        "fabric": "^5.4.0",
+        "figlet": "^1.8.0",
+        "jsdom": "25.0.1",
+        "lit": "^2.8.0",
+        "lit-element": "^3.3.3",
+        "lit-html": "^2.8.0",
+        "mini-svg-data-uri": "^1.4.4",
+        "node-fetch": "^3.3.2",
+        "stream": "^0.0.2",
+        "xml-js": "^1.6.11"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.14",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "@typescript-eslint/parser": "^5.62.0",
+        "clean-webpack-plugin": "^4.0.0",
+        "copy-webpack-plugin": "^11.0.0",
+        "eslint": "^8.57.1",
+        "html-webpack-plugin": "^5.6.3",
+        "jest": "^29.7.0",
+        "node-loader": "^2.0.0",
+        "standard-version": "^9.5.0",
+        "ts-jest": "^29.2.5",
+        "ts-loader": "^9.5.1",
+        "typedoc": "^0.26.11",
+        "typescript": "^4.9.5",
+        "webpack": "^5.95.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-dev-server": "^4.15.2",
+        "webpack-node-externals": "^3.0.0"
+    },
+    "bin": {
+        "jdispatcher-viewers": "bin/app.js"
+    },
+    "directories": {
+        "test": "tests"
+    },
+    "bugs": {
+        "url": "https://github.com/ebi-jdispatcher/jdispatcher-viewers/issues"
+    },
+    "homepage": "https://github.com/ebi-jdispatcher/jdispatcher-viewers#readme"
+}
