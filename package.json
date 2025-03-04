@@ -25,7 +25,9 @@
         "tsc:cli": "npx tsc -w -p ./tsconfig.cli.json",
         "release": "npx standard-version",
         "format": "npx prettier '**/*.ts' --check",
-        "format:write": "npx prettier '**/*.ts' --write"
+        "format:write": "npx prettier '**/*.ts' --write",
+        "docs": "mkdocs build && npx typedoc --out site/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh",
+        "docs:dev": "npx typedoc --out docs/api/ --entryPointStrategy Expand src && ./docs/fix-home-typedoc.sh && mkdocs serve"
     },
     "browser": {
         "child_process": false
