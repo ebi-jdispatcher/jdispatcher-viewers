@@ -39,11 +39,16 @@ Pfam, SUPERFAMILY, SMART, CATH-Gene3D, CDD, etc.
 
 ![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/assets/FP.gif)
 
-### Colouring Schemes
-Three colouring schemes are provided. 
-- `Dynamic`: It is based on the range of E-values (from min to max))
-- `Fixed`: It a fixed scale for E-values (from 0.0 to 100.0)
-- `NCBI BLAST`: It is a fixed scale based on NCBI-BLAST+ bit-score ranges (bit-score <40 to >=200)
+### Colouring and selection of scores
+Six colouring schemes can be selected along side scale type and score. The scale types are either `dynamic`,
+i.e. the scale ranges from the 'local' minimum to maximum score found in the results, or `fixed`, where the range is pre-defined based on the score being used. There is a selection of scores that can be selected, `E-value` being the default. Besides E-value, sequence `identity` and `similarity`, as well as, `bit score` can selected.
+The colouring schemes currently provided are:
+- `Heatmap`: from red to blue (multiple hues)
+- `Greyscale`: a grey scale (single hue)
+- `Sequential`: a blue scale (single hue)
+- `Divergent`: red to yellow to green  (multiple) hues)
+- `Qualitative`: categorical colouring (multiple hues)
+- `NCBI BLAST+`: NCBI BLAST+ based categorical colouring (multiple hues)
 
 ## Dependencies and Installation
 
