@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOCS_DIR="docs/api"
+DOCS_DIR="${1}docs/api"
 NEW_URL="/jdispatcher-viewers/index.html"
 
 # Find all .html files recursively
