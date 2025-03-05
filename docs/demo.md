@@ -34,6 +34,10 @@ This demo works with a pre-loaded example, but you can also pass a valid Job Dis
     margin-bottom: 5px;
   }
 
+  .md-sidebar {
+    display: none;
+  }
+
   </style>
   <script>
     async function eventHandler(event){
