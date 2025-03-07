@@ -1,7 +1,14 @@
 import { fabric } from 'fabric';
 import { xml2json } from 'xml-js';
 import { SSSResultModel, IPRMCResultModel, IPRMCResultModelFlat, IprMatchesFlat, IprMatchFlat } from './data-model';
-import { JobIdValidable, ColorSchemeEnum, jobIdDefaults, ScoreTypeEnum, ScaleTypeEnum } from './custom-types';
+import {
+  JobIdValidable,
+  ColorSchemeEnum,
+  jobIdDefaults,
+  ScoreTypeEnum,
+  ScaleTypeEnum,
+  DataModelEnum,
+} from './custom-types';
 
 export class BasicCanvasRenderer {
   public canvas: fabric.Canvas | fabric.StaticCanvas;

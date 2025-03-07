@@ -21,6 +21,15 @@ export enum ScoreTypeEnum {
 
 /* Global Options for Rendering the Fabric.js canvas
  * Width and Height in Pixels (px)
+/**
+ * Enum defining data model types.
+ * @enum {string}
+ */
+export enum DataModelEnum {
+  SSSResultModel = 'SSSResultModel',
+  IPRMCResultModel = 'IPRMCResultModel',
+  IPRMCResultModelFlat = 'IPRMCResultModelFlat',
+}
  */
 export interface RenderOptions {
   jobId?: string;

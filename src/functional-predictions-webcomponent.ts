@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element/lit-element.js';
 import { property, customElement } from 'lit/decorators.js';
-import { RenderOptions, ColorSchemeEnum } from './custom-types';
+import { RenderOptions, DataModelEnum, ColorSchemeEnum } from './custom-types';
 import {
   validateSubmittedJobIdInput,
   validateSubmittedDbfetchInput,
@@ -43,7 +43,7 @@ export class CanvasRendererComponent extends LitElement {
     // loading the JSON Data
     const sssJsonData = validateSubmittedJobIdInput(this.data);
     const sssJsonResponse = await fetchData(sssJsonData);
-    const sssDataObj = dataAsType(sssJsonResponse, 'SSSResultModel');
+    const sssDataObj = dataAsType(sssJsonResponse, DataModelEnum.SSSResultModel);
     // jobID has been validated
     let iprmcXmlData;
     if (this.data === 'mock_jobid-I20200317-103136-0485-5599422-np2') {
@@ -55,7 +55,7 @@ export class CanvasRendererComponent extends LitElement {
     const iprmcXmlResponse = await fetchData(iprmcXmlData, 'xml');
     // convert XML into Flattened JSON
     const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(iprmcXmlResponse as string);
-    const iprmcDataObj = dataAsType(iprmcJSONResponse, 'IPRMCResultModelFlat');
+    const iprmcDataObj = dataAsType(iprmcJSONResponse, DataModelEnum.IPRMCResultModelFlat);
 
     // New JD Viewers Fabricjs Canvas
     new FunctionalPredictions('canvas', sssDataObj, iprmcDataObj, renderOptions).render();

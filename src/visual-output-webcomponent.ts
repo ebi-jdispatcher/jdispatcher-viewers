@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element/lit-element.js';
 import { property, customElement } from 'lit/decorators.js';
-import { RenderOptions, ColorSchemeEnum } from './custom-types';
+import { RenderOptions, ColorSchemeEnum, DataModelEnum } from './custom-types';
 import { validateSubmittedJobIdInput, fetchData, dataAsType, validateSubmittedDbfetchInput } from './other-utilities';
 import { VisualOutput } from './visual-output-app';
 
@@ -40,7 +40,7 @@ export class CanvasRendererComponent extends LitElement {
     // loading the JSON Data
     const sssJsonData = validateSubmittedJobIdInput(this.data);
     const sssJsonResponse = await fetchData(sssJsonData);
-    const sssDataObj = dataAsType(sssJsonResponse, 'SSSResultModel');
+    const sssDataObj = dataAsType(sssJsonResponse, DataModelEnum.SSSResultModel);
 
     // New JD Viewers Fabricjs Canvas
     new VisualOutput('canvas', sssDataObj, renderOptions).render();

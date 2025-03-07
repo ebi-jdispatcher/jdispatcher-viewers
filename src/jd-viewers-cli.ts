@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { VisualOutput } from './visual-output-app';
 import { FunctionalPredictions } from './functional-predictions-app';
-import { ColorSchemeEnum } from './custom-types';
+import { ColorSchemeEnum, DataModelEnum } from './custom-types';
 import {
   dataAsType,
   validateSubmittedJobIdInput,
@@ -98,7 +98,7 @@ async function cliHandler() {
     }
     if (fs.existsSync(jsonFile)) {
       sssJsonResponse = loadDataFromFile(jsonFile, 'json');
-      sssDataObj = dataAsType(sssJsonResponse, 'SSSResultModel');
+      sssDataObj = dataAsType(sssJsonResponse, DataModelEnum.SSSResultModel);
     } else {
       console.log('JobID provided is not valid, or file not readable!');
       process.exit();
@@ -153,7 +153,7 @@ async function cliHandler() {
         iprmcXmlResponse = loadDataFromFile(iprmcXmlFile, 'xml');
         // convert XML into Flattened JSON
         iprmcJSONResponse = getIPRMCDataModelFlatFromXML(iprmcXmlResponse as string);
-        iprmcDataObj = dataAsType(iprmcJSONResponse, 'IPRMCResultModelFlat');
+        iprmcDataObj = dataAsType(iprmcJSONResponse, DataModelEnum.IPRMCResultModelFlat);
       } else {
         console.log('XML file not readable!');
         process.exit();

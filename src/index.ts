@@ -1,7 +1,7 @@
 import svgToMiniDataURI from 'mini-svg-data-uri';
 import { VisualOutput } from './visual-output-app';
 import { FunctionalPredictions } from './functional-predictions-app';
-import { ColorSchemeEnum, jobIdDefaults } from './custom-types';
+import { ColorSchemeEnum, jobIdDefaults, DataModelEnum } from './custom-types';
 import {
   validateJobId,
   validateSubmittedJobIdInput,
@@ -153,7 +153,7 @@ class FabricjsRenderer {
     let fabricjs: VisualOutput | FunctionalPredictions;
     const sssJsonData = validateSubmittedJobIdInput(this.canvasInstance.data);
     const sssJsonResponse = await fetchData(sssJsonData);
-    const dataObj = dataAsType(sssJsonResponse, 'SSSResultModel');
+    const dataObj = dataAsType(sssJsonResponse, DataModelEnum.SSSResultModel);
     if (this.canvasInstance.submitter === 'visual-output') {
       fabricjs = new VisualOutput('canvas', dataObj, {
         colorScheme: ColorSchemeEnum.heatmap,
@@ -173,7 +173,7 @@ class FabricjsRenderer {
       const iprmcXmlResponse = await fetchData(iprmcXmlData, 'xml');
       // convert XML into Flattened JSON
       const iprmcJSONResponse = getIPRMCDataModelFlatFromXML(iprmcXmlResponse as string);
-      const iprmcDataObj = dataAsType(iprmcJSONResponse, 'IPRMCResultModelFlat');
+      const iprmcDataObj = dataAsType(iprmcJSONResponse, DataModelEnum.IPRMCResultModelFlat);
 
       fabricjs = new FunctionalPredictions('canvas', dataObj, iprmcDataObj, {
         colorScheme: ColorSchemeEnum.heatmap,
