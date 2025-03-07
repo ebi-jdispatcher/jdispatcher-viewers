@@ -4,7 +4,7 @@
     "version": "0.1.1",
     "module": "./dist/jd_viewers.bundle.js",
     "exports": "./bin/jd-viewers-cli.js",
-    "main": "./bin/jd-viewers-cli.js",
+    "main": "./dist/index.ts",
     "type": "module",
     "engines": {
         "node": ">=18.20"
