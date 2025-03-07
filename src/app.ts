@@ -49,4 +49,4 @@ import './visual-output-webcomponent';
 import './functional-predictions-webcomponent';
 
 // demo index page with JobId input form (implemented in TypeScript)
-import '.';
+import './demo';

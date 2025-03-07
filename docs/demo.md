@@ -1,8 +1,7 @@
 This demo works with a pre-loaded example, but you can also pass a valid Job Dispatcher job ID.
 
 <div class="app">
-  <script type="text/javascript" src="../assets/jd_viewers_0.1.1.bundle.min.js" defer></script>
-  <link rel="stylesheet" href="../assets/style.css" type="text/css" media="all" />
+  <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/dist/jd_viewers_0.1.1.bundle.min.js" defer></script>
   <style>
     #canvas-wrapper {
       width: 100%;
