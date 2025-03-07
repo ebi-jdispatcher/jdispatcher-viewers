@@ -1,6 +1,10 @@
 import { fabric } from 'fabric';
 import { ColorSchemeEnum, ColorType } from './custom-types';
 
+/**
+ * A gradient color map for heatmap visualization.
+ * @type {ColorType}
+ */
 export const heatmapGradient: ColorType = {
   0.0: [255, 64, 64],
   0.25: [255, 255, 64],
@@ -10,6 +14,10 @@ export const heatmapGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
+/**
+ * A gradient color map for greyscale visualization.
+ * @type {ColorType}
+ */
 export const greyscaleGradient: ColorType = {
   0.0: [215, 215, 215],
   0.25: [177, 177, 177],
@@ -19,6 +27,10 @@ export const greyscaleGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
+/**
+ * A gradient color map for sequential visualization.
+ * @type {ColorType}
+ */
 export const sequentialGradient: ColorType = {
   0.0: [193, 231, 255],
   0.25: [148, 190, 217],
@@ -28,6 +40,10 @@ export const sequentialGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
+/**
+ * A gradient color map for divergent visualization.
+ * @type {ColorType}
+ */
 export const divergentGradient: ColorType = {
   0.0: [222, 66, 91],
   0.25: [236, 156, 157],
@@ -37,6 +53,10 @@ export const divergentGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
+/**
+ * A gradient color map for qualitative visualization.
+ * @type {ColorType}
+ */
 export const qualitativeGradient: ColorType = {
   0.0: [102, 194, 165],
   0.25: [252, 141, 98],
@@ -46,6 +66,12 @@ export const qualitativeGradient: ColorType = {
   keys: [0.0, 0.25, 0.5, 0.75, 1.0],
 };
 
+/**
+ * Creates a linear gradient for qualitative visualization.
+ * @param {number} start - The starting x-coordinate of the gradient.
+ * @param {number} end - The ending x-coordinate of the gradient.
+ * @returns {fabric.Gradient} A Fabric.js gradient object.
+ */
 export function colorQualitativeGradient(start: number, end: number) {
   return new fabric.Gradient({
     type: 'linear',
@@ -70,6 +96,10 @@ export function colorQualitativeGradient(start: number, end: number) {
   });
 }
 
+/**
+ * A gradient color map for NCBI BLAST visualization.
+ * @type {ColorType}
+ */
 export const ncbiBlastGradient: ColorType = {
   0: [0, 0, 0],
   40: [0, 32, 233],
@@ -79,6 +109,12 @@ export const ncbiBlastGradient: ColorType = {
   keys: [0, 40, 50, 80, 200],
 };
 
+/**
+ * Creates a linear gradient for NCBI BLAST visualization.
+ * @param {number} start - The starting x-coordinate of the gradient.
+ * @param {number} end - The ending x-coordinate of the gradient.
+ * @returns {fabric.Gradient} A Fabric.js gradient object.
+ */
 export function colorNcbiBlastGradient(start: number, end: number) {
   return new fabric.Gradient({
     type: 'linear',
@@ -103,6 +139,11 @@ export function colorNcbiBlastGradient(start: number, end: number) {
   });
 }
 
+/**
+ * Retrieves the appropriate color gradient based on the specified color scheme.
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {ColorType} The corresponding color gradient.
+ */
 export function getColorType(colorScheme: ColorSchemeEnum) {
   let colorType: ColorType = heatmapGradient;
   if (colorScheme === ColorSchemeEnum.heatmap) {
@@ -121,6 +162,13 @@ export function getColorType(colorScheme: ColorSchemeEnum) {
   return colorType;
 }
 
+/**
+ * Creates a generic linear gradient based on the specified color scheme.
+ * @param {number} start - The starting x-coordinate of the gradient.
+ * @param {number} end - The ending x-coordinate of the gradient.
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {fabric.Gradient} A Fabric.js gradient object.
+ */
 export function colorGenericGradient(start: number, end: number, colorScheme: ColorSchemeEnum): fabric.Gradient {
   let gradient: ColorType = getColorType(colorScheme);
   const colorStops = gradient.keys.map(key => ({

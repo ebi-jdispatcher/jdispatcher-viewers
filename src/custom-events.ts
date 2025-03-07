@@ -6,6 +6,16 @@ import { FunctionalPredictions } from './functional-predictions-app';
 import { drawURLInfoTooltip, drawDomainTooltips, drawDomainInfoTooltips } from './drawing-utilities';
 import { tooltipState } from './other-utilities';
 
+/**
+ * Adds mouseover event to a fabric object to display a tooltip and underline the text.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {TextType} textObj - The text object to modify on hover.
+ * @param {string} sequence - The sequence to display in the tooltip.
+ * @param {string} URL - The URL to link to.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {boolean} [_tooltip=true] - Whether to show the tooltip.
+ */
 export function mouseOverText(
   fabricObj: fabric.Object,
   textObj: TextType,
@@ -31,6 +41,12 @@ export function mouseOverText(
   });
 }
 
+/**
+ * Adds mousedown event to a fabric object to open a link in a new tab.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {string} href - The URL to open.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseDownLink(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions) {
   fabricObj.on('mousedown', (e: fabric.IEvent) => {
     if (e.target) {
@@ -40,6 +56,12 @@ export function mouseDownLink(fabricObj: fabric.Object, href: string, _this: Vis
   });
 }
 
+/**
+ * Adds mouseout event to a fabric object to reset the text style.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {TextType} textObj - The text object to reset on mouseout.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions) {
   fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
@@ -50,10 +72,26 @@ export function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this:
   });
 }
 
+/**
+ * Type guard to check if an object is of type Hsp.
+ * @param {any} object - The object to check.
+ * @returns {boolean} True if the object is of type Hsp, false otherwise.
+ */
 function isHsp(object: any): object is Hsp {
   return 'hsp_hit_from' in object;
 }
 
+/**
+ * Adds mouseover event to a fabric object to display a domain tooltip.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {number} endPixels - The ending pixel position.
+ * @param {number} seq_from - The starting sequence position.
+ * @param {number} seq_to - The ending sequence position.
+ * @param {Hsp | IprMatchFlat} domain - The domain object (Hsp or IprMatchFlat).
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseOverDomain(
   fabricObj: fabric.Object,
   startPixels: number,
@@ -100,6 +138,17 @@ export function mouseOverDomain(
   });
 }
 
+/**
+ * Adds mousedown event to a fabric object to toggle a domain tooltip.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {number} endPixels - The ending pixel position.
+ * @param {number} seq_from - The starting sequence position.
+ * @param {number} seq_to - The ending sequence position.
+ * @param {Hsp | IprMatchFlat} domain - The domain object (Hsp or IprMatchFlat).
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseClickDomain(
   fabricObj: fabric.Object,
   startPixels: number,
@@ -154,6 +203,11 @@ export function mouseClickDomain(
   });
 }
 
+/**
+ * Adds mouseout event to a fabric object to reset the canvas.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseOutDomain(fabricObj: fabric.Object, _this: VisualOutput | FunctionalPredictions) {
   fabricObj.on('mouseout', (e: fabric.IEvent) => {
     if (e.target) {
@@ -162,6 +216,12 @@ export function mouseOutDomain(fabricObj: fabric.Object, _this: VisualOutput | F
   });
 }
 
+/**
+ * Adds mouseover event to a fabric checkbox to change its appearance.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {TextType} textObj - The text object to modify on hover.
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseOverCheckbox(
   fabricObj: fabric.Object,
   textObj: TextType,
@@ -177,6 +237,13 @@ export function mouseOverCheckbox(
   });
 }
 
+/**
+ * Adds mousedown event to a fabric checkbox to update the state.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum} value - The value to set.
+ * @param {string} inputEnum - The type of input (ColorSchemeEnum, ScaleTypeEnum, or ScoreTypeEnum).
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseDownCheckbox(
   fabricObj: fabric.Object,
   value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum,
@@ -209,6 +276,14 @@ export function mouseDownCheckbox(
   });
 }
 
+/**
+ * Adds mouseout event to a fabric checkbox to reset its appearance.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {TextType} textObj - The text object to reset on mouseout.
+ * @param {ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum} value - The value to check against.
+ * @param {string} inputEnum - The type of input (ColorSchemeEnum, ScaleTypeEnum, or ScoreTypeEnum).
+ * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ */
 export function mouseOutCheckbox(
   fabricObj: fabric.Object,
   textObj: TextType,
@@ -243,6 +318,13 @@ export function mouseOutCheckbox(
   });
 }
 
+/**
+ * Adds mouseover event to a fabric domain checkbox to change its appearance.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {RectType} rectObj - The rectangle object to modify on hover.
+ * @param {string} currentDomainDatabase - The current domain database.
+ * @param {FunctionalPredictions} _this - The context (FunctionalPredictions).
+ */
 export function mouseOverDomainCheckbox(
   fabricObj: fabric.Object,
   rectObj: RectType,
@@ -272,6 +354,12 @@ export function mouseOverDomainCheckbox(
   });
 }
 
+/**
+ * Adds mousedown event to a fabric domain checkbox to update the state.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {string} currentDomainDatabase - The current domain database.
+ * @param {FunctionalPredictions} _this - The context (FunctionalPredictions).
+ */
 export function mouseDownDomainCheckbox(
   fabricObj: fabric.Object,
   currentDomainDatabase: string,
@@ -298,6 +386,13 @@ export function mouseDownDomainCheckbox(
   });
 }
 
+/**
+ * Adds mouseout event to a fabric domain checkbox to reset its appearance.
+ * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
+ * @param {RectType} rectObj - The rectangle object to reset on mouseout.
+ * @param {string} currentDomainDatabase - The current domain database.
+ * @param {FunctionalPredictions} _this - The context (FunctionalPredictions).
+ */
 export function mouseOutDomainCheckbox(
   fabricObj: fabric.Object,
   rectObj: RectType,

@@ -1,6 +1,13 @@
 import { getColorType } from './color-schemes';
 import { ColorType, ColorSchemeEnum, ScaleTypeEnum, ScoreTypeEnum } from './custom-types';
 
+/**
+ * Calculates an RGB color based on a logarithmic gradient.
+ * @param {number} score - The score to determine the color.
+ * @param {number[]} gradientSteps - The steps for the gradient (assumes length is 5).
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {string} The RGB color as a string.
+ */
 export function getRgbColorLogGradient(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
   // assumes length of gradientSteps is 5
   let colorType: ColorType = getColorType(colorScheme);
@@ -34,6 +41,12 @@ export function getRgbColorLogGradient(score: number, gradientSteps: number[], c
   }
 }
 
+/**
+ * Interpolates a color from a gradient based on a value.
+ * @param {number} value - The value to interpolate (between 0 and 1).
+ * @param {ColorType} colorType - The color gradient to use.
+ * @returns {[number, number, number]} The interpolated RGB color as an array.
+ */
 function interpolateGradient(value: number, colorType: ColorType): [number, number, number] {
   const { keys } = colorType;
 
@@ -62,6 +75,13 @@ function interpolateGradient(value: number, colorType: ColorType): [number, numb
   return colorType[1.0];
 }
 
+/**
+ * Calculates an RGB color based on a linear gradient.
+ * @param {number} score - The score to determine the color.
+ * @param {number[]} gradientSteps - The steps for the gradient (assumes length is 5).
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {string} The RGB color as a string.
+ */
 export function getRgbColorLinearGradient(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
   // assumes length of gradientSteps is 5
   let colorType: ColorType = getColorType(colorScheme);
@@ -99,6 +119,13 @@ export function getRgbColorLinearGradient(score: number, gradientSteps: number[]
   }
 }
 
+/**
+ * Calculates an RGB color based on fixed gradient steps.
+ * @param {number} score - The score to determine the color.
+ * @param {number[]} gradientSteps - The steps for the gradient (assumes length is 5).
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {string} The RGB color as a string.
+ */
 export function getRgbColorFixed(score: number, gradientSteps: number[], colorScheme: ColorSchemeEnum) {
   // assumes length of gradientSteps is 5
   let colorType: ColorType = getColorType(colorScheme);
@@ -121,6 +148,16 @@ export function getRgbColorFixed(score: number, gradientSteps: number[], colorSc
   }
 }
 
+/**
+ * Calculates gradient steps based on the provided parameters.
+ * @param {number} minScore - The minimum score.
+ * @param {number} maxSCore - The maximum score.
+ * @param {number} minScoreNotZero - The minimum non-zero score.
+ * @param {ScaleTypeEnum} scaleType - The scale type (fixed or dynamic).
+ * @param {ScoreTypeEnum} scoreType - The type of score (e.g., bitscore, similarity, etc.).
+ * @param {ColorSchemeEnum} colorScheme - The color scheme to use.
+ * @returns {number[]} An array of gradient steps.
+ */
 export function getGradientSteps(
   minScore: number,
   maxSCore: number,
@@ -306,6 +343,13 @@ export function getGradientSteps(
 /* accepts parameters
  * h, s, v
  */
+/**
+ * Converts HSV (Hue, Saturation, Value) to RGB (Red, Green, Blue).
+ * @param {number} h - Hue (0–1).
+ * @param {number} s - Saturation (0–1).
+ * @param {number} v - Value (0–1).
+ * @returns {[number, number, number]} The RGB color as an array.
+ */
 export function HSVtoRGB(h: number, s: number, v: number) {
   // Clamp input values to the expected range [0, 1]
   h = Math.min(Math.max(h, 0), 1);
@@ -376,6 +420,11 @@ export function HSVtoRGB(h: number, s: number, v: number) {
 // }
 
 // Using custom coloring scheme
+/**
+ * Returns a color based on the database name.
+ * @param {string} domainName - The name of the database.
+ * @returns {string} The RGB color as a string.
+ */
 export function colorByDatabaseName(domainName: string): string {
   let color: string;
   // if (domainName == "InterPro") color = "rgb(211,47,47)";

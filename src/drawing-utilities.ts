@@ -18,6 +18,13 @@ import {
 } from './custom-types';
 import { colorByDatabaseName } from './color-utilities';
 
+/**
+ * Draws a header text group for the visualization.
+ * @param {SSSResultModel} dataObj - The data object containing program, version, and database information.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the header text.
+ */
 export function drawHeaderTextGroup(
   dataObj: SSSResultModel,
   renderOptions: RenderOptions,
@@ -70,6 +77,13 @@ export function drawHeaderTextGroup(
   return textGroup;
 }
 
+/**
+ * Draws a header link text for the sequence.
+ * @param {SSSResultModel} dataObj - The data object containing sequence information.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, TextType]} A tuple containing the Fabric.js text object and its type.
+ */
 export function drawHeaderLinkText(
   dataObj: SSSResultModel,
   renderOptions: RenderOptions,
@@ -87,6 +101,13 @@ export function drawHeaderLinkText(
   return [sequenceDefText, textSeqObj];
 }
 
+/**
+ * Draws a content header text group for the visualization.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the content header text.
+ */
 export function drawContentHeaderTextGroup(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -137,6 +158,13 @@ export function drawContentHeaderTextGroup(
   return textGroup;
 }
 
+/**
+ * Draws line tracks for query and subject regions.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the line tracks.
+ */
 export function drawLineTracksQuerySubject(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -211,6 +239,13 @@ export function drawLineTracksQuerySubject(
   return lineGroup;
 }
 
+/**
+ * Draws line tracks for a single region.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the line tracks.
+ */
 export function drawLineTracks(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -253,6 +288,13 @@ export function drawLineTracks(
   return lineGroup;
 }
 
+/**
+ * Draws a domain line track.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Line} A Fabric.js line object.
+ */
 export function drawDomainLineTracks(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -274,6 +316,13 @@ export function drawDomainLineTracks(
   return new fabric.Line(coordsQuery, lineObj);
 }
 
+/**
+ * Draws a content footer text group.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the footer text.
+ */
 export function drawContentFooterTextGroup(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -293,6 +342,13 @@ export function drawContentFooterTextGroup(
   return textGroup;
 }
 
+/**
+ * Draws a content query and subject footer text group.
+ * @param {CoordsValues} coordValues - The coordinate values for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the footer text.
+ */
 export function drawContentQuerySubjFooterTextGroup(
   coordValues: CoordsValues,
   renderOptions: RenderOptions,
@@ -319,6 +375,12 @@ export function drawContentQuerySubjFooterTextGroup(
   return textGroup;
 }
 
+/**
+ * Draws a "No hits found" text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawNoHitsFoundText(renderOptions: RenderOptions, topPadding: number): fabric.Text {
   const textObj = { ...textDefaults };
   textObj.fontWeight = 'bold';
@@ -330,6 +392,14 @@ export function drawNoHitsFoundText(renderOptions: RenderOptions, topPadding: nu
   return noHitsText;
 }
 
+/**
+ * Draws content sequence information text.
+ * @param {number} maxIDLen - The maximum length of the hit ID.
+ * @param {Hit} hit - The hit object containing ID and description.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, fabric.Text, TextType]} A tuple containing the Fabric.js text objects and their type.
+ */
 export function drawContentSequenceInfoText(
   maxIDLen: number,
   hit: Hit,
@@ -356,6 +426,14 @@ export function drawContentSequenceInfoText(
   return [spaceText, hitText, textObj];
 }
 
+/**
+ * Draws an HSP notice text.
+ * @param {number} totalNumberHsps - The total number of HSPs.
+ * @param {number} numberHsps - The number of HSPs being displayed.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawHspNoticeText(
   totalNumberHsps: number,
   numberHsps: number,
@@ -375,6 +453,14 @@ export function drawHspNoticeText(
   return hspTextNotice;
 }
 
+/**
+ * Draws a score text for HSPs.
+ * @param {number} startEvalPixels - The starting pixel position for the score.
+ * @param {Hsp} hsp - The HSP object containing score information.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawScoreText(
   startEvalPixels: number,
   hsp: Hsp,
@@ -401,6 +487,16 @@ export function drawScoreText(
   return hspScoreText;
 }
 
+/**
+ * Draws domain rectangles for query and subject regions.
+ * @param {number} startQueryPixels - The starting pixel position for the query domain.
+ * @param {number} endQueryPixels - The ending pixel position for the query domain.
+ * @param {number} startSubjPixels - The starting pixel position for the subject domain.
+ * @param {number} endSubjPixels - The ending pixel position for the subject domain.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} fill - The fill color for the domain rectangles.
+ * @returns {[fabric.Rect, fabric.Rect]} A tuple containing the Fabric.js rectangle objects.
+ */
 export function drawDomainQueySubject(
   startQueryPixels: number,
   endQueryPixels: number,
@@ -432,6 +528,17 @@ export function drawDomainQueySubject(
   return [queryDomain, subjDomain];
 }
 
+/**
+ * Draws domain tooltips for HSPs.
+ * @param {number} startHspPixels - The starting pixel position for the HSP.
+ * @param {number} endHspPixels - The ending pixel position for the HSP.
+ * @param {number} seq_from - The starting sequence position.
+ * @param {number} seq_to - The ending sequence position.
+ * @param {Hsp} hsp - The HSP object containing score information.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the tooltip.
+ */
 export function drawDomainTooltips(
   startHspPixels: number,
   endHspPixels: number,
@@ -482,6 +589,13 @@ export function drawDomainTooltips(
   return tooltipGroup;
 }
 
+/**
+ * Draws a scale label text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} label - The label text.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawScaleLabelText(renderOptions: RenderOptions, topPadding: number, label: string): fabric.Text {
   const textSelObj = { ...textDefaults };
   textSelObj.fontSize = renderOptions.fontSize! + 1;
@@ -492,6 +606,12 @@ export function drawScaleLabelText(renderOptions: RenderOptions, topPadding: num
   return scaleTypeText;
 }
 
+/**
+ * Draws scale type checkbox text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, fabric.Text, TextType, fabric.Text, fabric.Text, TextType]} A tuple containing the Fabric.js text objects and their type.
+ */
 export function drawScaleTypeCheckBoxText(
   renderOptions: RenderOptions,
   topPadding: number
@@ -536,6 +656,25 @@ export function drawScaleTypeCheckBoxText(
   return [dynamicCheckboxText, dynamicText, textCheckDynObj, fixedCheckboxText, fixedText, textCheckFixObj];
 }
 
+/**
+ * Draws score type checkbox text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType
+ * ]} A tuple containing the Fabric.js text objects and their type.
+ */
 export function drawScoreTypeCheckBoxText(
   renderOptions: RenderOptions,
   topPadding: number
@@ -614,6 +753,31 @@ export function drawScoreTypeCheckBoxText(
   ];
 }
 
+/**
+ * Draws color scheme checkbox text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType,
+ *   fabric.Text,
+ *   fabric.Text,
+ *   TextType
+ * ]} A tuple containing the Fabric.js text objects and their type.
+ */
 export function drawColorSchemeCheckBoxText(
   renderOptions: RenderOptions,
   topPadding: number
@@ -720,6 +884,12 @@ export function drawColorSchemeCheckBoxText(
   ];
 }
 
+/**
+ * Draws a scale score text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawScaleScoreText(renderOptions: RenderOptions, topPadding: number): fabric.Text {
   const textObj = { ...textDefaults };
   textObj.fontSize = renderOptions.fontSize! + 1;
@@ -740,6 +910,12 @@ export function drawScaleScoreText(renderOptions: RenderOptions, topPadding: num
   return scaleScoreText;
 }
 
+/**
+ * Draws a scale color gradient.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Rect} A Fabric.js rectangle object representing the gradient.
+ */
 export function drawScaleColorGradient(renderOptions: RenderOptions, topPadding: number): fabric.Rect {
   const rectObj = { ...rectDefaults };
   rectObj.top = topPadding;
@@ -757,6 +933,17 @@ export function drawScaleColorGradient(renderOptions: RenderOptions, topPadding:
   return colorScale;
 }
 
+/**
+ * Draws a line axis with 5 buckets.
+ * @param {number} startGradPixels - The starting pixel position for the gradient.
+ * @param {number} o25GradPixels - The 25% pixel position for the gradient.
+ * @param {number} o50GradPixels - The 50% pixel position for the gradient.
+ * @param {number} o75GradPixels - The 75% pixel position for the gradient.
+ * @param {number} endGradPixels - The ending pixel position for the gradient.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the line axis.
+ */
 export function drawLineAxis5Buckets(
   startGradPixels: number,
   o25GradPixels: number,
@@ -817,6 +1004,18 @@ export function drawLineAxis5Buckets(
   return axisGroup;
 }
 
+/**
+ * Draws a line axis with 6 buckets.
+ * @param {number} startGradPixels - The starting pixel position for the gradient.
+ * @param {number} o20GradPixels - The 20% pixel position for the gradient.
+ * @param {number} o40GradPixels - The 40% pixel position for the gradient.
+ * @param {number} o60GradPixels - The 60% pixel position for the gradient.
+ * @param {number} o80GradPixels - The 80% pixel position for the gradient.
+ * @param {number} endGradPixels - The ending pixel position for the gradient.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the line axis.
+ */
 export function drawLineAxis6Buckets(
   startGradPixels: number,
   o20GradPixels: number,
@@ -883,6 +1082,14 @@ export function drawLineAxis6Buckets(
   return axisGroup;
 }
 
+/**
+ * Draws scale tick labels for 5 buckets.
+ * @param {number[]} gradientSteps - The gradient steps for the scale.
+ * @param {number} leftPadding - The left padding for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the tick labels.
+ */
 export function drawScaleTick5LabelsGroup(
   gradientSteps: number[],
   leftPadding: number,
@@ -920,6 +1127,14 @@ export function drawScaleTick5LabelsGroup(
   return textGroup;
 }
 
+/**
+ * Draws scale tick labels for 4 buckets.
+ * @param {number[]} gradientSteps - The gradient steps for the scale.
+ * @param {number} leftPadding - The left padding for positioning.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the tick labels.
+ */
 export function drawScaleTick4LabelsGroup(
   gradientSteps: number[],
   leftPadding: number,
@@ -953,6 +1168,12 @@ export function drawScaleTick4LabelsGroup(
   return textGroup;
 }
 
+/**
+ * Draws footer text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, TextType]} A tuple containing the Fabric.js text object and its type.
+ */
 export function drawFooterText(renderOptions: RenderOptions, topPadding: number): [fabric.Text, TextType] {
   const textObj = { ...textDefaults };
   textObj.fontSize = renderOptions.fontSize;
@@ -964,6 +1185,13 @@ export function drawFooterText(renderOptions: RenderOptions, topPadding: number)
   return [copyrightText, textObj];
 }
 
+/**
+ * Draws footer link text.
+ * @param {string} url - The URL to link to.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, TextType]} A tuple containing the Fabric.js text object and its type.
+ */
 export function drawFooterLinkText(
   url: string,
   renderOptions: RenderOptions,
@@ -979,6 +1207,11 @@ export function drawFooterLinkText(
   return [sequenceDefText, textSeqObj];
 }
 
+/**
+ * Draws a canvas wrapper stroke.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @returns {fabric.Rect} A Fabric.js rectangle object representing the stroke.
+ */
 export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {
   const canvasWrapper = new fabric.Rect({
     selectable: false,
@@ -995,6 +1228,12 @@ export function drawCanvasWrapperStroke(renderOptions: RenderOptions) {
   return canvasWrapper;
 }
 
+/**
+ * Draws a content title text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawContentTitleText(renderOptions: RenderOptions, topPadding: number): fabric.Text {
   const textObj = { ...textDefaults };
   textObj.fontWeight = 'bold';
@@ -1005,6 +1244,13 @@ export function drawContentTitleText(renderOptions: RenderOptions, topPadding: n
   return new fabric.Text(`${title}`, textObj);
 }
 
+/**
+ * Draws a content suppress text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {number} numberHits - The number of hits being displayed.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawContentSupressText(
   renderOptions: RenderOptions,
   topPadding: number,
@@ -1019,6 +1265,12 @@ export function drawContentSupressText(
   return new fabric.Text(`${title}`, textObj);
 }
 
+/**
+ * Draws protein features text.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Text} A Fabric.js text object.
+ */
 export function drawProteinFeaturesText(renderOptions: RenderOptions, topPadding: number): fabric.Text {
   const textSelObj = { ...textDefaults };
   textSelObj.fontSize = renderOptions.fontSize! + 1;
@@ -1029,6 +1281,14 @@ export function drawProteinFeaturesText(renderOptions: RenderOptions, topPadding
   return scaleTypeText;
 }
 
+/**
+ * Draws a domain checkbox.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {number} leftPadding - The left padding for positioning.
+ * @param {string} currentDomainDatabase - The current domain database.
+ * @returns {[fabric.Rect, fabric.Text, RectType, TextType]} A tuple containing the Fabric.js rectangle and text objects and their types.
+ */
 export function drawDomainCheckbox(
   renderOptions: RenderOptions,
   topPadding: number,
@@ -1063,6 +1323,15 @@ export function drawDomainCheckbox(
   return [proteinFeatureRect, proteinFeatureText, rectObj, rectObj];
 }
 
+/**
+ * Draws a hit transparent box.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {number} endPixels - The ending pixel position.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} fill - The fill color for the box.
+ * @param {number} height - The height of the box.
+ * @returns {fabric.Rect} A Fabric.js rectangle object.
+ */
 export function drawHitTransparentBox(
   startPixels: number,
   endPixels: number,
@@ -1083,6 +1352,13 @@ export function drawHitTransparentBox(
   return new fabric.Rect(rectObj);
 }
 
+/**
+ * Draws content domain information text.
+ * @param {string} domainID - The domain ID.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {[fabric.Text, fabric.Text, TextType]} A tuple containing the Fabric.js text objects and their type.
+ */
 export function drawContentDomainInfoText(
   domainID: string,
   renderOptions: RenderOptions,
@@ -1108,6 +1384,14 @@ export function drawContentDomainInfoText(
 }
 
 // TODO FIXME: fix boxes around the edges of the canvas
+/**
+ * Draws domain rectangles.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {number} endPixels - The ending pixel position.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} color - The color of the domain rectangles.
+ * @returns {fabric.Rect} A Fabric.js rectangle object.
+ */
 export function drawDomains(startPixels: number, endPixels: number, topPadding: number, color: string): fabric.Rect {
   const rectObj = { ...rectDefaults };
   rectObj.evented = true;
@@ -1125,6 +1409,17 @@ export function drawDomains(startPixels: number, endPixels: number, topPadding: 
   return new fabric.Rect(rectObj);
 }
 
+/**
+ * Draws domain information tooltips.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {number} endPixels - The ending pixel position.
+ * @param {number} seq_from - The starting sequence position.
+ * @param {number} seq_to - The ending sequence position.
+ * @param {IprMatchFlat} domain - The domain object containing information.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the tooltip.
+ */
 export function drawDomainInfoTooltips(
   startPixels: number,
   endPixels: number,
@@ -1178,6 +1473,15 @@ export function drawDomainInfoTooltips(
   return tooltipGroup;
 }
 
+/**
+ * Draws URL information tooltips.
+ * @param {number} startPixels - The starting pixel position.
+ * @param {string} sequence - The sequence to display.
+ * @param {string} URL - The URL to link to.
+ * @param {RenderOptions} renderOptions - The rendering options.
+ * @param {number} topPadding - The top padding for positioning.
+ * @returns {fabric.Group} A Fabric.js group containing the tooltip.
+ */
 export function drawURLInfoTooltip(
   startPixels: number,
   sequence: string,
