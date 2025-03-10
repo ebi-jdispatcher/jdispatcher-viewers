@@ -14,7 +14,7 @@ Job Dispatcher viewers is a TypeScript module that uses [Fabric.js](http://fabri
 Visual Output and Functional Predictions. The app is provided as an ES module, can be used as plugin and 
 also as [Web Components](https://www.webcomponents.org/). A [Node.js](https://nodejs.org/) CLI application
 is also provided to generate static figures in SVG and PNG formats.
-
+ 
 [Live Demo](https://ebi-jdispatcher.github.io/jdispatcher-viewers/demo/)
 
 ## Visual Output
@@ -39,7 +39,7 @@ Pfam, SUPERFAMILY, SMART, CATH-Gene3D, CDD, etc.
 
 ![home page](https://raw.githubusercontent.com/ebi-jdispatcher/jdispatcher-viewers/master/assets/FP.gif)
 
-### Colouring and selection of scores
+## Colouring and selection of scores
 Six colouring schemes can be selected along side scale type and score. The scale types are either `dynamic`,
 i.e. the scale ranges from the 'local' minimum to maximum score found in the results, or `fixed`, where the range is pre-defined based on the score being used. There is a selection of scores that can be selected, `E-value` being the default. Besides E-value, sequence `identity` and `similarity`, as well as, `bit score` can selected.
 The colouring schemes currently provided are:
@@ -49,6 +49,10 @@ The colouring schemes currently provided are:
 - `Divergent`: red to yellow to green  (multiple) hues)
 - `Qualitative`: categorical colouring (multiple hues)
 - `NCBI BLAST+`: NCBI BLAST+ based categorical colouring (multiple hues)
+
+## User and developer documentation
+
+Jdispatcher-viewers documentation can be found [here](https://ebi-jdispatcher.github.io/jdispatcher-viewers/). An example [demo](https://ebi-jdispatcher.github.io/jdispatcher-viewers/demo/) and [API docs](https://ebi-jdispatcher.github.io/jdispatcher-viewers/api/modules.html) are available.
 
 ## Dependencies and Installation
 
@@ -85,6 +89,10 @@ To compile the application for production, run:
 ```bash
 npm run build
 ```
+
+### Documentation development and build
+
+To develop and/or build the documentation, please refer to [docs/README.md](docs/README.md)
 
 ### Developing the CLI
 
