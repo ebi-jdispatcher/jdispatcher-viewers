@@ -1,7 +1,7 @@
 This demo works with a pre-loaded example, but you can also pass a valid Job Dispatcher job ID.
 
 <div class="app">
-  <script type="text/javascript" src="../assets/jd_viewers_0.1.3.bundle.min.js" defer></script>
+  <script type="text/javascript" src="../assets/jd_viewers_0.1.4.bundle.min.js" defer></script>
   <style>
     #canvas-wrapper {
       width: 100%;

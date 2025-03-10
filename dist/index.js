@@ -1206,7 +1206,7 @@ function drawScoreText(startEvalPixels, hsp, renderOptions, topPadding) {
   }
   return hspScoreText;
 }
-function drawDomainQueySubject(startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels, topPadding, fill) {
+function drawDomain(startPixels, endPixels, topPadding, fill) {
   const rectObj = { ...rectDefaults };
   rectObj.evented = true;
   rectObj.top = topPadding;
@@ -1214,15 +1214,15 @@ function drawDomainQueySubject(startQueryPixels, endQueryPixels, startSubjPixels
   rectObj.rx = 5;
   rectObj.ry = 5;
   rectObj.top = topPadding - 15;
-  rectObj.left = startQueryPixels;
-  rectObj.width = endQueryPixels;
+  rectObj.left = startPixels;
+  rectObj.width = endPixels;
   rectObj.height = 10;
-  const queryDomain = new fabric3.Rect(rectObj);
-  rectObj.top = topPadding - 15;
-  rectObj.left = startSubjPixels;
-  rectObj.width = endSubjPixels;
-  rectObj.height = 10;
-  const subjDomain = new fabric3.Rect(rectObj);
+  const newDomain = new fabric3.Rect(rectObj);
+  return newDomain;
+}
+function drawDomainQueySubject(startQueryPixels, endQueryPixels, startSubjPixels, endSubjPixels, topPadding, fill) {
+  const queryDomain = drawDomain(startQueryPixels, endQueryPixels, topPadding, fill);
+  const subjDomain = drawDomain(startSubjPixels, endSubjPixels, topPadding, fill);
   return [queryDomain, subjDomain];
 }
 function drawDomainTooltips(startHspPixels, endHspPixels, seq_from, seq_to, hsp, renderOptions, topPadding) {
@@ -3728,6 +3728,7 @@ export {
   drawContentSequenceInfoText,
   drawContentSupressText,
   drawContentTitleText,
+  drawDomain,
   drawDomainCheckbox,
   drawDomainInfoTooltips,
   drawDomainLineTracks,

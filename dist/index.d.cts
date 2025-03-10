@@ -1238,24 +1238,24 @@ declare class FunctionalPredictions extends BasicCanvasRenderer {
  * @param {string} sequence - The sequence to display in the tooltip.
  * @param {string} URL - The URL to link to.
  * @param {RenderOptions} renderOptions - The rendering options.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  * @param {boolean} [_tooltip=true] - Whether to show the tooltip.
  */
-declare function mouseOverText(fabricObj: fabric.Object, textObj: TextType, sequence: string, URL: string, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions, _tooltip?: boolean): void;
+declare function mouseOverText(fabricObj: fabric.Object, textObj: TextType, sequence: string, URL: string, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions | any, _tooltip?: boolean): void;
 /**
  * Adds mousedown event to a fabric object to open a link in a new tab.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
  * @param {string} href - The URL to open.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseDownLink(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseDownLink(fabricObj: fabric.Object, href: string, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseout event to a fabric object to reset the text style.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
  * @param {TextType} textObj - The text object to reset on mouseout.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseover event to a fabric object to display a domain tooltip.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
@@ -1265,9 +1265,9 @@ declare function mouseOutText(fabricObj: fabric.Object, textObj: TextType, _this
  * @param {number} seq_to - The ending sequence position.
  * @param {Hsp | IprMatchFlat} domain - The domain object (Hsp or IprMatchFlat).
  * @param {RenderOptions} renderOptions - The rendering options.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseOverDomain(fabricObj: fabric.Object, startPixels: number, endPixels: number, seq_from: number, seq_to: number, domain: Hsp | IprMatchFlat, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseOverDomain(fabricObj: fabric.Object, startPixels: number, endPixels: number, seq_from: number, seq_to: number, domain: Hsp | IprMatchFlat, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mousedown event to a fabric object to toggle a domain tooltip.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
@@ -1277,39 +1277,39 @@ declare function mouseOverDomain(fabricObj: fabric.Object, startPixels: number, 
  * @param {number} seq_to - The ending sequence position.
  * @param {Hsp | IprMatchFlat} domain - The domain object (Hsp or IprMatchFlat).
  * @param {RenderOptions} renderOptions - The rendering options.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseClickDomain(fabricObj: fabric.Object, startPixels: number, endPixels: number, seq_from: number, seq_to: number, domain: Hsp | IprMatchFlat, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseClickDomain(fabricObj: fabric.Object, startPixels: number, endPixels: number, seq_from: number, seq_to: number, domain: Hsp | IprMatchFlat, renderOptions: RenderOptions, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseout event to a fabric object to reset the canvas.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseOutDomain(fabricObj: fabric.Object, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseOutDomain(fabricObj: fabric.Object, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseover event to a fabric checkbox to change its appearance.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
  * @param {TextType} textObj - The text object to modify on hover.
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseOverCheckbox(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseOverCheckbox(fabricObj: fabric.Object, textObj: TextType, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mousedown event to a fabric checkbox to update the state.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
  * @param {ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum} value - The value to set.
  * @param {string} inputEnum - The type of input (ColorSchemeEnum, ScaleTypeEnum, or ScoreTypeEnum).
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseDownCheckbox(fabricObj: fabric.Object, value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum, inputEnum: string, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseDownCheckbox(fabricObj: fabric.Object, value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum, inputEnum: string, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseout event to a fabric checkbox to reset its appearance.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
  * @param {TextType} textObj - The text object to reset on mouseout.
  * @param {ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum} value - The value to check against.
  * @param {string} inputEnum - The type of input (ColorSchemeEnum, ScaleTypeEnum, or ScoreTypeEnum).
- * @param {VisualOutput | FunctionalPredictions} _this - The context (VisualOutput or FunctionalPredictions).
+ * @param {VisualOutput | FunctionalPredictions | any} _this - The context (VisualOutput or FunctionalPredictions).
  */
-declare function mouseOutCheckbox(fabricObj: fabric.Object, textObj: TextType, value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum, inputEnum: string, _this: VisualOutput | FunctionalPredictions): void;
+declare function mouseOutCheckbox(fabricObj: fabric.Object, textObj: TextType, value: ColorSchemeEnum | ScaleTypeEnum | ScoreTypeEnum, inputEnum: string, _this: VisualOutput | FunctionalPredictions | any): void;
 /**
  * Adds mouseover event to a fabric domain checkbox to change its appearance.
  * @param {fabric.Object} fabricObj - The fabric object to attach the event to.
@@ -1592,6 +1592,15 @@ declare function drawHspNoticeText(totalNumberHsps: number, numberHsps: number, 
 declare function drawScoreText(startEvalPixels: number, hsp: Hsp, renderOptions: RenderOptions, topPadding: number): fabric.Text;
 /**
  * Draws domain rectangles for query and subject regions.
+ * @param {number} startPixels - The domain's starting pixel position.
+ * @param {number} endPixels - The domain's ending pixel position.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} fill - The fill color for the domain rectangles.
+ * @returns {[fabric.Rect, fabric.Rect]} A tuple containing the Fabric.js rectangle objects.
+ */
+declare function drawDomain(startPixels: number, endPixels: number, topPadding: number, fill: string): fabric.Rect;
+/**
+ * Draws domain rectangles for query and subject regions.
  * @param {number} startQueryPixels - The starting pixel position for the query domain.
  * @param {number} endQueryPixels - The ending pixel position for the query domain.
  * @param {number} startSubjPixels - The starting pixel position for the subject domain.
@@ -1865,4 +1874,4 @@ declare function drawDomainInfoTooltips(startPixels: number, endPixels: number, 
  */
 declare function drawURLInfoTooltip(startPixels: number, sequence: string, URL: string, renderOptions: RenderOptions, topPadding: number): fabric.Group;
 
-export { BasicCanvasRenderer, ColorSchemeEnum, type ColorType, type CoordsValues, DataModelEnum, FunctionalPredictions, HSVtoRGB, type Hit, type Hsp, type IPRMCResultModel, type IPRMCResultModelFlat, type IprMatchFlat, type IprMatchesFlat, type JobIdValidable, type LineType, ObjectCache, type ObjectType, type RectType, type RenderOptions, type SSSResultModel, ScaleTypeEnum, ScoreTypeEnum, type TextType, VisualOutput, colorByDatabaseName, colorGenericGradient, colorNcbiBlastGradient, colorQualitativeGradient, countDecimals, dataAsType, divergentGradient, domainDatabaseNameToString, drawCanvasWrapperStroke, drawColorSchemeCheckBoxText, drawContentDomainInfoText, drawContentFooterTextGroup, drawContentHeaderTextGroup, drawContentQuerySubjFooterTextGroup, drawContentSequenceInfoText, drawContentSupressText, drawContentTitleText, drawDomainCheckbox, drawDomainInfoTooltips, drawDomainLineTracks, drawDomainQueySubject, drawDomainTooltips, drawDomains, drawFooterLinkText, drawFooterText, drawHeaderLinkText, drawHeaderTextGroup, drawHitTransparentBox, drawHspNoticeText, drawLineAxis5Buckets, drawLineAxis6Buckets, drawLineTracks, drawLineTracksQuerySubject, drawNoHitsFoundText, drawProteinFeaturesText, drawScaleColorGradient, drawScaleLabelText, drawScaleScoreText, drawScaleTick4LabelsGroup, drawScaleTick5LabelsGroup, drawScaleTypeCheckBoxText, drawScoreText, drawScoreTypeCheckBoxText, drawURLInfoTooltip, fetchData, getColorType, getDomainPixelCoords, getDomainURLbyDatabase, getGradientSteps, getIPRMCDataModelFlatFromXML, getIPRMCDbfetchAccessions, getIPRMCDbfetchURL, getJdispatcherJsonURL, getPixelCoords, getQuerySubjPixelCoords, getRgbColorFixed, getRgbColorLinearGradient, getRgbColorLogGradient, getTextLegendPaddingFactor, getTotalPixels, getUniqueIPRMCDomainDatabases, greyscaleGradient, heatmapGradient, jobIdDefaults, lineDefaults, mouseClickDomain, mouseDownCheckbox, mouseDownDomainCheckbox, mouseDownLink, mouseOutCheckbox, mouseOutDomain, mouseOutDomainCheckbox, mouseOutText, mouseOverCheckbox, mouseOverDomain, mouseOverDomainCheckbox, mouseOverText, ncbiBlastGradient, numberToString, objectDefaults, type posnumber, qualitativeGradient, rectDefaults, sequentialGradient, textDefaults, toPositiveNumber, tooltipState, validateJobId, validateSubmittedDbfetchInput, validateSubmittedJobIdInput };
+export { BasicCanvasRenderer, ColorSchemeEnum, type ColorType, type CoordsValues, DataModelEnum, FunctionalPredictions, HSVtoRGB, type Hit, type Hsp, type IPRMCResultModel, type IPRMCResultModelFlat, type IprMatchFlat, type IprMatchesFlat, type JobIdValidable, type LineType, ObjectCache, type ObjectType, type RectType, type RenderOptions, type SSSResultModel, ScaleTypeEnum, ScoreTypeEnum, type TextType, VisualOutput, colorByDatabaseName, colorGenericGradient, colorNcbiBlastGradient, colorQualitativeGradient, countDecimals, dataAsType, divergentGradient, domainDatabaseNameToString, drawCanvasWrapperStroke, drawColorSchemeCheckBoxText, drawContentDomainInfoText, drawContentFooterTextGroup, drawContentHeaderTextGroup, drawContentQuerySubjFooterTextGroup, drawContentSequenceInfoText, drawContentSupressText, drawContentTitleText, drawDomain, drawDomainCheckbox, drawDomainInfoTooltips, drawDomainLineTracks, drawDomainQueySubject, drawDomainTooltips, drawDomains, drawFooterLinkText, drawFooterText, drawHeaderLinkText, drawHeaderTextGroup, drawHitTransparentBox, drawHspNoticeText, drawLineAxis5Buckets, drawLineAxis6Buckets, drawLineTracks, drawLineTracksQuerySubject, drawNoHitsFoundText, drawProteinFeaturesText, drawScaleColorGradient, drawScaleLabelText, drawScaleScoreText, drawScaleTick4LabelsGroup, drawScaleTick5LabelsGroup, drawScaleTypeCheckBoxText, drawScoreText, drawScoreTypeCheckBoxText, drawURLInfoTooltip, fetchData, getColorType, getDomainPixelCoords, getDomainURLbyDatabase, getGradientSteps, getIPRMCDataModelFlatFromXML, getIPRMCDbfetchAccessions, getIPRMCDbfetchURL, getJdispatcherJsonURL, getPixelCoords, getQuerySubjPixelCoords, getRgbColorFixed, getRgbColorLinearGradient, getRgbColorLogGradient, getTextLegendPaddingFactor, getTotalPixels, getUniqueIPRMCDomainDatabases, greyscaleGradient, heatmapGradient, jobIdDefaults, lineDefaults, mouseClickDomain, mouseDownCheckbox, mouseDownDomainCheckbox, mouseDownLink, mouseOutCheckbox, mouseOutDomain, mouseOutDomainCheckbox, mouseOutText, mouseOverCheckbox, mouseOverDomain, mouseOverDomainCheckbox, mouseOverText, ncbiBlastGradient, numberToString, objectDefaults, type posnumber, qualitativeGradient, rectDefaults, sequentialGradient, textDefaults, toPositiveNumber, tooltipState, validateJobId, validateSubmittedDbfetchInput, validateSubmittedJobIdInput };
