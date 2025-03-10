@@ -57,7 +57,7 @@ Below is a step-by-step guide to setting up a basic Fabric.js visualization usin
     <!-- Load jdispatcher-viewers -->
     <script
       type="text/javascript"
-      src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js"
+      src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js"
       defer
     ></script>
     </head>
@@ -212,7 +212,7 @@ Below is a step-by-step guide to setting up a basic Fabric.js visualization usin
     <!-- Load jdispatcher-viewers -->
     <script
       type="text/javascript"
-      src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js"
+      src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js"
       defer
     ></script>
   <div>

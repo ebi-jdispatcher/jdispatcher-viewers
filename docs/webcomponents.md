@@ -17,7 +17,7 @@ Visual Output can be used directly as HTML elements as shown in the example belo
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/webcomponents-bundle.min.js" charset="utf-8"></script>
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/custom-elements-es5-adapter.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js" defer></script>
+        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js" defer></script>
     </head>
     <body>
         <!-- JD Visual Output Web-component -->
@@ -51,7 +51,7 @@ Similarly for the Functional Predictions visualisation:
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/webcomponents-bundle.min.js" charset="utf-8"></script>
         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.6.0/custom-elements-es5-adapter.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js" defer></script>
+        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js" defer></script>
     </head>
     <body>
         <!-- JD Functional Predictions Web-component -->
