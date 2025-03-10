@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#jdispatcher-viewers" class="md-skip">
+        <a href="#developing-a-new-visualisation" class="md-skip">
           Skip to content
         </a>
       
@@ -572,11 +572,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
+  <a href="#using-jdispatcher-viewers" class="md-nav__link">
     <span class="md-ellipsis">
-      Notes
+      Using jdispatcher-viewers
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-new-visualisation-with-fabricjs-and-some-of-the-jdispatcher-viewers-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a new visualisation with Fabric.js and some of the jdispatcher-viewers utilities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating a new visualisation with Fabric.js and some of the jdispatcher-viewers utilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#html-based-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      HTML based example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#develop-a-new-javascripttypescript-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Develop a new JavaScript/TypeScript project
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -698,8 +731,8 @@
   
 
 
-<h1 id="jdispatcher-viewers">jdispatcher-viewers</h1>
-<p>This documentation describes how to build an interactive visualization using jdispatcher-viewers and the <a href="http://fabricjs.com/">Fabric.js</a> library. The visualisation leverages Fabric.js objects (e.g., rectangles) to create a dynamic, customizable canvas-based experience.</p>
+<h1 id="developing-a-new-visualisation">Developing a new visualisation</h1>
+<p>This documentation describes how to build an interactive visualization using <a href="http://fabricjs.com/">Fabric.js</a> and jdispatcher-viewers. The visualisation leverages Fabric.js objects (e.g., rectangles) to create a dynamic, customizable canvas-based experience.</p>
 <h2 id="overview">Overview</h2>
 <p>Fabric.js supports features like gradient fills, object manipulation, and dynamic updates, making it suitable for applications such as biological data visualisation. Here we demonstrate how to build a small basic visualisation for viewing protein domain annotations on a sequence track.</p>
 <h2 id="prerequisites">Prerequisites</h2>
@@ -713,29 +746,550 @@
 <li>Include Fabric.js in your new project:
    <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>fabric
 </code></pre></div></li>
-<li>
-<p>Likewise, you need to install jdispatcher-viewers:
+<li>Likewise, you need to install jdispatcher-viewers:
    <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>jdispatcher-viewers
-</code></pre></div></p>
+</code></pre></div></li>
+</ol>
+<h2 id="using-jdispatcher-viewers">Using jdispatcher-viewers</h2>
+<p>For an example of how <code>jdispatcher-viewers</code> is used to provide the two main visualisations, Visual Output and Functional Predictions, see <a href="https://github.com/ebi-jdispatcher/jdispatcher-viewers/blob/main/src/demo.ts">index.ts</a>.</p>
+<h2 id="creating-a-new-visualisation-with-fabricjs-and-some-of-the-jdispatcher-viewers-utilities">Creating a new visualisation with Fabric.js and some of the jdispatcher-viewers utilities</h2>
+<p>Before starting, ensure you have basic knowledge of <a href="https://fabricjs.com/docs/">Fabric.js</a> for canvas rendering as jdispatcher-viewers builds on top of that.</p>
+<p>Below is a step-by-step guide to setting up a basic Fabric.js visualization using a <code>&lt;script&gt;</code> tag to load Fabric.js and a <code>&lt;canvas&gt;</code> element to render the visualization.</p>
+<h3 id="html-based-example">HTML based example</h3>
+<ol>
+<li>Create wew HTML file (e.g. 'demo.html') and set up a canvas element:</li>
+</ol>
+<p><div class="highlight"><pre><span></span><code>  <span class="cp">&lt;!DOCTYPE html&gt;</span>
+  <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;width=device-width, initial-scale=1.0&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Fabric.js and jdispatcher-viewers Demo<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="nt">canvas</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#ccc</span><span class="p">;</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+  <span class="cm">&lt;!-- Load Fabric.js from a CDN with defer --&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span>
+    <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span>
+    <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.4.0/fabric.min.js&quot;</span>
+    <span class="na">defer</span>
+  <span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+
+  <span class="cm">&lt;!-- Load jdispatcher-viewers --&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span>
+    <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span>
+    <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js&quot;</span>
+    <span class="na">defer</span>
+  <span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="cm">&lt;!-- Canvas --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas-wrapper&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">canvas</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="cm">&lt;!-- Your custom script --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">      </span><span class="c1">// Your Fabric.js code goes here</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+2. Initialize Fabric.js</p>
+<p>Inside the <code>&lt;script&gt;</code> tag, initialize Fabric.js and create a canvas object:</p>
+<p><div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// Wrap script with a DOMContentLoaded event listener </span>
+<span class="w">  </span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;DOMContentLoaded&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="c1">// Get the canvas element</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">canvasElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;canvas&quot;</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Initialize Fabric.js canvas</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">startupDef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">defaultCursor</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">moveCursor</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">hoverCursor</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">backgroundColor</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;#ffffff&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="p">};</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">canvas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Canvas</span><span class="p">(</span><span class="nx">canvasElement</span><span class="p">,</span><span class="w"> </span><span class="nx">startupDef</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+3. Add objects to the canvas:</p>
+<p>Now, you can add objects like title, domain label and domain track:</p>
+<p><div class="highlight"><pre><span></span><code><span class="w">    </span><span class="c1">// set a number of variables</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">topPadding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">canvasWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">800</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">canvasHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">100</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">contentWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">300</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">marginWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.15</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">canvasWidth</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">100</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">14</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">fontWeigth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">fontFamily</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Arial&quot;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// set height and width of the canvas</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">setWidth</span><span class="p">(</span><span class="nx">canvasWidth</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">setHeight</span><span class="p">(</span><span class="nx">canvasHeight</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// draw title</span>
+<span class="w">    </span><span class="nx">topPadding</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">20</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">titleObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">textDefaults</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">titleObj</span><span class="p">.</span><span class="nx">fontWeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">titleObj</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fontSize</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">titleObj</span><span class="p">.</span><span class="nx">top</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">topPadding</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">titleObj</span><span class="p">.</span><span class="nx">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">contentWidth</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">titleText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Text</span><span class="p">(</span><span class="s2">&quot;Demo Visualisation&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">titleObj</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">titleText</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nx">topPadding</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">30</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// draw sequence label</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">labelObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">textDefaults</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">fontWeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fontSize</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">top</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">topPadding</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">40</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">domainLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Text</span><span class="p">(</span><span class="s2">&quot;Domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">labelObj</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">domainLabel</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// draw sequence track</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">lineTrackGroup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">drawLineTracks</span><span class="p">(</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">startPixels</span><span class="o">:</span><span class="w"> </span><span class="mf">100</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">endPixels</span><span class="o">:</span><span class="w"> </span><span class="mf">750</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">strokeWidth</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">topPadding</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">lineTrackGroup</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// draw a domain</span>
+<span class="w">    </span><span class="nx">topPadding</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">10</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">seqDomain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">drawDomain</span><span class="p">(</span><span class="mf">150</span><span class="p">,</span><span class="w"> </span><span class="mf">550</span><span class="p">,</span><span class="w"> </span><span class="nx">topPadding</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;green&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">seqDomain</span><span class="p">);</span>
+</code></pre></div>
+4. Add interactivity</p>
+<p>You can make the visualization interactive reacting to mouse hovering and clicking. For example:</p>
+<p><div class="highlight"><pre><span></span><code><span class="w">  </span><span class="c1">// domain mouse hovering and click</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">domainObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;test domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;protein&quot;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">mouseOverDomain</span><span class="p">(</span>
+<span class="w">      </span><span class="nx">seqDomain</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">domainObj</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="nx">fontSize</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nx">canvas</span>
+<span class="w">  </span><span class="p">);</span>
+<span class="w">  </span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">mouseOutDomain</span><span class="p">(</span><span class="nx">seqDomain</span><span class="p">,</span><span class="w"> </span><span class="nx">canvas</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Mouse click display/hide domain tooltip</span>
+<span class="w">  </span><span class="nx">JDViewers</span><span class="p">.</span><span class="nx">mouseClickDomain</span><span class="p">(</span>
+<span class="w">      </span><span class="nx">seqDomain</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">domainObj</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="nx">fontSize</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nx">canvas</span>
+<span class="w">  </span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// finally, do not forget to render all elements</span>
+<span class="w">  </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">renderAll</span><span class="p">();</span>
+</code></pre></div>
+5. Run the demo</p>
+<ol>
+<li>
+<p>Open the <code>demo.html</code> file in your browser.</p>
 </li>
 <li>
-<p>Create wew HTML file (e.g. 'index.html') and set up a canvas element:
-   <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">canvas</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas&quot;</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;800&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;600&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">canvas</span><span class="p">&gt;</span>
-</code></pre></div></p>
+<p>You should see a canvas with a sequence track on domain in green.</p>
 </li>
 <li>
-<p>Initialize Fabric.js in your JavaScript/TypeScript:
-   <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">canvas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Canvas</span><span class="p">(</span><span class="s1">&#39;canvas&#39;</span><span class="p">);</span>
-</code></pre></div></p>
+<p>Interact with the objects (e.g., mouse hover over one of the domains or click on them to reveal the tooltip information).</p>
 </li>
 </ol>
-<h2 id="notes">Notes</h2>
-<ul>
-<li>Ensure the canvas is re-rendered (<code>canvas.renderAll()</code>) after dynamic updates.</li>
-<li>Check Fabric.js <a href="https://fabricjs.com/docs/">documentation</a> for advanced features like groups, animations, or filters.</li>
-</ul>
+<div>
+    <style>
+      canvas {
+        border: 1px solid #ccc;
+
+      }
+    </style>
+    <!-- Load Fabric.js from a CDN with defer -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.4.0/fabric.min.js"
+      defer
+    ></script>
+
+    <!-- Load jdispatcher-viewers -->
+    <script
+      type="text/javascript"
+      src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.4.bundle.min.js"
+      defer
+    ></script>
+  <div>
+    <div id="canvas-wrapper">
+      <canvas id="canvas" />
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+
+        // Get the canvas element
+        const canvasElement = document.getElementById("canvas");
+
+        // Initialize Fabric.js canvas
+        const startupDef = {
+            defaultCursor: 'default',
+            moveCursor: 'default',
+            hoverCursor: 'default',
+            backgroundColor: '#ffffff',
+          };
+        const canvas = new fabric.Canvas(canvasElement, startupDef);
+
+        // set a number of variables
+        let topPadding = 0;
+        let canvasWidth = 800;
+        let canvasHeight = 100;
+        let contentWidth = 300;
+        let marginWidth = (0.15 * canvasWidth) / 100;
+        let fontSize = 14;
+        let fontWeigth = "normal";
+        let fontFamily = "Arial";
+
+        // set height and width of the canvas
+        canvas.setWidth(canvasWidth);
+        canvas.setHeight(canvasHeight);
+
+        // draw title
+        topPadding += 20;
+        const titleObj = { ...JDViewers.textDefaults };
+        titleObj.fontWeight = "bold";
+        titleObj.fontSize = fontSize + 1;
+        titleObj.top = topPadding;
+        titleObj.left = contentWidth;
+        const titleText = new fabric.Text("Demo Visualisation", titleObj);
+        canvas.add(titleText);
+
+        topPadding += 30;
+        // draw sequence label
+        const labelObj = { ...JDViewers.textDefaults };
+        labelObj.fontWeight = "bold";
+        labelObj.fontSize = fontSize + 1;
+        labelObj.top = topPadding - 10 ;
+        labelObj.left = 40;
+        const domainLabel = new fabric.Text("Domain", labelObj);
+        canvas.add(domainLabel);
+
+        // draw sequence track
+        const lineTrackGroup = JDViewers.drawLineTracks(
+        {
+            startPixels: 100,
+            endPixels: 750,
+        },
+        { strokeWidth: 1 },
+        topPadding
+        );
+        canvas.add(lineTrackGroup);
+
+        // draw a domain
+        topPadding += 10;
+        const seqDomain = JDViewers.drawDomain(150, 550, topPadding, "green");
+        canvas.add(seqDomain);
+
+        // domain mouse hovering and click
+        const domainObj = { id: "domain", name: "test domain", type: "protein" };
+        JDViewers.mouseOverDomain(
+            seqDomain,
+            150,
+            550,
+            150,
+            550,
+            domainObj,
+            { fontSize: fontSize },
+            canvas
+        );
+        JDViewers.mouseOutDomain(seqDomain, canvas);
+
+        // Mouse click display/hide domain tooltip
+        JDViewers.mouseClickDomain(
+            seqDomain,
+            150,
+            550,
+            150,
+            550,
+            domainObj,
+            {
+            fontSize: fontSize,
+            },
+            canvas
+        );
+
+        // finally, do not forget to render all elements
+        canvas.renderAll();
+      });
+    </script>
+  </div>
+</div>
+
+<h3 id="develop-a-new-javascripttypescript-project">Develop a new JavaScript/TypeScript project</h3>
+<ol>
+<li>Initialize a new project (if you don’t already have one):</li>
+</ol>
+<p><div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>visualisation-demo
+<span class="nb">cd</span><span class="w"> </span>visualisation-demo
+npm<span class="w"> </span>init<span class="w"> </span>-y
+</code></pre></div>
+2. Install Fabric.js and jdispatcher-viewers as a dependency:</p>
+<p><div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>fabric<span class="w"> </span>@ebi-jdispatcher/jdispatcher-viewers
+</code></pre></div>
+3. If you're using TypeScript, install the types for Fabric.js:</p>
+<p><div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>--save-dev<span class="w"> </span>@types/fabric
+</code></pre></div>
+4. Set up your project structure:</p>
+<p><div class="highlight"><pre><span></span><code>fabric-demo/
+├── src/
+│   ├── index.ts (or index.js)
+│   ├── styles.css
+├── index.html
+├── package.json
+├── tsconfig.json (if using TypeScript)
+└── webpack.config.js (or vite.config.js, etc.)
+</code></pre></div>
+5. Create an HTML File</p>
+<p>Create an <code>index.html</code> file in the root of your project:</p>
+<p><div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;width=device-width, initial-scale=1.0&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Fabric.js and jdispatcher-viewers Demo<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas-wrapper&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">canvas</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas&quot;</span> <span class="p">/&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;./dist/bundle.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span> <span class="cm">&lt;!-- Output bundle file --&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+6. Add Styles</p>
+<p>Create a styles.css file in the <code>src/</code> folder:</p>
+<p><div class="highlight"><pre><span></span><code><span class="nt">canvas</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#ccc</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="mh">#fff</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+7. Add a TypeScript/JavaScript</p>
+<p>Create an <code>index.ts</code> (or <code>index.js</code>) file in the <code>src/</code> folder. For example for TypeScript:</p>
+<p><div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fabric</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;fabric&quot;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">BasicCanvasRenderer</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">RenderOptions</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">textDefaults</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">drawLineTracks</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">mouseOverDomain</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">mouseClickDomain</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">mouseOutDomain</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">drawDomain</span><span class="p">,</span>
+<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;@ebi-jdispatcher/jdispatcher-viewers&quot;</span><span class="p">;</span>
+
+<span class="c1">// Get the canvas element</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nx">DemoVisualisation</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">BasicCanvasRenderer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">topPadding</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">queryLen</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">subjLen</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">startQueryPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">endQueryPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">startEvalPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">startSubjPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">endSubjPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">gradientSteps</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">queryFactor</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="nx">subjFactor</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="kr">constructor</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">element</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nx">HTMLCanvasElement</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="o">:</span><span class="w"> </span><span class="kt">RenderOptions</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">super</span><span class="p">(</span><span class="nx">element</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;vlieeded&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">800</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">canvasHeight</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">canvasHeight</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">100</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">contentWidth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">contentWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">contentWidth</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">contentWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">300</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">marginWidth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">marginWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">marginWidth</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">marginWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.15</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">100</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontSize</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">14</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontWeigth</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontWeigth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontWeigth</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontWeigth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontFamily</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">undefined</span>
+<span class="w">      </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontFamily</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">renderOptions</span><span class="p">.</span><span class="nx">fontFamily</span><span class="p">)</span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fontFamily</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Arial&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">getFabricCanvas</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">public</span><span class="w"> </span><span class="nx">render</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// clear the canvas</span>
+<span class="w">    </span><span class="c1">// this.canvas.clear();</span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;rendering from canvas&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// canvas title</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">drawHeaderGroup</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// canvas content</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">drawContentGroup</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// finishing off</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">setFrameSize</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// render all</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">renderCanvas</span><span class="p">();</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">renderAll</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="nx">drawHeaderGroup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">2</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// draw title</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">textObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">textDefaults</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">textObj</span><span class="p">.</span><span class="nx">fontWeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">textObj</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">fontSize</span><span class="o">!</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">textObj</span><span class="p">.</span><span class="nx">top</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">textObj</span><span class="p">.</span><span class="nx">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">contentWidth</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">titleText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Text</span><span class="p">(</span><span class="s2">&quot;Demo Visualisation&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">textObj</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">titleText</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="nx">drawContentGroup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">30</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// draw sequence label</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">labelObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">textDefaults</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">fontWeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bold&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">fontSize</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">top</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">10</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">labelObj</span><span class="p">.</span><span class="nx">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">40</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">domainLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">fabric</span><span class="p">.</span><span class="nx">Text</span><span class="p">(</span><span class="s2">&quot;Domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">labelObj</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">domainLabel</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// draw sequence track</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">lineTrackGroup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">drawLineTracks</span><span class="p">(</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">startPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">100</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">endPixels</span><span class="o">:</span><span class="w"> </span><span class="kt">750</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">strokeWidth</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">lineTrackGroup</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// draw a domain</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">seqDomain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">drawDomain</span><span class="p">(</span><span class="mf">150</span><span class="p">,</span><span class="w"> </span><span class="mf">550</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">topPadding</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;orange&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">seqDomain</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// domain mouse hovering and click</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">domainObj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;test domain&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;protein&quot;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">mouseOverDomain</span><span class="p">(</span>
+<span class="w">      </span><span class="nx">seqDomain</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">domainObj</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">this.fontSize</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="k">this</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="nx">mouseOutDomain</span><span class="p">(</span><span class="nx">seqDomain</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Mouse click display/hide domain tooltip</span>
+<span class="w">    </span><span class="nx">mouseClickDomain</span><span class="p">(</span>
+<span class="w">      </span><span class="nx">seqDomain</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">      </span><span class="mf">550</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">domainObj</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">this.fontSize</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="k">this</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="nx">setFrameSize</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">setWidth</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasWidth</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">setHeight</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvasHeight</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="nx">renderCanvas</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">renderAll</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="p">(</span><span class="nb">window</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">any</span><span class="p">).</span><span class="nx">DemoVisualisation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DemoVisualisation</span><span class="p">;</span>
+</code></pre></div>
+8. Bundle the Project</p>
+<p>Using Webpack. Install Webpack and its CLI:
+  <div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install<span class="w"> </span>--save-dev<span class="w"> </span>webpack<span class="w"> </span>webpack-cli<span class="w"> </span>webpack-dev-server<span class="w"> </span>ts-loader<span class="w"> </span>typescript
+</code></pre></div></p>
+<p>Create a <code>webpack.config.js</code> file:
+  <div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">entry</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;./src/index.ts&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">output</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">filename</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;bundle.js&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;dist&#39;</span><span class="p">),</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">devServer</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;./&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">hot</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">module</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">rules</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="sr">/\.ts$/</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ts-loader&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">exclude</span><span class="o">:</span><span class="w"> </span><span class="sr">/node_modules/</span><span class="p">,</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="sr">/\.css$/</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;style-loader&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;css-loader&#39;</span><span class="p">],</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">resolve</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">extensions</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;.ts&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;.js&#39;</span><span class="p">],</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></p>
+<p>Add the following scripts to <code>package.json</code>:
+  <div class="highlight"><pre><span></span><code><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;webpack serve --open&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;build&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;webpack&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Finally run the project, and open your browser and navigate to http://localhost:3000 (or the port specified by your dev server).
+  You should see the Fabric.js canvas visualisation.</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>start
+</code></pre></div>
 <h2 id="api-reference">API Reference</h2>
 <ul>
+<li>Check Fabric.js <a href="https://fabricjs.com/docs/">documentation</a> for advanced features like groups, animations, or filters.</li>
 <li>For a complete overview of the jdispatcher-viewers modules and utilities, check the <a href="/jdispatcher-viewers/api/modules.html">API Docs</a>.</li>
 </ul>
 
