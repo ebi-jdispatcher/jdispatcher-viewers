@@ -4,7 +4,7 @@ jdispatcher-viweres can be used by loading the library's JavaScript and creating
 
 ### Visual Output
 
-Visual Output can be used by embedding a script tag in HTML as shown in the example below. The visualisation can be customised to some extent. TODO
+Visual Output can be used by embedding a script tag in HTML as shown in the example below. The visualisation can be customised to some extent.
 
 ```html
 <!DOCTYPE html>

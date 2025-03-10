@@ -4,7 +4,7 @@ jdispatcher-viweres can be used as [Web Components](https://www.webcomponents.or
 
 ### Visual Output
 
-Visual Output can be used directly as HTML elements as shown in the example below. The visualisation can be customised to some extent. TODO
+Visual Output can be used directly as HTML elements as shown in the example below. The visualisation can be customised to some extent.
 
 ```html
 <!DOCTYPE html>
