@@ -489,6 +489,31 @@ export function drawScoreText(
 
 /**
  * Draws domain rectangles for query and subject regions.
+ * @param {number} startPixels - The domain's starting pixel position.
+ * @param {number} endPixels - The domain's ending pixel position.
+ * @param {number} topPadding - The top padding for positioning.
+ * @param {string} fill - The fill color for the domain rectangles.
+ * @returns {[fabric.Rect, fabric.Rect]} A tuple containing the Fabric.js rectangle objects.
+ */
+export function drawDomain(startPixels: number, endPixels: number, topPadding: number, fill: string): fabric.Rect {
+  const rectObj = { ...rectDefaults };
+  rectObj.evented = true;
+  rectObj.top = topPadding;
+  rectObj.fill = fill;
+  rectObj.rx = 5;
+  rectObj.ry = 5;
+
+  // Domain
+  rectObj.top = topPadding - 15;
+  rectObj.left = startPixels;
+  rectObj.width = endPixels;
+  rectObj.height = 10;
+  const newDomain = new fabric.Rect(rectObj);
+  return newDomain;
+}
+
+/**
+ * Draws domain rectangles for query and subject regions.
  * @param {number} startQueryPixels - The starting pixel position for the query domain.
  * @param {number} endQueryPixels - The ending pixel position for the query domain.
  * @param {number} startSubjPixels - The starting pixel position for the subject domain.
@@ -505,26 +530,10 @@ export function drawDomainQueySubject(
   topPadding: number,
   fill: string
 ): [fabric.Rect, fabric.Rect] {
-  const rectObj = { ...rectDefaults };
-  rectObj.evented = true;
-  rectObj.top = topPadding;
-  rectObj.fill = fill;
-  rectObj.rx = 5;
-  rectObj.ry = 5;
-  //  Query
-  rectObj.top = topPadding - 15;
-  rectObj.left = startQueryPixels;
-  rectObj.width = endQueryPixels;
-  rectObj.height = 10;
-  const queryDomain = new fabric.Rect(rectObj);
-
+  // Query
+  const queryDomain = drawDomain(startQueryPixels, endQueryPixels, topPadding, fill);
   // Subject
-  rectObj.top = topPadding - 15;
-  rectObj.left = startSubjPixels;
-  rectObj.width = endSubjPixels;
-  rectObj.height = 10;
-  const subjDomain = new fabric.Rect(rectObj);
-
+  const subjDomain = drawDomain(startSubjPixels, endSubjPixels, topPadding, fill);
   return [queryDomain, subjDomain];
 }
 
