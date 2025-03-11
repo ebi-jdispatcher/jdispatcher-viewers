@@ -713,7 +713,9 @@
                 submitterShort = "vo";
                 // Render Options
                 const options = {
-                    colorScheme: "dynamic",
+                    scaleType: 'dynamic',
+                    scoreType: 'evalue',
+                    colorScheme: 'heatmap',
                     numberHits: 100,
                     numberHsps: 10,
                     logSkippedHsps: true,
@@ -727,7 +729,9 @@
                 submitterShort = "fp";
                 // Render Options
                 const options = {
-                    colorScheme: "dynamic",
+                    scaleType: 'dynamic',
+                    scoreType: 'evalue',
+                    colorScheme: 'heatmap',
                     numberHits: 30,
                     canvasWrapperStroke: true,
                     staticCanvas: false
