@@ -33,7 +33,9 @@ Visual Output can be used by embedding a script tag in HTML as shown in the exam
 
             // Render Options
             const options = {
-                colorScheme: "heatmap",
+                colorScheme: "ncbiblast",
+                scaleType: "fixed",
+                scoreType: "bitscore",
                 numberHits: 100,
                 numberHsps: 10,
                 logSkippedHsps: true,
@@ -89,7 +91,9 @@ Similarly for the Functional Predictions visualisation:
 
             // Render Options
             const options = {
-                colorScheme: "heatmap",
+                colorScheme="heatmap"
+                scaleType="dynamic"
+                scoreType="evalue"
                 numberHits: 30,
                 canvasWrapperStroke: true,
             };

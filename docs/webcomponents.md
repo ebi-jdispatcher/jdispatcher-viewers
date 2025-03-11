@@ -58,7 +58,9 @@ Similarly for the Functional Predictions visualisation:
         <!-- data attribute should be a valid jobId -->
         <jd-functional-predictions
             data="mock_jobid-I20200317-103136-0485-5599422-np2"
-            colorScheme="ncbiblast"
+            scaleType="dynamic"
+            scoreType="evalue"
+            colorScheme="heatmap"
             numberHits="30"
             canvasWrapperStroke="true"
         ></jd-functional-predictions>

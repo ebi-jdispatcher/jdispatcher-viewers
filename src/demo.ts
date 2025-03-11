@@ -1,7 +1,7 @@
 import svgToMiniDataURI from 'mini-svg-data-uri';
 import { VisualOutput } from './visual-output-app';
 import { FunctionalPredictions } from './functional-predictions-app';
-import { ColorSchemeEnum, jobIdDefaults, DataModelEnum } from './custom-types';
+import { ColorSchemeEnum, jobIdDefaults, DataModelEnum, ScaleTypeEnum, ScoreTypeEnum } from './custom-types';
 import {
   validateJobId,
   validateSubmittedJobIdInput,
@@ -156,6 +156,8 @@ class FabricjsRenderer {
     const dataObj = dataAsType(sssJsonResponse, DataModelEnum.SSSResultModel);
     if (this.canvasInstance.submitter === 'visual-output') {
       fabricjs = new VisualOutput('canvas', dataObj, {
+        scaleType: ScaleTypeEnum.dynamic,
+        scoreType: ScoreTypeEnum.evalue,
         colorScheme: ColorSchemeEnum.heatmap,
         numberHits: 100,
         numberHsps: 10,
@@ -176,6 +178,8 @@ class FabricjsRenderer {
       const iprmcDataObj = dataAsType(iprmcJSONResponse, DataModelEnum.IPRMCResultModelFlat);
 
       fabricjs = new FunctionalPredictions('canvas', dataObj, iprmcDataObj, {
+        scaleType: ScaleTypeEnum.dynamic,
+        scoreType: ScoreTypeEnum.evalue,
         colorScheme: ColorSchemeEnum.heatmap,
         numberHits: 30,
         canvasWrapperStroke: true,

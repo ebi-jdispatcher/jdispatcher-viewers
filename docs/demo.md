@@ -98,7 +98,9 @@ This demo works with a pre-loaded example, but you can also pass a valid Job Dis
                 submitterShort = "vo";
                 // Render Options
                 const options = {
-                    colorScheme: "dynamic",
+                    scaleType: 'dynamic',
+                    scoreType: 'evalue',
+                    colorScheme: 'heatmap',
                     numberHits: 100,
                     numberHsps: 10,
                     logSkippedHsps: true,
@@ -112,7 +114,9 @@ This demo works with a pre-loaded example, but you can also pass a valid Job Dis
                 submitterShort = "fp";
                 // Render Options
                 const options = {
-                    colorScheme: "dynamic",
+                    scaleType: 'dynamic',
+                    scoreType: 'evalue',
+                    colorScheme: 'heatmap',
                     numberHits: 30,
                     canvasWrapperStroke: true,
                     staticCanvas: false
