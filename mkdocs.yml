@@ -36,7 +36,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 nav:
-    - Home: 'index.md'
+    - Getting Started: 'index.md'
     - Demo: 'demo.md'
     - Web Components: 'webcomponents.md'
     - Script Embedding: 'script.md'
