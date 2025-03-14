@@ -967,7 +967,7 @@ function drawHeaderLinkText(dataObj, renderOptions, topPadding) {
   textSeqObj.fontSize = renderOptions.fontSize - 2;
   textSeqObj.evented = true;
   textSeqObj.top = topPadding - 15;
-  textSeqObj.left = 57.5;
+  textSeqObj.left = 64.5;
   const sequenceDefText = new fabric3.Text(`${sequence}`, textSeqObj);
   return [sequenceDefText, textSeqObj];
 }

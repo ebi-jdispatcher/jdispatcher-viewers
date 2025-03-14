@@ -15,7 +15,7 @@ Visual Output can be used by embedding a script tag in HTML as shown in the exam
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Visual Output - plugin</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js" defer></script>
+        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.6.bundle.min.js" defer></script>
     </head>
     <body>
         <div id="canvas-wrapper">
@@ -61,7 +61,7 @@ Similarly for the Functional Predictions visualisation:
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Functional Predictions - plugin</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.5.bundle.min.js" defer></script>
+        <script type="text/javascript" src="https://ebi-jdispatcher.github.io/jdispatcher-viewers/assets/jd_viewers_0.1.6.bundle.min.js" defer></script>
     </head>
     <body>
         <div id="canvas-wrapper">
