@@ -3,10 +3,9 @@
     <a href="https://www.npmjs.com/package/@ebi-jdispatcher/jdispatcher-viewers" alt="NPM">
         <img src="https://img.shields.io/badge/npm-%40ebi--jdispatcher%2Fjdispatcher--viewers-blue" /></a>
     <a href="https://nodejs.org/en/download/releases/" alt="Node">
-            <img src="https://img.shields.io/badge/node-18.20-green" /></a>
-    <a href="https://twitter.com/intent/follow?screen_name=ebi_jdispatcher">
-        <img src="https://img.shields.io/twitter/follow/ebi_jdispatcher?style=social&logo=twitter"
-            alt="follow on Twitter"></a>  
+        <img src="https://img.shields.io/badge/node-18.20-blue" /></a>
+    <a href="https://doi.org/10.1093/bioadv/vbaf122" alt="Bioinformatics Advances: 10.1093/bioadv/vbaf122">
+        <img src="https://img.shields.io/badge/Bioinformatics_Advances-10.1093%2Fbioadv%2Fvbaf122-brightgreen"></a>
 </p>
 
 Job Dispatcher viewers is a TypeScript module that uses [Fabric.js](http://fabricjs.com/)
@@ -166,6 +165,16 @@ If you find any bugs or issues please log them in the
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).
+
+
+## Citation
+
+If you use `jdispatcher-viewers` in your work, please cite:
+
+> Madeira et al., (2025). jdispatcher-viewers: interactive visualizations of sequence similarity search results and domain predictions. 
+> *Bioinformatics Advances*, 5 (1), doi: [10.1093/bioadv/vbaf122](https://doi.org/10.1093/bioadv/vbaf122)
+
+
 
 ## Licensing
 
