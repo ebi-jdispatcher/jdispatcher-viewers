@@ -11,6 +11,7 @@ export default {
   output: {
     filename: 'jd_viewers.bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    clean: true,
   },
   devtool: 'inline-source-map',
   devServer: {

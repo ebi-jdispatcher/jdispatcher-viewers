@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import cleanPlugin from 'clean-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -11,6 +10,7 @@ export default {
   output: {
     filename: `jd-viewers-cli.js`,
     path: path.resolve(__dirname, 'bin'),
+    clean: true,
     library: {
       type: 'module',
     },
